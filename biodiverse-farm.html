@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biodiverse Farm — Straight Fin Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #e8e4dc; color: #1a1a1a; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid #e0ddd6;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: 15px; max-width: 220px; line-height: 1.3;
+    color: #1a1a1a; text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; color: #1a1a1a; text-decoration: none; font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .nav-links a:hover { text-decoration: underline; }
+  .nav-links a.btn-book,
+  .nav-links a.btn-book:visited,
+  .nav-links a.btn-book:link {
+    background: #3d8c40; color: #fff !important; border: none; border-radius: 50px;
+    padding: 12px 28px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none !important; display: inline-block;
+  }
+  .nav-links a.btn-book:hover { background: #2e6e31; color: #fff !important; text-decoration: none !important; }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; margin: 5px 0; transition: 0.3s; }
+
+  /* PAGE HERO */
+  .page-hero {
+    position: relative; height: 60vh; min-height: 400px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+  }
+  .page-hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: url('images/IMG_0460.jpg') center/cover no-repeat;
+  }
+  .page-hero::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.52) 100%);
+  }
+  .page-hero-content { position: relative; z-index: 2; padding: 0 20px; }
+  .page-hero h1 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(40px, 6vw, 72px); color: #fff;
+    line-height: 1.08; margin-bottom: 16px;
+  }
+  .page-hero p {
+    font-size: 18px; color: rgba(255,255,255,0.9); max-width: 560px;
+    margin: 0 auto; line-height: 1.6;
+  }
+  .breadcrumb {
+    position: relative; z-index: 2; font-size: 13px; color: rgba(255,255,255,0.7);
+    margin-bottom: 16px; letter-spacing: 0.04em;
+  }
+  .breadcrumb a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  .breadcrumb a:hover { color: #fff; text-decoration: underline; }
+
+  /* CONTENT SECTIONS */
+  .content-section {
+    padding: 96px 48px; max-width: 1100px; margin: 0 auto;
+  }
+  .content-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px); line-height: 1.12; margin-bottom: 24px; color: #1a1a1a;
+  }
+  .content-section p {
+    font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 20px; max-width: 720px;
+  }
+
+  /* TWO COLUMN */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+    align-items: center; padding: 96px 48px; max-width: 1200px; margin: 0 auto;
+  }
+  .two-col img {
+    width: 100%; border-radius: 6px; object-fit: cover; aspect-ratio: 4/3; display: block;
+  }
+  .two-col-text h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(26px, 3vw, 40px); line-height: 1.12; margin-bottom: 20px; color: #1a1a1a;
+  }
+  .two-col-text p {
+    font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 16px;
+  }
+
+  /* ALT BG */
+  .bg-alt { background: #f0ede6; }
+
+  /* FARM SYSTEMS GRID */
+  .systems-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px;
+    margin-top: 48px;
+  }
+  .system-card {
+    background: #fff; border-radius: 8px; padding: 36px 28px;
+    border: 1px solid #e0ddd6;
+  }
+  .system-card .icon { font-size: 36px; margin-bottom: 16px; }
+  .system-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 20px; color: #1a1a1a; margin-bottom: 12px;
+  }
+  .system-card p { font-size: 15px; color: #555; line-height: 1.7; }
+
+  /* PRODUCTS SECTION */
+  .products-section {
+    padding: 96px 48px; background: #2b4a1f;
+  }
+  .products-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px); color: #fff; text-align: center; margin-bottom: 16px;
+  }
+  .products-section .subtitle {
+    font-size: 16px; color: rgba(255,255,255,0.7); text-align: center;
+    max-width: 560px; margin: 0 auto 48px; line-height: 1.7;
+  }
+  .products-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .product-card {
+    text-align: center; padding: 32px 20px;
+    background: rgba(255,255,255,0.08); border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .product-card .icon { font-size: 40px; margin-bottom: 14px; }
+  .product-card h3 {
+    font-family: 'Playfair Display', serif; font-size: 17px;
+    color: #fff; margin-bottom: 10px; font-weight: 700;
+  }
+  .product-card p { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.65; }
+
+  /* HIGHLIGHT BANNER */
+  .highlight-banner {
+    background: #2b4a1f; padding: 80px 48px; text-align: center;
+  }
+  .highlight-banner h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 4vw, 48px); color: #fff; margin-bottom: 16px;
+  }
+  .highlight-banner p {
+    font-size: 16px; color: rgba(255,255,255,0.75); max-width: 640px;
+    margin: 0 auto 36px; line-height: 1.8;
+  }
+  .btn-primary {
+    background: #3d8c40; color: #fff; border: none; border-radius: 50px;
+    padding: 18px 52px; font-size: 13px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: #2e6e31; }
+
+  /* FOOTER */
+  footer {
+    background: #1a1a1a; color: rgba(255,255,255,0.6);
+    padding: 56px 48px; display: grid;
+    grid-template-columns: 1fr 1fr 1fr; gap: 48px;
+  }
+  footer h4 {
+    font-family: 'Playfair Display', serif; font-size: 15px;
+    color: #fff; font-weight: 700; margin-bottom: 18px;
+  }
+  footer a { color: rgba(255,255,255,0.6); text-decoration: none; display: block; margin-bottom: 10px; font-size: 14px; }
+  footer a:hover { color: #fff; }
+  footer p { font-size: 14px; line-height: 1.7; }
+  .footer-bottom {
+    background: #111; padding: 20px 48px; text-align: center;
+    font-size: 13px; color: rgba(255,255,255,0.35);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .systems-grid { grid-template-columns: repeat(2, 1fr); }
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: #fff; flex-direction: column; padding: 24px;
+      border-bottom: 1px solid #e0ddd6; gap: 20px;
+    }
+    .nav-links.open { display: flex; }
+    .hamburger { display: block; }
+    .two-col { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
+    .content-section { padding: 60px 24px; }
+    .systems-grid { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: 1fr; }
+    .products-section { padding: 60px 24px; }
+    .highlight-banner { padding: 60px 24px; }
+    footer { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="straight-fin-farms.html">Welcome to Balance Nature Project at Straight Fin Farms</a>
+  <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+    <a class="btn-book" href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="color:#fff !important;">BOOK NOW</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-content">
+    <div class="breadcrumb"><a href="straight-fin-farms.html">Home</a> &nbsp;/&nbsp; Projects &nbsp;/&nbsp; Biodiverse Farm</div>
+    <h1>Biodiverse Farm</h1>
+    <p>Growing nutrient-dense food using regenerative practices &mdash; from raised bed gardens and orchards to beekeeping and mushroom cultivation.</p>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="content-section">
+  <h2>Working With Nature, Not Against It</h2>
+  <p>At Straight Fin Farms, we don't do monoculture. Every system on the farm is designed to support and strengthen the others &mdash; the bees pollinate the orchard, the compost feeds the garden, the mushroom logs enrich the forest floor, and the native plantings provide habitat for the wildlife that keeps our ecosystem in balance.</p>
+  <p>We use biodiverse and permaculture practices to stay organic, leveraging nature's own cycles to produce our crops. The result is a farm that grows healthier every year &mdash; building soil, increasing biodiversity, and producing food that nourishes both the land and the people who eat it.</p>
+  <p>Our approach is rooted in observation and adaptation. Rather than imposing a rigid plan on the landscape, we study what the land wants to do and find ways to work within those patterns. This is what makes permaculture farming fundamentally different from conventional agriculture.</p>
+</section>
+
+<!-- FARM SYSTEMS -->
+<section class="content-section bg-alt">
+  <h2>Our Farm Systems</h2>
+  <p>Each system on the farm plays a role in the larger ecosystem. Together, they create a resilient, productive, and biodiverse landscape.</p>
+  <div class="systems-grid">
+    <div class="system-card">
+      <div class="icon">&#127807;</div>
+      <h3>Market Garden</h3>
+      <p>Raised bed gardens producing seasonal fruits and vegetables using polyculture design, companion planting, and integrated pest management. No chemicals, no shortcuts &mdash; just healthy soil growing healthy food.</p>
+    </div>
+    <div class="system-card">
+      <div class="icon">&#127812;</div>
+      <h3>Orchard &amp; Food Forest</h3>
+      <p>A developing perennial food system with fruit trees, berry bushes, and understory crops. Designed using permaculture guild principles to create self-sustaining plant communities that produce for decades.</p>
+    </div>
+    <div class="system-card">
+      <div class="icon">&#127344;</div>
+      <h3>Mushroom Cultivation</h3>
+      <p>Growing gourmet and medicinal mushrooms including lion's mane, oyster, and shiitake. From substrate preparation and inoculation to fruiting and harvest, our mushroom program turns forest waste into nourishing food.</p>
+    </div>
+    <div class="system-card">
+      <div class="icon">&#128029;</div>
+      <h3>Beekeeping</h3>
+      <p>Active hives producing raw honey while providing essential pollination services across the farm. Our beekeeping program supports both honeybee health and native pollinator habitat through diverse plantings.</p>
+    </div>
+    <div class="system-card">
+      <div class="icon">&#9851;&#65039;</div>
+      <h3>Composting Systems</h3>
+      <p>Hot composting, cold composting, vermicomposting, and bokashi &mdash; we use multiple methodologies to transform organic waste into rich soil amendments. Compost is the engine that drives everything on the farm.</p>
+    </div>
+    <div class="system-card">
+      <div class="icon">&#127793;</div>
+      <h3>Plant Nursery</h3>
+      <p>Propagating plants from seed and cuttings for use across the farm and for sharing with the community. Our nursery supports the orchard, gardens, and native habitat restoration projects on the property.</p>
+    </div>
+  </div>
+</section>
+
+<!-- IMAGE + TEXT -->
+<div class="two-col">
+  <div class="two-col-text">
+    <h2>Why Biodiversity Matters</h2>
+    <p>A biodiverse farm is a resilient farm. When you grow dozens of species instead of one, you create a web of ecological relationships that naturally controls pests, builds soil, manages water, and produces a wider range of food &mdash; all without synthetic inputs.</p>
+    <p>Over the last two generations, we've industrialized food production to the point where less than one percent of the population farms, compared to nearly half just two generations ago. With that shift, we've lost a generation of people who understood the land and how food is produced.</p>
+    <p>Our biodiverse approach is about reclaiming that knowledge &mdash; showing that productive farming and ecological health aren't opposites, but partners. Every visitor, volunteer, and student who comes to the farm gets to see this in action.</p>
+  </div>
+  <img src="images/IMG_1396.jpeg" alt="Wildflower echinacea garden at golden hour sunset">
+</div>
+
+<!-- PRODUCTS -->
+<section class="products-section">
+  <h2>What We Grow</h2>
+  <p class="subtitle">Fresh, nutrient-dense food grown right here using regenerative practices. Everything we produce reflects our commitment to working with nature.</p>
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="icon">&#129388;</div>
+      <h3>Seasonal Vegetables</h3>
+      <p>A rotating selection of organic vegetables from our raised bed gardens, harvested at peak freshness</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">&#127812;</div>
+      <h3>Berries &amp; Fruits</h3>
+      <p>Seasonal berries and orchard fruits grown using permaculture guild principles and companion planting</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">&#127812;</div>
+      <h3>Gourmet Mushrooms</h3>
+      <p>Lion's mane, oyster, and shiitake mushrooms cultivated on farm-sourced substrates and forest logs</p>
+    </div>
+    <div class="product-card">
+      <div class="icon">&#127855;</div>
+      <h3>Raw Honey &amp; Eggs</h3>
+      <p>Pure raw honey from our hives and free-range eggs from happy hens raised on pasture</p>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO GALLERY -->
+<section style="padding: 96px 48px; background: #f0ede6;">
+  <h2 style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(28px, 3.5vw, 44px); text-align: center; color: #1a1a1a; margin-bottom: 48px;">The Farm in Action</h2>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1100px; margin: 0 auto;">
+    <img src="images/IMG_0666 Large.jpeg" alt="Beehive boxes nestled in a forest clearing" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_1189 Large.jpeg" alt="Beekeeper inspecting a hive frame full of bees" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_0710.jpeg" alt="Inoculating mushroom spawn jars with spore syringe" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_3199.jpeg" alt="Mushroom fruiting tent with lion's mane growing" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_4415.jpeg" alt="Preparing mushroom grain spawn in the farmhouse kitchen" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/PHOTO-2022-09-19-17-16-38.jpg" alt="Lab coat and grain spawn jar — mushroom cultivation" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_0705.jpeg" alt="Mushroom spore syringes and inoculation jars ready for use" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_1187.PNG" alt="Close-up of hive frame covered in honeybees" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_1396.jpeg" alt="Wildflower echinacea garden at golden hour" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="highlight-banner">
+  <h2>Experience the Farm</h2>
+  <p>Visit Straight Fin Farms to see biodiverse permaculture in action. Join a tour, take a course, or simply come and spend time in nature.</p>
+  <a class="btn-primary" href="straight-fin-farms.html#contact">GET IN TOUCH</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <h4>Straight Fin Farms</h4>
+    <p>Balance Nature Project &mdash; Reconnecting people with the land, nature, and each other.</p>
+    <br>
+    <p>1091 County Road 24<br>Dunsford, ON, K0M 1L0</p>
+    <br>
+    <p>hello@straightfinfarms.com</p>
+  </div>
+  <div>
+    <h4>Navigate</h4>
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+  </div>
+  <div>
+    <h4>Get Involved</h4>
+    <a href="https://airbnb.ca/h/straightfinfarms" target="_blank">Book a Stay</a>
+    <a href="straight-fin-farms.html#permaculture">Take a Course</a>
+    <a href="straight-fin-farms.html#contact">Join the Community</a>
+  </div>
+</footer>
+<div class="footer-bottom">&copy; 2026 Straight Fin Farms. All rights reserved.</div>
+
+</body>
+</html>

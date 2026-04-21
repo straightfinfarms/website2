@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balance Nature Project — Straight Fin Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #e8e4dc; color: #1a1a1a; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid #e0ddd6;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: 15px; max-width: 220px; line-height: 1.3;
+    color: #1a1a1a; text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; color: #1a1a1a; text-decoration: none; font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .nav-links a:hover { text-decoration: underline; }
+  .nav-links a.btn-book,
+  .nav-links a.btn-book:visited,
+  .nav-links a.btn-book:link {
+    background: #3d8c40; color: #fff !important; border: none; border-radius: 50px;
+    padding: 12px 28px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none !important; display: inline-block;
+  }
+  .nav-links a.btn-book:hover { background: #2e6e31; color: #fff !important; text-decoration: none !important; }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; margin: 5px 0; transition: 0.3s; }
+
+  /* PAGE HERO */
+  .page-hero {
+    position: relative; height: 60vh; min-height: 400px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+  }
+  .page-hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: url('images/IMG_6091.jpg') center/cover no-repeat;
+  }
+  .page-hero::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.52) 100%);
+  }
+  .page-hero-content { position: relative; z-index: 2; padding: 0 20px; }
+  .page-hero h1 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(40px, 6vw, 72px); color: #fff;
+    line-height: 1.08; margin-bottom: 16px;
+  }
+  .page-hero p {
+    font-size: 18px; color: rgba(255,255,255,0.9); max-width: 560px;
+    margin: 0 auto; line-height: 1.6;
+  }
+  .breadcrumb {
+    position: relative; z-index: 2; font-size: 13px; color: rgba(255,255,255,0.7);
+    margin-bottom: 16px; letter-spacing: 0.04em;
+  }
+  .breadcrumb a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  .breadcrumb a:hover { color: #fff; text-decoration: underline; }
+
+  /* CONTENT SECTIONS */
+  .content-section {
+    padding: 96px 48px; max-width: 1100px; margin: 0 auto;
+  }
+  .content-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px); line-height: 1.12; margin-bottom: 24px; color: #1a1a1a;
+  }
+  .content-section p {
+    font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 20px; max-width: 720px;
+  }
+
+  /* TWO COLUMN */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+    align-items: center; padding: 96px 48px; max-width: 1200px; margin: 0 auto;
+  }
+  .two-col img {
+    width: 100%; border-radius: 6px; object-fit: cover; aspect-ratio: 4/3; display: block;
+  }
+  .two-col-text h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(26px, 3vw, 40px); line-height: 1.12; margin-bottom: 20px; color: #1a1a1a;
+  }
+  .two-col-text p {
+    font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 16px;
+  }
+
+  /* ALT BG */
+  .bg-alt { background: #f0ede6; }
+
+  /* PILLARS GRID */
+  .pillars-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px;
+    margin-top: 48px;
+  }
+  .pillar-card {
+    background: #fff; border-radius: 8px; padding: 36px 28px;
+    border: 1px solid #e0ddd6;
+  }
+  .pillar-card .icon { font-size: 36px; margin-bottom: 16px; }
+  .pillar-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 20px; color: #1a1a1a; margin-bottom: 12px;
+  }
+  .pillar-card p { font-size: 15px; color: #555; line-height: 1.7; }
+
+  /* PHOTO GALLERY */
+  .gallery-section { padding: 96px 48px; }
+  .gallery-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px); text-align: center; color: #1a1a1a; margin-bottom: 48px;
+  }
+  .gallery-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .gallery-grid img {
+    width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px; display: block;
+  }
+  @media (max-width: 768px) {
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-section { padding: 60px 24px; }
+  }
+
+  /* HIGHLIGHT BANNER */
+  .highlight-banner {
+    background: #2b4a1f; padding: 80px 48px; text-align: center;
+  }
+  .highlight-banner h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 4vw, 48px); color: #fff; margin-bottom: 16px;
+  }
+  .highlight-banner p {
+    font-size: 16px; color: rgba(255,255,255,0.75); max-width: 640px;
+    margin: 0 auto 36px; line-height: 1.8;
+  }
+  .btn-primary {
+    background: #3d8c40; color: #fff; border: none; border-radius: 50px;
+    padding: 18px 52px; font-size: 13px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: #2e6e31; }
+
+  /* TIMELINE */
+  .timeline { margin-top: 48px; }
+  .timeline-item {
+    display: grid; grid-template-columns: 120px 1fr; gap: 24px;
+    margin-bottom: 36px; align-items: start;
+  }
+  .timeline-label {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 18px; color: #3d8c40; padding-top: 2px;
+  }
+  .timeline-content h3 {
+    font-size: 18px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px;
+  }
+  .timeline-content p {
+    font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 0;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #1a1a1a; color: rgba(255,255,255,0.6);
+    padding: 56px 48px; display: grid;
+    grid-template-columns: 1fr 1fr 1fr; gap: 48px;
+  }
+  footer h4 {
+    font-family: 'Playfair Display', serif; font-size: 15px;
+    color: #fff; font-weight: 700; margin-bottom: 18px;
+  }
+  footer a { color: rgba(255,255,255,0.6); text-decoration: none; display: block; margin-bottom: 10px; font-size: 14px; }
+  footer a:hover { color: #fff; }
+  footer p { font-size: 14px; line-height: 1.7; }
+  .footer-bottom {
+    background: #111; padding: 20px 48px; text-align: center;
+    font-size: 13px; color: rgba(255,255,255,0.35);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: #fff; flex-direction: column; padding: 24px;
+      border-bottom: 1px solid #e0ddd6; gap: 20px;
+    }
+    .nav-links.open { display: flex; }
+    .hamburger { display: block; }
+    .two-col { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
+    .content-section { padding: 60px 24px; }
+    .pillars-grid { grid-template-columns: 1fr; }
+    .highlight-banner { padding: 60px 24px; }
+    .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+    footer { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="straight-fin-farms.html">Welcome to Balance Nature Project at Straight Fin Farms</a>
+  <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+    <a class="btn-book" href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="color:#fff !important;">BOOK NOW</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-content">
+    <div class="breadcrumb"><a href="straight-fin-farms.html">Home</a> &nbsp;/&nbsp; Projects &nbsp;/&nbsp; Balance Nature Project</div>
+    <h1>Balance Nature Project</h1>
+    <p>Transforming 34 acres of Kawartha countryside into a thriving, balanced ecosystem that supports community, food production, and wildlife.</p>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="content-section">
+  <h2>Our Mission</h2>
+  <p>The Balance Nature Project began as a three-day festival celebrating nature, the end of summer, and the birth of a farm and a tribe. A space where we can ground ourselves and grow &mdash; with good vibes, uplifting workshops, an abundance of nature, and a powerful soundtrack. The pandemic helped us all reassess our lives, and what became abundantly clear is that we all need to reconnect with nature. Balance Nature Project invites you to redefine what success means to you in a growth mindset atmosphere. Disconnect to connect.</p>
+  <p><strong>What important truth is nobody talking about?</strong> We have roughly 60 harvests left before our monoculture farming system collapses. In that same period, we'll add 3 billion humans to a world population of 8 billion. A third of the planet is covered with monoculture farms that will no longer be able to feed us as their soil becomes devoid of life. We mask the problem today by increasing synthetic fertilizers and pesticides &mdash; pesticides that nearly triple in quantity every 20 years just to maintain current yields. Micro-organisms are killed by tilling that bakes them in the sun, releasing CO2 and degrading the soil further.</p>
+  <p>The overall mission for Straight Fin Farms is to raise awareness about this important truth and take concrete action to find a new path. We are building a biodiverse farm that helps raise awareness, regains skills we are losing, and promotes ethical growing practices. For any of this to matter, we also need to prove we can produce 10x more profit per acre compared to a monoculture farm &mdash; with tastier produce. We will document every step, celebrate every milestone with our tribe, and provide a blueprint for others who want to follow.</p>
+  <p>The good news is there is a better way, and the movement has already started. It's really simple &mdash; we've been doing it for over 10,000 years prior to World War&nbsp;2. We need to Balance Nature: let natural ecosystems deal with pests, use permaculture practices to harness the power of nature, and move from monoculture to biodiverse so we have richness in our soil and a more profitable, tastier yield.</p>
+</section>
+
+<!-- THE ESSENCE -->
+<section class="content-section bg-alt">
+  <h2>The Essence of What We're Doing</h2>
+  <p>Three generations ago, half the population worked the land. Today, less than one percent of Canada is in agriculture &mdash; a massive loss in skills and our inner wisdom. Our work is guided by four core truths:</p>
+  <p><strong>Reconnect with nature</strong> &mdash; Help our community and tribe regain the skills we are losing and rediscover the connection to the land that was essential to our being for thousands of years.</p>
+  <p><strong>Heal the soil</strong> &mdash; By moving away from tilling, we can sequester 20% of our global CO2 emissions and store it underground where it belongs, instead of killing the micro-organisms that give soil its life.</p>
+  <p><strong>Avoid a food crisis</strong> &mdash; Within 60 harvests, monoculture farms will deplete all life in their soil. They will no longer produce food if we don't change course.</p>
+  <p><strong>Nature is fun</strong> &mdash; It helps us reshape our community, reconnect with each other, and rediscover our own nature. Come ground yourself and grow with us.</p>
+</section>
+
+<!-- THREE PILLARS -->
+<section class="content-section bg-alt">
+  <h2>The Three Pillars</h2>
+  <p>The Balance Nature Project is built on permaculture's three core ethics, which guide every aspect of our work on the farm.</p>
+  <div class="pillars-grid">
+    <div class="pillar-card">
+      <div class="icon">&#127807;</div>
+      <h3>Earth Care</h3>
+      <p>Rebuilding soil health, restoring native habitats, managing water systems, and increasing biodiversity across all 34 acres. We treat the land as a living system and aim to leave it healthier than we found it.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="icon">&#129309;</div>
+      <h3>People Care</h3>
+      <p>Creating a welcoming space for learning, healing, and community. From our permaculture courses and volunteer programs to our vacation rentals, we invite people to experience life in balance with nature.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="icon">&#127793;</div>
+      <h3>Fair Share</h3>
+      <p>Sharing our harvest, our knowledge, and our space. We work collaboratively with other local farmers and producers, host educational tours, and make our resources available to the broader community.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE'RE BUILDING -->
+<div class="two-col">
+  <img src="images/IMG_3602.jpeg" alt="Overlooking the gardens, orchard and landscape at Straight Fin Farms">
+  <div class="two-col-text">
+    <h2>What We're Building</h2>
+    <p>The Balance Nature Project is a holistic approach to land management that integrates food production, wildlife habitat, education, and community living into one interconnected system.</p>
+    <p>On our 34 acres you'll find regenerative market gardens, a developing food forest and orchard, mushroom cultivation areas, active beehives producing raw honey, restored wetlands and pond ecosystems, forest trails, and a growing tiny house community &mdash; all designed to work together as a single living system.</p>
+    <p>We also produce seasonal fruits and vegetables, berries, select gourmet mushrooms including lion's mane, oyster, and shiitake, free-range eggs, and raw honey &mdash; all grown using biodiverse permaculture practices that leverage nature's own cycles.</p>
+  </div>
+</div>
+
+<!-- VISION TIMELINE -->
+<section class="content-section bg-alt">
+  <h2>Our Vision &amp; Roadmap</h2>
+  <p>The Balance Nature Project is a long-term commitment to the land. Here's how our vision is unfolding across the property.</p>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-label">Phase 1</div>
+      <div class="timeline-content">
+        <h3>Foundation &amp; Soil</h3>
+        <p>Establish core garden systems, build healthy soil through composting and cover cropping, set up beehives, and begin mushroom cultivation. Create the first tiny house dwelling on the property.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-label">Phase 2</div>
+      <div class="timeline-content">
+        <h3>Food Forest &amp; Orchard</h3>
+        <p>Plant the perennial food forest with fruit and nut trees, berry bushes, and understory crops. Expand the orchard and integrate companion planting throughout the property.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-label">Phase 3</div>
+      <div class="timeline-content">
+        <h3>Community &amp; Education</h3>
+        <p>Grow the tiny house community, launch the Permaculture Design Course, expand volunteer and educational programs, and open the farm for tours, workshops, and retreats.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-label">Phase 4</div>
+      <div class="timeline-content">
+        <h3>Regenerative Model</h3>
+        <p>Achieve a fully integrated, self-sustaining farm ecosystem that serves as a replicable model for regenerative land management. Share our methods, data, and lessons with the broader permaculture community.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO GALLERY -->
+<section class="gallery-section">
+  <h2>The Farm in Action</h2>
+  <div class="gallery-grid">
+    <img src="images/IMG_1396.jpeg" alt="Wildflower echinacea garden at sunset">
+    <img src="images/IMG_1884.jpeg" alt="Hands-on land work — digging and planting on the farm">
+    <img src="images/IMG_0289.jpeg" alt="Water management — IBC tanks for irrigation systems">
+    <img src="images/IMG_5255.jpeg" alt="Landscape work with excavator — building stone features">
+    <img src="images/PHOTO-2022-08-16-22-36-53.jpg" alt="Community walking the farm fields together">
+    <img src="images/IMG_5142.jpeg" alt="Setting up composting and water collection systems">
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="highlight-banner">
+  <h2>Be Part of the Balance</h2>
+  <p>Whether you want to visit the farm, take a permaculture course, volunteer, or simply stay and experience life in nature &mdash; there's a place for you here.</p>
+  <a class="btn-primary" href="straight-fin-farms.html#contact">GET IN TOUCH</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <h4>Straight Fin Farms</h4>
+    <p>Balance Nature Project &mdash; Reconnecting people with the land, nature, and each other.</p>
+    <br>
+    <p>1091 County Road 24<br>Dunsford, ON, K0M 1L0</p>
+    <br>
+    <p>hello@straightfinfarms.com</p>
+  </div>
+  <div>
+    <h4>Navigate</h4>
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+  </div>
+  <div>
+    <h4>Get Involved</h4>
+    <a href="https://airbnb.ca/h/straightfinfarms" target="_blank">Book a Stay</a>
+    <a href="straight-fin-farms.html#permaculture">Take a Course</a>
+    <a href="straight-fin-farms.html#contact">Join the Community</a>
+  </div>
+</footer>
+<div class="footer-bottom">&copy; 2026 Straight Fin Farms. All rights reserved.</div>
+
+</body>
+</html>

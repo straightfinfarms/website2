@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiny House Community — Straight Fin Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #e8e4dc; color: #1a1a1a; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid #e0ddd6;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: 15px; max-width: 220px; line-height: 1.3;
+    color: #1a1a1a; text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; color: #1a1a1a; text-decoration: none; font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .nav-links a:hover { text-decoration: underline; }
+  .nav-links a.btn-book,
+  .nav-links a.btn-book:visited,
+  .nav-links a.btn-book:link {
+    background: #3d8c40; color: #fff !important; border: none; border-radius: 50px;
+    padding: 12px 28px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none !important; display: inline-block;
+  }
+  .nav-links a.btn-book:hover { background: #2e6e31; color: #fff !important; text-decoration: none !important; }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; margin: 5px 0; transition: 0.3s; }
+
+  /* PAGE HERO */
+  .page-hero {
+    position: relative; height: 60vh; min-height: 400px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+  }
+  .page-hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: url('images/IMG_0008.jpg') center/cover no-repeat;
+  }
+  .page-hero::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.52) 100%);
+  }
+  .page-hero-content { position: relative; z-index: 2; padding: 0 20px; }
+  .page-hero h1 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(40px, 6vw, 72px); color: #fff;
+    line-height: 1.08; margin-bottom: 16px;
+  }
+  .page-hero p {
+    font-size: 18px; color: rgba(255,255,255,0.9); max-width: 600px;
+    margin: 0 auto; line-height: 1.6;
+  }
+  .breadcrumb {
+    position: relative; z-index: 2; font-size: 13px; color: rgba(255,255,255,0.7);
+    margin-bottom: 16px; letter-spacing: 0.04em;
+  }
+  .breadcrumb a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  .breadcrumb a:hover { color: #fff; text-decoration: underline; }
+
+  /* CONTENT SECTIONS */
+  .content-section {
+    padding: 96px 48px; max-width: 1100px; margin: 0 auto;
+  }
+  .content-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px); line-height: 1.12; margin-bottom: 24px; color: #1a1a1a;
+  }
+  .content-section p {
+    font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 20px; max-width: 720px;
+  }
+
+  /* TWO COLUMN */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+    align-items: center; padding: 96px 48px; max-width: 1200px; margin: 0 auto;
+  }
+  .two-col img {
+    width: 100%; border-radius: 6px; object-fit: cover; aspect-ratio: 4/3; display: block;
+  }
+  .two-col-text h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(26px, 3vw, 40px); line-height: 1.12; margin-bottom: 20px; color: #1a1a1a;
+  }
+  .two-col-text p {
+    font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 16px;
+  }
+
+  /* ALT BG */
+  .bg-alt { background: #f0ede6; }
+
+  /* CONCEPT GRID */
+  .concept-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px;
+    margin-top: 48px;
+  }
+  .concept-card {
+    background: #fff; border-radius: 8px; padding: 36px 28px;
+    border: 1px solid #e0ddd6;
+  }
+  .concept-card .icon { font-size: 36px; margin-bottom: 16px; }
+  .concept-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 20px; color: #1a1a1a; margin-bottom: 12px;
+  }
+  .concept-card p { font-size: 15px; color: #555; line-height: 1.7; }
+
+  /* DARK SECTION */
+  .dark-section {
+    padding: 96px 48px; background: #2b4a1f;
+  }
+  .dark-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px); color: #fff; text-align: center; margin-bottom: 16px;
+  }
+  .dark-section .subtitle {
+    font-size: 16px; color: rgba(255,255,255,0.7); text-align: center;
+    max-width: 640px; margin: 0 auto 48px; line-height: 1.7;
+  }
+  .stewardship-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px;
+    max-width: 1000px; margin: 0 auto;
+  }
+  .stewardship-card {
+    padding: 32px 28px;
+    background: rgba(255,255,255,0.08); border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .stewardship-card .icon { font-size: 28px; margin-bottom: 12px; }
+  .stewardship-card h3 {
+    font-family: 'Playfair Display', serif; font-size: 18px;
+    color: #fff; margin-bottom: 10px; font-weight: 700;
+  }
+  .stewardship-card p { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.7; }
+
+  /* EMPLOYMENT / VISION */
+  .vision-list {
+    margin-top: 32px;
+  }
+  .vision-item {
+    display: grid; grid-template-columns: 48px 1fr; gap: 16px;
+    margin-bottom: 24px; align-items: start;
+  }
+  .vision-icon {
+    width: 48px; height: 48px; background: #f0ede6; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .vision-item h3 {
+    font-size: 17px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px;
+  }
+  .vision-item p {
+    font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 0;
+  }
+
+  /* QUOTE BANNER */
+  .quote-banner {
+    background: #1a1a1a; padding: 80px 48px; text-align: center;
+  }
+  .quote-banner blockquote {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: clamp(22px, 3vw, 36px); color: #fff; line-height: 1.35;
+    max-width: 800px; margin: 0 auto 24px; font-style: italic;
+  }
+  .quote-banner cite {
+    font-family: 'Inter', sans-serif; font-size: 14px;
+    color: rgba(255,255,255,0.5); font-style: normal; letter-spacing: 0.05em;
+  }
+
+  /* HIGHLIGHT BANNER */
+  .highlight-banner {
+    background: #2b4a1f; padding: 80px 48px; text-align: center;
+  }
+  .highlight-banner h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 4vw, 48px); color: #fff; margin-bottom: 16px;
+  }
+  .highlight-banner p {
+    font-size: 16px; color: rgba(255,255,255,0.75); max-width: 640px;
+    margin: 0 auto 36px; line-height: 1.8;
+  }
+  .btn-primary {
+    background: #3d8c40; color: #fff; border: none; border-radius: 50px;
+    padding: 18px 52px; font-size: 13px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: #2e6e31; }
+
+  /* FOOTER */
+  footer {
+    background: #1a1a1a; color: rgba(255,255,255,0.6);
+    padding: 56px 48px; display: grid;
+    grid-template-columns: 1fr 1fr 1fr; gap: 48px;
+  }
+  footer h4 {
+    font-family: 'Playfair Display', serif; font-size: 15px;
+    color: #fff; font-weight: 700; margin-bottom: 18px;
+  }
+  footer a { color: rgba(255,255,255,0.6); text-decoration: none; display: block; margin-bottom: 10px; font-size: 14px; }
+  footer a:hover { color: #fff; }
+  footer p { font-size: 14px; line-height: 1.7; }
+  .footer-bottom {
+    background: #111; padding: 20px 48px; text-align: center;
+    font-size: 13px; color: rgba(255,255,255,0.35);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .concept-grid { grid-template-columns: repeat(2, 1fr); }
+    .stewardship-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: #fff; flex-direction: column; padding: 24px;
+      border-bottom: 1px solid #e0ddd6; gap: 20px;
+    }
+    .nav-links.open { display: flex; }
+    .hamburger { display: block; }
+    .two-col { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
+    .content-section { padding: 60px 24px; }
+    .concept-grid { grid-template-columns: 1fr; }
+    .dark-section { padding: 60px 24px; }
+    .quote-banner { padding: 60px 24px; }
+    .highlight-banner { padding: 60px 24px; }
+    footer { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="straight-fin-farms.html">Welcome to Balance Nature Project at Straight Fin Farms</a>
+  <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+    <a class="btn-book" href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="color:#fff !important;">BOOK NOW</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-content">
+    <div class="breadcrumb"><a href="straight-fin-farms.html">Home</a> &nbsp;/&nbsp; Projects &nbsp;/&nbsp; Tiny House Community</div>
+    <h1>Tiny House Community</h1>
+    <p>A low-impact community integrated into a biodiverse permaculture farm &mdash; balancing nature by helping people reconnect with the land, with others, and with themselves.</p>
+  </div>
+</section>
+
+<!-- BIG IDEAS -->
+<section class="content-section">
+  <h2>Big Ideas, Real Impact</h2>
+  <p>Over the last two generations, we have industrialized our food production &mdash; and with it, our connection to the land &mdash; to the point where less than one percent of the population farms today, compared to nearly half just two generations ago. With that shift, we've lost a generation of people with a connection to the land, people who understood how our food is produced.</p>
+  <p>We've gotten away from what was essential to our being for thousands of years, and become dangerously disconnected from nature and sustainable farming practices.</p>
+  <p>This farm is designed to find a balance &mdash; reconnecting with nature, permaculture, biodiverse farming &mdash; and to re-engage our community and educate through experience. The Tiny Home Community is at the heart of that mission.</p>
+</section>
+
+<!-- COMMUNITY CONCEPT -->
+<section class="content-section bg-alt">
+  <h2>Community Concept</h2>
+  <p>The Straight Fin Farms Tiny Home Community is not an escape from life &mdash; it is a return to balance. Designed as a quiet, intentional environment rather than a resort, the community invites guests to engage at their own pace with optional participation in farm activities, workshops, and community gatherings.</p>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="icon">&#127968;</div>
+      <h3>Thoughtful Dwellings</h3>
+      <p>A limited number of small, thoughtfully sited homes with minimal environmental footprint, preserving the natural features of the landscape they sit within.</p>
+    </div>
+    <div class="concept-card">
+      <div class="icon">&#127793;</div>
+      <h3>Greenhouse &amp; Plenary</h3>
+      <p>A plenary space that doubles as a greenhouse, showcasing our plant nursery and serving as a year-round classroom for permaculture courses and community gatherings.</p>
+    </div>
+    <div class="concept-card">
+      <div class="icon">&#128706;</div>
+      <h3>Bathhouse</h3>
+      <p>A dedicated bathhouse for day visitors to use without entering the main lodge &mdash; welcoming guests while maintaining the quiet rhythm of the community.</p>
+    </div>
+    <div class="concept-card">
+      <div class="icon">&#129309;</div>
+      <h3>Shared Spaces</h3>
+      <p>Common areas designed to encourage connection, reflection, and learning &mdash; from communal kitchens to fire pits and outdoor gathering spots.</p>
+    </div>
+    <div class="concept-card">
+      <div class="icon">&#127749;</div>
+      <h3>Nature Immersion</h3>
+      <p>Guests disconnect from digital and urban intensity, and reconnect with nature, personal reflection, and community at their own pace.</p>
+    </div>
+    <div class="concept-card">
+      <div class="icon">&#128218;</div>
+      <h3>Hands-On Learning</h3>
+      <p>Optional participation in regenerative growing, permaculture workshops, farm tours, and land stewardship activities &mdash; learning by doing.</p>
+    </div>
+  </div>
+</section>
+
+<!-- IMAGE + SUSTAINABLE FUNDING -->
+<div class="two-col">
+  <img src="images/IMG_5238.jpeg" alt="Building the tiny house deck at Straight Fin Farms">
+  <div class="two-col-text">
+    <h2>A Sustainable Funding Model</h2>
+    <p>The tiny homes generate recurring income through short- and medium-term stays, with revenue reinvested directly into the farm's core mission. This creates a self-sustaining cycle where every guest stay funds real progress on the land.</p>
+    <p>Revenue supports soil regeneration and permaculture expansion, biodiversity and habitat restoration, educational programming and workshops, increased accommodations to grow our annual permaculture courses for a larger audience, and farm infrastructure that supports long-term sustainability.</p>
+  </div>
+</div>
+
+<!-- ENVIRONMENTAL STEWARDSHIP -->
+<section class="dark-section">
+  <h2>Environmental &amp; Land Stewardship</h2>
+  <p class="subtitle">Environmental responsibility is foundational. The land remains the primary stakeholder in every decision we make.</p>
+  <div class="stewardship-grid">
+    <div class="stewardship-card">
+      <div class="icon">&#128269;</div>
+      <h3>Ecological Studies &amp; Approvals</h3>
+      <p>All development is guided by ecological studies and proper approvals, ensuring that growth happens in harmony with the ecosystem, not at its expense.</p>
+    </div>
+    <div class="stewardship-card">
+      <div class="icon">&#127754;</div>
+      <h3>Wetland Protection</h3>
+      <p>Active protection of wetlands and environmentally sensitive areas across the property. These are not obstacles to development &mdash; they are assets we steward.</p>
+    </div>
+    <div class="stewardship-card">
+      <div class="icon">&#9879;&#65039;</div>
+      <h3>Low-Impact Infrastructure</h3>
+      <p>Incremental build-out using low-impact construction methods and materials that tread lightly on the land while providing comfortable, functional spaces.</p>
+    </div>
+    <div class="stewardship-card">
+      <div class="icon">&#127807;</div>
+      <h3>Native &amp; Edible Landscaping</h3>
+      <p>All landscaping integrates native and edible plantings into the farm system &mdash; every plant serves a purpose in the larger ecosystem.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY IMPACT & EMPLOYMENT -->
+<section class="content-section">
+  <h2>Community Impact &amp; Employment</h2>
+  <p>The Tiny Home Community is designed to bring meaningful employment and economic growth to the local area. As the project grows, it will create a range of roles rooted in the farm's operations and values.</p>
+  <div class="vision-list">
+    <div class="vision-item">
+      <div class="vision-icon">&#127793;</div>
+      <div>
+        <h3>Groundskeeper</h3>
+        <p>A full-time property manager responsible for patrolling, waste management, grounds maintenance, inspections, and logistics coordination.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#127794;</div>
+      <div>
+        <h3>Arborist</h3>
+        <p>A dedicated arborist to manage the property's trees, forest health, and the developing orchard and food forest systems.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#10024;</div>
+      <div>
+        <h3>Cleaning &amp; Hospitality Staff</h3>
+        <p>Support staff to maintain the tiny house units and shared spaces, ensuring a welcoming and well-kept environment for every guest.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#127860;</div>
+      <div>
+        <h3>Farm-to-Table Chef</h3>
+        <p>A chef who utilizes farm-to-table ingredients for guest meals, sourcing directly from the farm and the surrounding local community.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#128296;</div>
+      <div>
+        <h3>Carpenter</h3>
+        <p>Continuing to leverage our current carpenter who maintains the property, builds new structures, and supports the incremental expansion of the community.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#128101;</div>
+      <div>
+        <h3>Tour Guides</h3>
+        <p>Guides who showcase the farm's operations and permaculture principles in action, bringing the story of the land to life for visitors and guests.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-banner">
+  <blockquote>&ldquo;The Straight Fin Farms Tiny Home Community is not an escape from life &mdash; it is a return to balance.&rdquo;</blockquote>
+  <cite>Balance Nature Project</cite>
+</section>
+
+<!-- LONG-TERM VISION -->
+<section class="content-section bg-alt">
+  <h2>Long-Term Vision</h2>
+  <p>Over time, the Tiny Home Community project will grow into a living example of how economic viability and ecological responsibility can coexist. By combining intentional living, regenerative land practices, and community learning, the project supports both the land and the people who experience it.</p>
+  <div class="vision-list">
+    <div class="vision-item">
+      <div class="vision-icon">&#128176;</div>
+      <div>
+        <h3>Financial Sustainability</h3>
+        <p>Ensure the long-term financial sustainability of Straight Fin Farms through diversified, mission-aligned revenue streams.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#127983;</div>
+      <div>
+        <h3>Local Economic Growth</h3>
+        <p>Provide jobs and economic growth to the local community through farming, construction, hospitality, culinary, and education roles.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#127758;</div>
+      <div>
+        <h3>A Replicable Model</h3>
+        <p>Demonstrate a viable model for low-impact rural living and biodiverse farming that others can learn from and adapt to their own land.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#128218;</div>
+      <div>
+        <h3>Education &amp; Knowledge</h3>
+        <p>Spread knowledge and education around permaculture principles through courses, workshops, and the lived example of the farm itself.</p>
+      </div>
+    </div>
+    <div class="vision-item">
+      <div class="vision-icon">&#129309;</div>
+      <div>
+        <h3>Regenerative Community</h3>
+        <p>Build a community aligned with regenerative values &mdash; people who care for the land, for each other, and for the future.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY GALLERY -->
+<section style="padding: 96px 48px;">
+  <h2 style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(28px, 3.5vw, 44px); text-align: center; color: #1a1a1a; margin-bottom: 48px;">Community Life</h2>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1100px; margin: 0 auto;">
+    <img src="images/PHOTO-2022-08-16-22-36-53.jpg" alt="Community walking through the farm fields with the husky" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/PHOTO-2022-09-19-19-54-38.jpg" alt="Outdoor community gathering in the garden" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_2460.jpg" alt="Workshop circle inside the farmhouse" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_4955.jpeg" alt="Community dinner around the farmhouse table" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/PHOTO-2022-09-19-22-48-28.jpg" alt="Farm-to-table charcuterie board" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/PHOTO-2022-09-19-17-14-04 2.jpg" alt="Nighttime campfire gathering on the farm" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_5225.jpeg" alt="Relaxing on the tiny house deck" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/PHOTO-2022-09-02-10-36-29.jpg" alt="Farm work day with equipment" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+    <img src="images/IMG_5167.jpeg" alt="Loading lumber for building projects in the forest" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="highlight-banner">
+  <h2>A Return to Balance</h2>
+  <p>Whether you want to stay in a tiny home, visit the farm, or learn more about what we're building &mdash; we'd love to hear from you.</p>
+  <a class="btn-primary" href="straight-fin-farms.html#contact">GET IN TOUCH</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <h4>Straight Fin Farms</h4>
+    <p>Balance Nature Project &mdash; Reconnecting people with the land, nature, and each other.</p>
+    <br>
+    <p>1091 County Road 24<br>Dunsford, ON, K0M 1L0</p>
+    <br>
+    <p>hello@straightfinfarms.com</p>
+  </div>
+  <div>
+    <h4>Navigate</h4>
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+  </div>
+  <div>
+    <h4>Get Involved</h4>
+    <a href="https://airbnb.ca/h/straightfinfarms" target="_blank">Book a Stay</a>
+    <a href="straight-fin-farms.html#permaculture">Take a Course</a>
+    <a href="straight-fin-farms.html#contact">Join the Community</a>
+  </div>
+</footer>
+<div class="footer-bottom">&copy; 2026 Straight Fin Farms. All rights reserved.</div>
+
+</body>
+</html>

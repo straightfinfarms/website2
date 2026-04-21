@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Your Stay — Straight Fin Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #e8e4dc; color: #1a1a1a; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid #e0ddd6;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: 15px; max-width: 220px; line-height: 1.3;
+    color: #1a1a1a; text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; color: #1a1a1a; text-decoration: none; font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .nav-links a:hover { text-decoration: underline; }
+  .nav-links a.btn-book,
+  .nav-links a.btn-book:visited,
+  .nav-links a.btn-book:link {
+    background: #3d8c40; color: #fff !important; border: none; border-radius: 50px;
+    padding: 12px 28px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none !important; display: inline-block;
+  }
+  .nav-links a.btn-book:hover { background: #2e6e31; color: #fff !important; text-decoration: none !important; }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; margin: 5px 0; transition: 0.3s; }
+
+  /* PAGE HERO */
+  .page-hero {
+    position: relative; height: 55vh; min-height: 380px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden;
+  }
+  .page-hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: url('images/IMG_3293.jpg') center/cover no-repeat;
+  }
+  .page-hero::after {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%);
+  }
+  .page-hero-content { position: relative; z-index: 2; padding: 0 20px; max-width: 700px; }
+  .page-hero .tag {
+    font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255,255,255,0.7); margin-bottom: 16px;
+  }
+  .page-hero h1 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(36px, 5.5vw, 64px); color: #fff;
+    line-height: 1.08; margin-bottom: 16px;
+  }
+  .page-hero p {
+    font-size: 17px; color: rgba(255,255,255,0.88); max-width: 560px;
+    margin: 0 auto; line-height: 1.65;
+  }
+
+  /* RETREAT OPTIONS HERO CARD */
+  .hero-cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+    max-width: 1200px; margin: -60px auto 0; padding: 0 48px;
+    position: relative; z-index: 3;
+  }
+  .hero-card {
+    background: #fff; border-radius: 12px; padding: 40px 36px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  }
+  .hero-card h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 24px; color: #1a1a1a; margin-bottom: 8px;
+  }
+  .hero-card .price {
+    font-size: 36px; font-weight: 700; color: #3d8c40; margin-bottom: 4px;
+  }
+  .hero-card .price-note {
+    font-size: 13px; color: #888; margin-bottom: 24px;
+  }
+  .hero-card p { font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 24px; }
+  .btn-primary {
+    background: #3d8c40; color: #fff; border: none; border-radius: 50px;
+    padding: 16px 44px; font-size: 13px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-primary:hover { background: #2e6e31; }
+  .btn-outline {
+    background: transparent; color: #1a1a1a; border: 1px solid #ccc; border-radius: 50px;
+    padding: 16px 44px; font-size: 13px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-outline:hover { border-color: #3d8c40; color: #3d8c40; }
+
+  /* CONTENT SECTION */
+  .content-section { padding: 96px 48px; max-width: 1100px; margin: 0 auto; }
+  .content-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px); line-height: 1.12; margin-bottom: 24px; color: #1a1a1a;
+  }
+  .content-section p {
+    font-size: 16px; line-height: 1.85; color: #444; margin-bottom: 20px; max-width: 720px;
+  }
+
+  /* EXPERIENCE GRID */
+  .exp-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    margin-top: 40px;
+  }
+  .exp-card {
+    background: #fff; border-radius: 10px; padding: 32px 24px;
+    border: 1px solid #e0ddd6;
+  }
+  .exp-card .icon { font-size: 32px; margin-bottom: 14px; }
+  .exp-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 18px; color: #1a1a1a; margin-bottom: 10px;
+  }
+  .exp-card p { font-size: 14px; color: #555; line-height: 1.7; }
+
+  /* ACCOMMODATION GRID */
+  .accom-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    margin-top: 40px;
+  }
+  .accom-card {
+    background: #fff; border-radius: 10px; padding: 32px 24px;
+    border: 1px solid #e0ddd6; text-align: center;
+  }
+  .accom-card .icon { font-size: 36px; margin-bottom: 14px; }
+  .accom-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 17px; color: #1a1a1a; margin-bottom: 8px;
+  }
+  .accom-card p { font-size: 14px; color: #555; line-height: 1.6; }
+
+  /* ALT BG */
+  .bg-alt { background: #f0ede6; }
+
+  /* TESTIMONIALS */
+  .testimonials-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    margin-top: 40px;
+  }
+  .testimonial-card {
+    background: #fff; border-radius: 10px; padding: 32px 24px;
+    border: 1px solid #e0ddd6;
+  }
+  .testimonial-card blockquote {
+    font-size: 15px; color: #444; line-height: 1.7; font-style: italic;
+    margin-bottom: 16px;
+  }
+  .testimonial-card cite {
+    font-size: 14px; color: #1a1a1a; font-weight: 600; font-style: normal;
+  }
+
+  /* CORPORATE SECTION */
+  .corporate-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+    margin-top: 24px; align-items: start;
+  }
+  .corporate-text h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(26px, 3vw, 40px); line-height: 1.12; margin-bottom: 16px; color: #1a1a1a;
+  }
+  .corporate-text .tag {
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: #888; margin-bottom: 16px;
+  }
+  .corporate-text p { font-size: 15px; line-height: 1.8; color: #444; margin-bottom: 16px; }
+  .corporate-details { font-size: 15px; color: #555; line-height: 2; }
+  .corporate-form {
+    background: #fff; border-radius: 12px; padding: 36px 32px;
+    border: 1px solid #e0ddd6;
+  }
+  .corporate-form h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 22px; color: #1a1a1a; margin-bottom: 24px;
+  }
+  .corporate-form input, .corporate-form textarea {
+    font-family: 'Inter', sans-serif; font-size: 14px;
+    padding: 14px 16px; border: 1px solid #ccc; border-radius: 6px;
+    background: #fff; color: #1a1a1a; width: 100%; margin-bottom: 14px;
+  }
+  .corporate-form textarea { resize: vertical; min-height: 100px; }
+  .corporate-form input:focus, .corporate-form textarea:focus { outline: none; border-color: #3d8c40; }
+
+  /* FAQ */
+  .faq-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+    margin-top: 40px;
+  }
+  .faq-card {
+    background: #fff; border-radius: 10px; padding: 28px 24px;
+    border: 1px solid #e0ddd6;
+  }
+  .faq-card h3 { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px; }
+  .faq-card p { font-size: 14px; color: #555; line-height: 1.7; }
+
+  /* POLICY */
+  .policy-box {
+    background: #fff; border-radius: 10px; padding: 36px 32px;
+    border: 1px solid #e0ddd6; margin-top: 40px;
+  }
+  .policy-box h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 22px; color: #1a1a1a; margin-bottom: 20px;
+  }
+  .policy-box p { font-size: 14px; color: #555; line-height: 1.8; margin-bottom: 10px; }
+
+  /* SEASONAL GRID */
+  .season-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    margin-top: 40px;
+  }
+  .season-card {
+    background: #fff; border-radius: 10px; padding: 28px 24px;
+    border: 1px solid #e0ddd6;
+  }
+  .season-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 17px; color: #1a1a1a; margin-bottom: 6px;
+  }
+  .season-card .status { font-size: 13px; font-weight: 600; color: #3d8c40; margin-bottom: 8px; }
+  .season-card p { font-size: 14px; color: #555; line-height: 1.6; }
+
+  /* DARK CTA */
+  .dark-cta {
+    background: #1a1a1a; padding: 80px 48px; text-align: center;
+  }
+  .dark-cta h2 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: clamp(28px, 4vw, 48px); color: #fff; margin-bottom: 16px;
+  }
+  .dark-cta p {
+    font-size: 16px; color: rgba(255,255,255,0.65); max-width: 560px;
+    margin: 0 auto 36px; line-height: 1.8;
+  }
+
+  /* AIRBNB SECTION */
+  .airbnb-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+    margin-top: 40px;
+  }
+  .airbnb-card {
+    background: #fff; border-radius: 12px; padding: 32px 28px;
+    border: 1px solid #e0ddd6;
+  }
+  .airbnb-card h3 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 20px; color: #1a1a1a; margin-bottom: 16px;
+  }
+  .airbnb-card p { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 16px; }
+  .cal-links { margin-top: 16px; }
+  .cal-links a {
+    display: block; color: #3d8c40; text-decoration: underline;
+    font-size: 14px; margin-bottom: 10px;
+  }
+  .cal-links a:hover { color: #2e6e31; }
+
+  /* FOOTER */
+  footer {
+    background: #1a1a1a; color: rgba(255,255,255,0.6);
+    padding: 56px 48px; display: grid;
+    grid-template-columns: 1fr 1fr 1fr; gap: 48px;
+  }
+  footer h4 {
+    font-family: 'Playfair Display', serif; font-size: 15px;
+    color: #fff; font-weight: 700; margin-bottom: 18px;
+  }
+  footer a { color: rgba(255,255,255,0.6); text-decoration: none; display: block; margin-bottom: 10px; font-size: 14px; }
+  footer a:hover { color: #fff; }
+  footer p { font-size: 14px; line-height: 1.7; }
+  .footer-bottom {
+    background: #111; padding: 20px 48px; text-align: center;
+    font-size: 13px; color: rgba(255,255,255,0.35);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .exp-grid { grid-template-columns: repeat(2, 1fr); }
+    .accom-grid { grid-template-columns: repeat(2, 1fr); }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .season-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: #fff; flex-direction: column; padding: 24px;
+      border-bottom: 1px solid #e0ddd6; gap: 20px;
+    }
+    .nav-links.open { display: flex; }
+    .hamburger { display: block; }
+    .hero-cards { grid-template-columns: 1fr; padding: 0 24px; margin-top: -40px; }
+    .content-section { padding: 60px 24px; }
+    .exp-grid { grid-template-columns: 1fr; }
+    .accom-grid { grid-template-columns: 1fr; }
+    .corporate-grid { grid-template-columns: 1fr; }
+    .faq-grid { grid-template-columns: 1fr; }
+    .season-grid { grid-template-columns: 1fr; }
+    .airbnb-grid { grid-template-columns: 1fr; }
+    .dark-cta { padding: 60px 24px; }
+    footer { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="straight-fin-farms.html">Welcome to Balance Nature Project at Straight Fin Farms</a>
+  <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+    <a class="btn-book" href="book-direct.html" style="color:#fff !important;">BOOK DIRECT</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-content">
+    <div class="tag">Straight Fin Farms &bull; 34-Acre Private Waterfront Retreat</div>
+    <h1>Stay on the Farm.<br>Learn Permaculture.<br>Reconnect with Nature.</h1>
+    <p>Straight Fin Farms is a 34-acre private waterfront retreat sleeping 16+ guests across 7 bedrooms. Book the farmhouse on Airbnb &mdash; and stay tuned for immersive permaculture workshops and certification retreats, coming soon.</p>
+  </div>
+</section>
+
+<!-- RETREAT OPTION CARDS -->
+<div class="hero-cards">
+  <div class="hero-card">
+    <h2>Book the Farmhouse</h2>
+    <div class="price-note" style="color:#2e6e31;">Available Now &mdash; Book Direct &amp; Save 15%</div>
+    <p>Book the entire 7-bedroom farmhouse for your family, friends, or group. 16+ guests, 500 ft of private waterfront, hot tub, kayaks, pedal boat, fireplace, forest trails &mdash; 8 minutes from downtown Bobcaygeon.</p>
+    <a class="btn-primary" href="book-direct.html">BOOK DIRECT &amp; SAVE</a>
+    <a class="btn-outline" href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="margin-left: 12px;">VIEW ON AIRBNB</a>
+  </div>
+  <div class="hero-card">
+    <h2>Permaculture Retreats</h2>
+    <div class="price-note" style="color:#c49000;">Coming Soon</div>
+    <p>Immersive 3-day and 7-day certification retreats with hands-on learning in gardening, composting, orchard care, mushrooms, beekeeping, and biodiversity stewardship. Small groups of 8&ndash;16 guests with meals included.</p>
+    <a class="btn-primary" href="#contact-retreat">JOIN THE WAITLIST</a>
+  </div>
+</div>
+
+<!-- SPACER -->
+<div style="height: 96px; background: #e8e4dc;"></div>
+
+<!-- WHAT YOU'LL EXPERIENCE -->
+<section class="content-section bg-alt" style="padding-top:96px;">
+  <h2>What You'll Experience</h2>
+  <p>Participants live within the ecosystem they are studying, making the farm itself the classroom. Every day blends theory with real hands-on work.</p>
+  <div class="exp-grid">
+    <div class="exp-card">
+      <div class="icon">&#127807;</div>
+      <h3>Garden &amp; Compost Systems</h3>
+      <p>Raised bed design, companion planting, succession planting, and building compost systems including hot, cold, sheet mulch, and vermicomposting.</p>
+    </div>
+    <div class="exp-card">
+      <div class="icon">&#127822;</div>
+      <h3>Orchard, Fruits &amp; Berries</h3>
+      <p>Food forest design, fruit tree pruning and feeding, berry ecology with raspberries, blueberries, and strawberries, plus pollinator companion species.</p>
+    </div>
+    <div class="exp-card">
+      <div class="icon">&#127812;</div>
+      <h3>Mushroom Cultivation</h3>
+      <p>Log inoculation, straw bed growing, indoor substrate bags. Learn lion's mane, oyster, and shiitake cultivation from spore to harvest.</p>
+    </div>
+    <div class="exp-card">
+      <div class="icon">&#128029;</div>
+      <h3>Beekeeping &amp; Pollinators</h3>
+      <p>Hive ecology, queen health, seasonal cycles, and apiary visits with protective gear. Understand how pollination drives the entire farm ecosystem.</p>
+    </div>
+    <div class="exp-card">
+      <div class="icon">&#127793;</div>
+      <h3>Biodiversity Walks</h3>
+      <p>Guided walks through natural wildlife corridors, forest floor observation, and soil biology studies. See decomposition, fungi, and natural systems at work.</p>
+    </div>
+    <div class="exp-card">
+      <div class="icon">&#127860;</div>
+      <h3>Farm-to-Table Living</h3>
+      <p>Morning farm chores, sunrise garden walks, meals from the garden, evening bonfires, and optional family participation with kids biodiversity activities.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ACCOMMODATION -->
+<section class="content-section">
+  <h2>The Farmhouse &mdash; 7 Bedrooms</h2>
+  <p>Book the entire farmhouse for your group. 16+ guests across 7 uniquely designed bedrooms with 4.5 bathrooms, full kitchen, and shared living spaces.</p>
+  <div class="accom-grid">
+    <div class="accom-card">
+      <div class="icon">&#127807;</div>
+      <h3>The Orchard Suite</h3>
+      <p>Primary suite with king bed, private ensuite, and views of the orchard and gardens.</p>
+    </div>
+    <div class="accom-card">
+      <div class="icon">&#128029;</div>
+      <h3>Beekeeper's Room</h3>
+      <p>Cozy double room with garden views, inspired by the farm's apiary heritage.</p>
+    </div>
+    <div class="accom-card">
+      <div class="icon">&#127754;</div>
+      <h3>Pond View</h3>
+      <p>Overlooking the pond and wetland &mdash; a peaceful retreat-within-the-retreat.</p>
+    </div>
+    <div class="accom-card">
+      <div class="icon">&#127809;</div>
+      <h3>The Maple Room</h3>
+      <p>Named for the sugar maples outside the window. Warm, classic farmhouse feel.</p>
+    </div>
+    <div class="accom-card">
+      <div class="icon">&#127794;</div>
+      <h3>The Pines</h3>
+      <p>Tucked into the quieter wing of the house with views of the pine corridor.</p>
+    </div>
+    <div class="accom-card">
+      <div class="icon">&#127758;</div>
+      <h3>Creekside</h3>
+      <p>Ground-floor room closest to the creek. Fall asleep to the sound of running water.</p>
+    </div>
+    <div class="accom-card">
+      <div class="icon">&#11088;</div>
+      <h3>The Loft</h3>
+      <p>Open loft space ideal for kids or extra guests. Flexible sleeping arrangements.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="content-section bg-alt">
+  <h2>What Our Guests Are Saying</h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <blockquote>&ldquo;An unforgettable experience. We learned so much about gardening, composting, and beekeeping while enjoying a peaceful countryside retreat.&rdquo;</blockquote>
+      <cite>Sarah &amp; Michael, Toronto</cite>
+    </div>
+    <div class="testimonial-card">
+      <blockquote>&ldquo;The 3-day intensive gave us practical skills we brought back to our own backyard garden. The farm stay was beautiful and restorative.&rdquo;</blockquote>
+      <cite>Priya, Mississauga</cite>
+    </div>
+    <div class="testimonial-card">
+      <blockquote>&ldquo;Perfect mix of education and relaxation. The biodiversity walks and fireside evenings made it feel like a true retreat.&rdquo;</blockquote>
+      <cite>James, Vaughan</cite>
+    </div>
+  </div>
+</section>
+
+<!-- CORPORATE RETREATS -->
+<section class="content-section" id="corporate">
+  <div class="corporate-grid">
+    <div class="corporate-text">
+      <div class="tag">Corporate &amp; Team Retreats</div>
+      <h2>Plan a Private Team Experience</h2>
+      <p>Host your leadership offsite, wellness retreat, or sustainability workshop at Straight Fin Farms. Custom programs include team-building activities, hands-on permaculture learning, bonfire strategy sessions, and farm-to-table experiences.</p>
+      <div class="corporate-details">
+        &bull; 8&ndash;20 guest private bookings<br>
+        &bull; Leadership &amp; strategy workshops<br>
+        &bull; Sustainability / ESG learning themes<br>
+        &bull; Custom catering &amp; accommodation options<br>
+        &bull; $4,500&ndash;$9,500 per retreat depending on size
+      </div>
+    </div>
+    <div class="corporate-form">
+      <h3>Request a Proposal</h3>
+      <form onsubmit="event.preventDefault(); alert('Thank you! We will be in touch about your retreat.');">
+        <input type="text" placeholder="Company Name" required>
+        <input type="text" placeholder="Contact Name" required>
+        <input type="email" placeholder="Email Address" required>
+        <input type="text" placeholder="Preferred Dates">
+        <input type="text" placeholder="Estimated Group Size">
+        <textarea placeholder="Tell us about your retreat goals, preferred activities, and accommodation needs"></textarea>
+        <button type="submit" class="btn-primary" style="width:100%; border:none; cursor:pointer;">SUBMIT INQUIRY</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- SEASONAL AVAILABILITY -->
+<section class="content-section bg-alt">
+  <h2>Seasonal Availability</h2>
+  <p>Straight Fin Farms runs seasonal immersive retreats aligned with planting, harvest, and ecosystem cycles. Availability varies based on farm operations and nature rhythms.</p>
+  <div class="season-grid">
+    <div class="season-card">
+      <h3>Spring (Mar&ndash;May)</h3>
+      <div class="status">High Availability</div>
+      <p>Planting season, compost building, garden preparation</p>
+    </div>
+    <div class="season-card">
+      <h3>Early Summer (Jun)</h3>
+      <div class="status">Limited Availability</div>
+      <p>Pollination, orchard care, early garden systems</p>
+    </div>
+    <div class="season-card">
+      <h3>Summer Peak (Jul&ndash;Aug)</h3>
+      <div class="status" style="color:#c49000;">Low Availability</div>
+      <p>Full biodiversity, harvesting, beekeeping activity</p>
+    </div>
+    <div class="season-card">
+      <h3>Fall (Sep&ndash;Oct)</h3>
+      <div class="status">High Availability</div>
+      <p>Harvest season, food preservation, orchard work</p>
+    </div>
+    <div class="season-card">
+      <h3>Late Fall (Nov)</h3>
+      <div class="status">Moderate Availability</div>
+      <p>Soil restoration, composting, mushroom systems</p>
+    </div>
+    <div class="season-card">
+      <h3>Winter (Dec&ndash;Feb)</h3>
+      <div class="status" style="color:#888;">Private / Corporate Only</div>
+      <p>Planning, workshops, indoor learning, retreats</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="dark-cta">
+  <h2>Ready to reconnect with nature?</h2>
+  <p>Book your stay at Straight Fin Farms and begin your hands-on journey into regenerative living.</p>
+  <a class="btn-primary" href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="background:#fff; color:#1a1a1a;">BOOK NOW ON AIRBNB</a>
+</section>
+
+<!-- BOOK YOUR STAY -->
+<section class="content-section">
+  <h2>Book Your Stay</h2>
+  <p>Check live availability or book directly through Airbnb. You can also sync your stay with our seasonal retreat calendar.</p>
+  <div class="airbnb-grid">
+    <div class="airbnb-card">
+      <h3>Airbnb Listing</h3>
+      <p>View our full listing, photos, reviews, and real-time availability on Airbnb. Book directly for an instant reservation.</p>
+      <a class="btn-primary" href="https://airbnb.ca/h/straightfinfarms" target="_blank">VIEW LISTING ON AIRBNB</a>
+    </div>
+    <div class="airbnb-card">
+      <h3>Calendar Sync</h3>
+      <p>Subscribe to our farm retreat calendar to see open dates and seasonal programming updates.</p>
+      <div class="cal-links">
+        <a href="https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1" target="_blank">Download iCal Feed</a>
+        <a href="webcal://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1">Subscribe in Calendar App</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="content-section bg-alt" id="faq">
+  <h2>Frequently Asked Questions</h2>
+  <div class="faq-grid">
+    <div class="faq-card">
+      <h3>Do I need prior farming or gardening experience?</h3>
+      <p>No experience is required. The 3-day and 7-day retreats are designed for beginners through experienced growers, with step-by-step instruction and hands-on guidance.</p>
+    </div>
+    <div class="faq-card">
+      <h3>What accommodation options are available?</h3>
+      <p>Guests may choose from a private farmhouse room, rustic bunkie, bell tent glamping, or BYOT camping depending on their preferred experience and budget.</p>
+    </div>
+    <div class="faq-card">
+      <h3>Is the certificate included?</h3>
+      <p>Yes. All participants who complete the course modules and hands-on activities receive a Straight Fin Farms Certificate in Practical Permaculture Design &amp; Biodiversity Stewardship.</p>
+    </div>
+    <div class="faq-card">
+      <h3>Are meals included?</h3>
+      <p>Farm-to-table meals and refreshments can be included depending on the selected package and retreat format.</p>
+    </div>
+  </div>
+
+  <div class="policy-box">
+    <h3>Cancellation Policy</h3>
+    <p>&bull; Full refund for cancellations made 14 days or more before check-in.</p>
+    <p>&bull; 50% refund for cancellations made 7&ndash;13 days before check-in.</p>
+    <p>&bull; No refund for cancellations made within 7 days of arrival.</p>
+    <p>&bull; Corporate retreat bookings may be rescheduled once within the same season, subject to availability.</p>
+    <p>&bull; Severe weather or emergency farm closures will be eligible for full refund or rebooking credit.</p>
+  </div>
+</section>
+
+<!-- CONTACT FOR RETREAT -->
+<section class="content-section" id="contact-retreat">
+  <h2>Join the Waitlist</h2>
+  <p>Permaculture workshops and certification retreats are coming soon. Sign up to be the first to know when dates and pricing are announced.</p>
+  <form style="max-width: 480px; margin-top: 32px;" onsubmit="event.preventDefault(); alert('Thank you! You\'re on the waitlist. We\'ll be in touch when retreat dates are announced.');">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <input type="text" placeholder="First Name" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%;">
+      <input type="text" placeholder="Last Name" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%;">
+    </div>
+    <input type="email" placeholder="Email Address" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; margin-bottom:14px;">
+    <select style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; margin-bottom:14px; background:#fff; color:#1a1a1a;">
+      <option value="">I'm interested in...</option>
+      <option value="3-day">3-Day Weekend Intensive</option>
+      <option value="7-day">7-Day Certification Retreat</option>
+      <option value="corporate">Corporate / Team Retreat</option>
+      <option value="general">General Updates</option>
+    </select>
+    <textarea placeholder="Tell us about yourself, your group size, and what you're hoping to learn" style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; min-height:120px; resize:vertical; margin-bottom:14px;"></textarea>
+    <button type="submit" class="btn-primary" style="border:none; cursor:pointer;">JOIN THE WAITLIST</button>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <h4>Straight Fin Farms</h4>
+    <p>Balance Nature Project &mdash; Reconnecting people with the land, nature, and each other.</p>
+    <br>
+    <p>1091 County Road 24<br>Dunsford, ON, K0M 1L0</p>
+    <br>
+    <p>hello@straightfinfarms.com</p>
+  </div>
+  <div>
+    <h4>Navigate</h4>
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+  </div>
+  <div>
+    <h4>Get Involved</h4>
+    <a href="book-direct.html">Book Direct (Save 15%)</a>
+    <a href="https://airbnb.ca/h/straightfinfarms" target="_blank">Book on Airbnb</a>
+    <a href="straight-fin-farms.html#permaculture">Take a Course</a>
+    <a href="straight-fin-farms.html#contact">Join the Community</a>
+  </div>
+</footer>
+<div class="footer-bottom">&copy; 2026 Straight Fin Farms. All rights reserved.</div>
+
+</body>
+</html>

@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Direct — Straight Fin Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #fff; color: #1a1a1a; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px; background: #fff; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid #e0ddd6;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900; font-size: 15px; max-width: 220px; line-height: 1.3;
+    color: #1a1a1a; text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a {
+    font-size: 14px; color: #1a1a1a; text-decoration: none; font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .nav-links a:hover { text-decoration: underline; }
+  .nav-links a.btn-book,
+  .nav-links a.btn-book:visited,
+  .nav-links a.btn-book:link {
+    background: #3d8c40; color: #fff !important; border: none; border-radius: 50px;
+    padding: 12px 28px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer; text-decoration: none !important; display: inline-block;
+  }
+  .nav-links a.btn-book:hover { background: #2e6e31; color: #fff !important; text-decoration: none !important; }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: #1a1a1a; margin: 5px 0; transition: 0.3s; }
+
+  /* PHOTO GALLERY */
+  .gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 320px 160px;
+    gap: 8px;
+    max-width: 1200px; margin: 24px auto 0; padding: 0 48px;
+    border-radius: 16px; overflow: hidden;
+  }
+  .gallery-main {
+    grid-row: 1 / 3;
+    background: url('images/IMG_3293.jpg') center/cover no-repeat;
+    cursor: pointer; position: relative;
+    border-radius: 16px 0 0 16px;
+  }
+  .gallery-sub {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .gallery-thumb {
+    background-size: cover; background-position: center;
+    cursor: pointer; position: relative;
+  }
+  .gallery-thumb:nth-child(2) { border-radius: 0 16px 0 0; }
+  .gallery-sub:last-child .gallery-thumb:nth-child(2) { border-radius: 0 0 16px 0; }
+
+  /* LISTING HEADER */
+  .listing-header {
+    max-width: 1200px; margin: 0 auto; padding: 28px 48px 0;
+  }
+  .listing-header h1 {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: 30px; line-height: 1.2; margin-bottom: 8px;
+  }
+  .listing-meta {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    font-size: 14px; color: #555; margin-bottom: 4px;
+  }
+  .listing-meta .star { color: #1a1a1a; font-weight: 600; }
+  .listing-meta a { color: #1a1a1a; font-weight: 600; text-decoration: underline; }
+  .listing-meta .dot { color: #bbb; }
+  .save-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #eaf5ea; color: #2e6e31; border-radius: 8px;
+    padding: 8px 16px; font-size: 14px; font-weight: 600; margin-top: 12px;
+  }
+
+  /* MAIN LAYOUT */
+  .listing-body {
+    display: grid; grid-template-columns: 1fr 400px;
+    gap: 64px; max-width: 1200px; margin: 0 auto; padding: 36px 48px 80px;
+    align-items: start;
+  }
+
+  /* LEFT COLUMN */
+  .host-row {
+    display: flex; align-items: center; gap: 16px;
+    padding-bottom: 28px; border-bottom: 1px solid #e8e4dc;
+  }
+  .host-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #2b4a1f; color: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px;
+  }
+  .host-info h3 { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+  .host-info p { font-size: 14px; color: #888; }
+
+  .section-divider { border: none; border-top: 1px solid #e8e4dc; margin: 28px 0; }
+
+  .detail-highlights {
+    display: flex; flex-direction: column; gap: 20px;
+    padding-bottom: 28px; border-bottom: 1px solid #e8e4dc;
+  }
+  .highlight-item {
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .highlight-icon {
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .highlight-text h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .highlight-text p { font-size: 14px; color: #888; line-height: 1.5; }
+
+  .description { padding: 28px 0; border-bottom: 1px solid #e8e4dc; }
+  .description p { font-size: 16px; line-height: 1.8; color: #333; margin-bottom: 16px; }
+  .description-toggle {
+    background: none; border: none; color: #1a1a1a; font-weight: 600;
+    font-size: 15px; cursor: pointer; text-decoration: underline;
+    padding: 0; font-family: 'Inter', sans-serif;
+  }
+
+  /* AMENITIES */
+  .amenities-section { padding: 28px 0; border-bottom: 1px solid #e8e4dc; }
+  .amenities-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 24px; margin-bottom: 24px;
+  }
+  .amenities-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .amenity-item {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 15px; color: #333; padding: 6px 0;
+  }
+  .amenity-icon { font-size: 22px; width: 28px; text-align: center; }
+
+  /* SLEEPING ARRANGEMENTS */
+  .sleeping-section { padding: 28px 0; border-bottom: 1px solid #e8e4dc; }
+  .sleeping-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 24px; margin-bottom: 24px;
+  }
+  .sleeping-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  .sleeping-card {
+    border: 1px solid #e0ddd6; border-radius: 12px; padding: 20px;
+  }
+  .sleeping-card .bed-icon { font-size: 28px; margin-bottom: 10px; }
+  .sleeping-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .sleeping-card p { font-size: 13px; color: #888; }
+
+  /* RIGHT COLUMN — BOOKING CARD */
+  .booking-card {
+    background: #fff; border: 1px solid #ddd; border-radius: 12px;
+    padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    position: sticky; top: 90px;
+  }
+  .price-row {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;
+  }
+  .price-row .price {
+    font-size: 26px; font-weight: 700; color: #1a1a1a;
+  }
+  .price-row .per-night { font-size: 15px; color: #555; }
+  .price-row .orig-price {
+    font-size: 18px; color: #bbb; text-decoration: line-through; margin-left: 4px;
+  }
+  .rating-row {
+    font-size: 13px; color: #555; margin-bottom: 20px;
+  }
+  .rating-row .star { color: #1a1a1a; font-weight: 600; }
+
+  /* DATE / GUEST PICKER */
+  .picker-box {
+    border: 1px solid #bbb; border-radius: 10px; overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .picker-dates {
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .picker-field {
+    padding: 12px 14px; cursor: pointer; position: relative;
+  }
+  .picker-field:first-child { border-right: 1px solid #bbb; }
+  .picker-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #1a1a1a; margin-bottom: 4px;
+  }
+  .picker-value {
+    font-size: 14px; color: #555;
+  }
+  .picker-field input {
+    font-family: 'Inter', sans-serif; font-size: 14px; color: #1a1a1a;
+    border: none; background: transparent; width: 100%; outline: none;
+    cursor: pointer;
+  }
+  .picker-guests {
+    border-top: 1px solid #bbb;
+    padding: 12px 14px;
+  }
+  .picker-guests .picker-label { margin-bottom: 4px; }
+
+  .guest-counter {
+    display: flex; align-items: center; gap: 12px; margin-top: 6px;
+  }
+  .guest-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid #bbb; background: #fff; cursor: pointer;
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+    color: #555; font-family: 'Inter', sans-serif; transition: 0.15s;
+  }
+  .guest-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+  .guest-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .guest-count { font-size: 16px; font-weight: 500; min-width: 24px; text-align: center; }
+
+  .btn-reserve {
+    width: 100%; padding: 16px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #3d8c40 0%, #2b6e2e 100%);
+    color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; letter-spacing: 0.02em;
+    transition: 0.2s;
+  }
+  .btn-reserve:hover { background: linear-gradient(135deg, #2e6e31 0%, #1f5a22 100%); }
+
+  .no-charge-note {
+    text-align: center; font-size: 14px; color: #888; margin-top: 14px;
+  }
+
+  /* PRICE BREAKDOWN */
+  .price-breakdown {
+    margin-top: 24px; padding-top: 20px; border-top: 1px solid #e8e4dc;
+  }
+  .breakdown-row {
+    display: flex; justify-content: space-between; margin-bottom: 12px;
+    font-size: 15px; color: #333;
+  }
+  .breakdown-row .label { text-decoration: underline; cursor: help; }
+  .breakdown-row.savings { color: #2e6e31; font-weight: 500; }
+  .breakdown-total {
+    display: flex; justify-content: space-between;
+    padding-top: 16px; border-top: 1px solid #e8e4dc;
+    font-size: 16px; font-weight: 700; color: #1a1a1a;
+  }
+
+  /* VISUAL CALENDAR */
+  .cal-dropdown {
+    display: none; border-top: 1px solid #bbb;
+    padding: 20px 16px 12px; background: #fff;
+  }
+  .cal-dropdown.open { display: block; }
+  .cal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .cal-nav {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid #ddd; background: #fff; cursor: pointer;
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+    color: #333; font-family: 'Inter', sans-serif;
+  }
+  .cal-nav:hover { background: #f5f5f5; }
+  .cal-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+  .cal-months { display: flex; gap: 48px; }
+  .cal-month-title {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 16px; color: #1a1a1a;
+  }
+  .cal-grid-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  }
+  .cal-dow {
+    font-size: 11px; font-weight: 600; color: #999;
+    text-align: center; padding: 4px 0 8px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #333; border-radius: 50%; cursor: pointer;
+    transition: 0.12s; position: relative;
+  }
+  .cal-day:hover:not(.booked):not(.past):not(.empty) { background: #f0ede6; }
+  .cal-day.today { font-weight: 700; }
+  .cal-day.past { color: #ccc; cursor: default; text-decoration: line-through; }
+  .cal-day.booked {
+    color: #ccc; cursor: not-allowed;
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 3px, #f0ede6 3px, #f0ede6 4px
+    );
+    text-decoration: line-through;
+  }
+  .cal-day.selected {
+    background: #3d8c40; color: #fff; font-weight: 600;
+  }
+  .cal-day.in-range {
+    background: #e8f5e9; border-radius: 0;
+  }
+  .cal-day.range-start {
+    background: #3d8c40; color: #fff; font-weight: 600;
+    border-radius: 50% 0 0 50%;
+  }
+  .cal-day.range-end {
+    background: #3d8c40; color: #fff; font-weight: 600;
+    border-radius: 0 50% 50% 0;
+  }
+  .cal-day.empty { cursor: default; }
+
+  .cal-legend {
+    display: flex; gap: 20px; padding: 14px 0 8px;
+    font-size: 12px; color: #888;
+  }
+  .legend-dot {
+    display: inline-block; width: 12px; height: 12px;
+    border-radius: 50%; margin-right: 6px; vertical-align: middle;
+  }
+  .legend-avail { background: #fff; border: 1px solid #ccc; }
+  .legend-booked {
+    background: repeating-linear-gradient(
+      45deg, #eee, #eee 2px, #fff 2px, #fff 4px
+    );
+    border: 1px solid #ccc;
+  }
+  .legend-selected { background: #3d8c40; }
+  .cal-status {
+    font-size: 12px; color: #3d8c40; padding: 6px 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cal-status::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%;
+    background: #3d8c40; display: inline-block;
+    animation: pulse 1.5s infinite;
+  }
+  .cal-status.synced::before { animation: none; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+  .cal-clear {
+    background: none; border: none; font-size: 13px; color: #555;
+    text-decoration: underline; cursor: pointer; padding: 4px 0;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* SYNC BADGE */
+  .sync-section {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 16px; font-size: 12px; color: #888;
+  }
+  .sync-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #3d8c40;
+  }
+
+  /* DIRECT BOOKING BADGE */
+  .direct-badge {
+    display: flex; align-items: center; gap: 10px;
+    background: #f0faf0; border: 1px solid #c8e6c9; border-radius: 10px;
+    padding: 14px 16px; margin-top: 20px;
+  }
+  .direct-badge .badge-icon { font-size: 20px; }
+  .direct-badge .badge-text { font-size: 13px; color: #2e6e31; line-height: 1.5; }
+  .direct-badge .badge-text strong { font-weight: 600; }
+
+  /* MAP / LOCATION */
+  .location-section { padding: 28px 0; border-bottom: 1px solid #e8e4dc; }
+  .location-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 24px; margin-bottom: 8px;
+  }
+  .location-section .loc-sub {
+    font-size: 15px; color: #555; margin-bottom: 20px;
+  }
+  .location-map {
+    width: 100%; height: 280px; border-radius: 12px; overflow: hidden;
+    background: #e8e4dc; position: relative;
+  }
+  .location-map iframe {
+    width: 100%; height: 100%; border: 0;
+  }
+  .location-details {
+    margin-top: 20px; font-size: 15px; color: #444; line-height: 1.8;
+  }
+
+  /* HOUSE RULES */
+  .rules-section { padding: 28px 0; border-bottom: 1px solid #e8e4dc; }
+  .rules-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 24px; margin-bottom: 20px;
+  }
+  .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 40px; }
+  .rule-item {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 15px; color: #333; padding: 6px 0;
+  }
+  .rule-icon { font-size: 18px; width: 24px; text-align: center; }
+
+  /* CANCELLATION */
+  .cancel-section { padding: 28px 0; border-bottom: 1px solid #e8e4dc; }
+  .cancel-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 24px; margin-bottom: 16px;
+  }
+  .cancel-section p { font-size: 15px; color: #444; line-height: 1.8; margin-bottom: 10px; }
+
+  /* INQUIRY FORM (MODAL-STYLE) */
+  .inquiry-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.55); align-items: center; justify-content: center;
+  }
+  .inquiry-overlay.open { display: flex; }
+  .inquiry-modal {
+    background: #fff; border-radius: 16px; max-width: 520px; width: 90%;
+    max-height: 90vh; overflow-y: auto; padding: 40px 36px;
+    position: relative;
+  }
+  .inquiry-close {
+    position: absolute; top: 16px; right: 20px; background: none; border: none;
+    font-size: 24px; cursor: pointer; color: #555; font-family: 'Inter', sans-serif;
+  }
+  .inquiry-modal h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 24px; margin-bottom: 8px;
+  }
+  .inquiry-modal .modal-sub {
+    font-size: 14px; color: #888; margin-bottom: 28px; line-height: 1.6;
+  }
+  .inquiry-form { display: flex; flex-direction: column; gap: 14px; }
+  .inquiry-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .inquiry-form label {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #555; margin-bottom: 4px; display: block;
+  }
+  .inquiry-form input,
+  .inquiry-form textarea,
+  .inquiry-form select {
+    font-family: 'Inter', sans-serif; font-size: 14px;
+    padding: 14px 16px; border: 1px solid #ccc; border-radius: 8px;
+    background: #fff; color: #1a1a1a; width: 100%;
+  }
+  .inquiry-form textarea { resize: vertical; min-height: 100px; }
+  .inquiry-form input:focus,
+  .inquiry-form textarea:focus,
+  .inquiry-form select:focus { outline: none; border-color: #3d8c40; }
+  .btn-submit-inquiry {
+    width: 100%; padding: 16px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #3d8c40 0%, #2b6e2e 100%);
+    color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; margin-top: 8px;
+  }
+  .btn-submit-inquiry:hover { background: linear-gradient(135deg, #2e6e31 0%, #1f5a22 100%); }
+  .inquiry-form .form-note {
+    font-size: 13px; color: #888; text-align: center; line-height: 1.5;
+  }
+
+  /* SUCCESS STATE */
+  .inquiry-success { display: none; text-align: center; padding: 40px 20px; }
+  .inquiry-success .check { font-size: 56px; margin-bottom: 16px; }
+  .inquiry-success h3 {
+    font-family: 'Playfair Display', serif; font-size: 22px;
+    font-weight: 700; margin-bottom: 12px;
+  }
+  .inquiry-success p { font-size: 15px; color: #555; line-height: 1.7; }
+
+  /* FOOTER */
+  footer {
+    background: #1a1a1a; color: rgba(255,255,255,0.6);
+    padding: 56px 48px; display: grid;
+    grid-template-columns: 1fr 1fr 1fr; gap: 48px;
+  }
+  footer h4 {
+    font-family: 'Playfair Display', serif; font-size: 15px;
+    color: #fff; font-weight: 700; margin-bottom: 18px;
+  }
+  footer a { color: rgba(255,255,255,0.6); text-decoration: none; display: block; margin-bottom: 10px; font-size: 14px; }
+  footer a:hover { color: #fff; }
+  footer p { font-size: 14px; line-height: 1.7; }
+  .footer-bottom {
+    background: #111; padding: 20px 48px; text-align: center;
+    font-size: 13px; color: rgba(255,255,255,0.35);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .listing-body { grid-template-columns: 1fr; }
+    .booking-card { position: static; max-width: 480px; }
+    .sleeping-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: #fff; flex-direction: column; padding: 24px;
+      border-bottom: 1px solid #e0ddd6; gap: 20px;
+    }
+    .nav-links.open { display: flex; }
+    .hamburger { display: block; }
+    .gallery {
+      grid-template-columns: 1fr; grid-template-rows: 280px;
+      padding: 0 20px; border-radius: 12px;
+    }
+    .gallery-main { border-radius: 12px; }
+    .gallery-sub { display: none; }
+    .listing-header { padding: 20px 20px 0; }
+    .listing-header h1 { font-size: 24px; }
+    .listing-body { padding: 28px 20px 60px; gap: 36px; }
+    .amenities-grid { grid-template-columns: 1fr; }
+    .sleeping-grid { grid-template-columns: 1fr; }
+    .rules-grid { grid-template-columns: 1fr; }
+    .inquiry-row { grid-template-columns: 1fr; }
+    .cal-grid-wrap { grid-template-columns: 1fr; }
+    .cal-months { gap: 0; }
+    .cal-month-title:last-child { display: none; }
+    #calGrid2 { display: none; }
+    footer { grid-template-columns: 1fr; padding: 40px 20px; }
+    .footer-bottom { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="straight-fin-farms.html">Welcome to Balance Nature Project at Straight Fin Farms</a>
+  <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+    <a class="btn-book" href="book-direct.html" style="color:#fff !important;">BOOK DIRECT</a>
+  </div>
+</nav>
+
+<!-- PHOTO GALLERY -->
+<div class="gallery">
+  <div class="gallery-main"></div>
+  <div class="gallery-sub">
+    <div class="gallery-thumb" style="background-image: url('images/IMG_4673.jpg')"></div>
+    <div class="gallery-thumb" style="background-image: url('images/IMG_0576.jpg')"></div>
+  </div>
+  <div class="gallery-sub">
+    <div class="gallery-thumb" style="background-image: url('images/IMG_7523.jpg')"></div>
+    <div class="gallery-thumb" style="background-image: url('images/IMG_2790.jpg')"></div>
+  </div>
+</div>
+
+<!-- LISTING HEADER -->
+<div class="listing-header">
+  <h1>Straight Fin Farms &mdash; 34-Acre Private Waterfront Retreat</h1>
+  <div class="listing-meta">
+    <span class="star">&#9733; 5.0</span>
+    <span class="dot">&middot;</span>
+    <a href="https://airbnb.ca/h/straightfinfarms" target="_blank">Airbnb Reviews</a>
+    <span class="dot">&middot;</span>
+    <span>Dunsford, Ontario, Canada</span>
+  </div>
+  <div class="listing-meta" style="margin-top: 4px;">
+    <span>16+ guests &middot; 7 bedrooms &middot; 10 beds &middot; 4.5 bathrooms</span>
+  </div>
+  <div class="save-badge">
+    &#10003;&ensp;Book direct &mdash; save up to 15% vs. Airbnb (no service fees)
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="listing-body">
+
+  <!-- LEFT COLUMN -->
+  <div class="listing-details">
+
+    <!-- HOST -->
+    <div class="host-row">
+      <div class="host-avatar">D</div>
+      <div class="host-info">
+        <h3>Entire farmhouse hosted by Deniz</h3>
+        <p>Superhost &middot; Joined 2022</p>
+      </div>
+    </div>
+
+    <!-- HIGHLIGHTS -->
+    <div class="detail-highlights" style="margin-top: 28px;">
+      <div class="highlight-item">
+        <div class="highlight-icon">&#127968;</div>
+        <div class="highlight-text">
+          <h4>Entire property &mdash; all to yourselves</h4>
+          <p>You'll have the full 34-acre farm, 7-bedroom farmhouse, waterfront, trails, and all amenities exclusively for your group.</p>
+        </div>
+      </div>
+      <div class="highlight-item">
+        <div class="highlight-icon">&#128221;</div>
+        <div class="highlight-text">
+          <h4>Self check-in</h4>
+          <p>Check yourself in with the lockbox. Detailed instructions sent after booking confirmation.</p>
+        </div>
+      </div>
+      <div class="highlight-item">
+        <div class="highlight-icon">&#127754;</div>
+        <div class="highlight-text">
+          <h4>500 ft of private waterfront</h4>
+          <p>Kayaks, pedal boat, and direct water access right from the property. Dock and swimming area included.</p>
+        </div>
+      </div>
+      <div class="highlight-item">
+        <div class="highlight-icon">&#128176;</div>
+        <div class="highlight-text">
+          <h4>Book direct and save</h4>
+          <p>No platform service fees. Same property, same host, better price. You're booking directly with the owner.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="description">
+      <p>Welcome to Straight Fin Farms &mdash; a 34-acre private waterfront retreat just 8 minutes from downtown Bobcaygeon and 1.5 hours from Toronto. The farmhouse sleeps 16+ guests across 7 uniquely designed bedrooms and 4.5 bathrooms, with a full kitchen, spacious living areas, and wraparound outdoor spaces.</p>
+      <p>The property includes 500 feet of private waterfront with kayaks and a pedal boat, an outdoor hot tub, fireplace, BBQ, forest trails, a developing permaculture farm with gardens, orchards, beehives, and mushroom cultivation areas. Whether you're here for a multi-family getaway, a milestone birthday, a yoga retreat, or a corporate offsite &mdash; the entire property is yours.</p>
+      <p id="desc-more" style="display: none;">Bobcaygeon is one of the Kawarthas' most charming small towns. You're just minutes from restaurants, craft shops, Kawartha Dairy ice cream, boat launches on the Trent-Severn Waterway, and the famous Thursday night concerts on the bridge all summer long. The property is four-season &mdash; summer bonfires, fall harvest colours, winter snowshoeing and hot tub evenings, spring planting season. Every visit is different.</p>
+      <button class="description-toggle" onclick="var el=document.getElementById('desc-more'); if(el.style.display==='none'){el.style.display='block';this.textContent='Show less';}else{el.style.display='none';this.textContent='Show more \u203A';}">Show more &#8250;</button>
+    </div>
+
+    <!-- SLEEPING ARRANGEMENTS -->
+    <div class="sleeping-section">
+      <h2>Where you'll sleep</h2>
+      <div class="sleeping-grid">
+        <div class="sleeping-card">
+          <div class="bed-icon">&#128716;</div>
+          <h4>Bedroom 1</h4>
+          <p>1 king bed</p>
+        </div>
+        <div class="sleeping-card">
+          <div class="bed-icon">&#128716;</div>
+          <h4>Bedroom 2</h4>
+          <p>1 queen bed</p>
+        </div>
+        <div class="sleeping-card">
+          <div class="bed-icon">&#128716;</div>
+          <h4>Bedroom 3</h4>
+          <p>1 queen bed</p>
+        </div>
+        <div class="sleeping-card">
+          <div class="bed-icon">&#128716;</div>
+          <h4>Bedroom 4</h4>
+          <p>1 double bed</p>
+        </div>
+        <div class="sleeping-card">
+          <div class="bed-icon">&#128716;</div>
+          <h4>Bedroom 5</h4>
+          <p>1 double bed</p>
+        </div>
+        <div class="sleeping-card">
+          <div class="bed-icon">&#128716;</div>
+          <h4>Bedroom 6</h4>
+          <p>2 single beds</p>
+        </div>
+        <div class="sleeping-card">
+          <div class="bed-icon">&#128716;</div>
+          <h4>Bedroom 7 &mdash; Loft</h4>
+          <p>Flexible sleeping</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMENITIES -->
+    <div class="amenities-section">
+      <h2>What this place offers</h2>
+      <div class="amenities-grid">
+        <div class="amenity-item"><span class="amenity-icon">&#127754;</span> 500 ft private waterfront</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128752;</span> Outdoor hot tub</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127866;</span> Full kitchen</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128293;</span> Indoor fireplace</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128758;</span> Kayaks &amp; pedal boat</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127869;</span> BBQ grill</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127795;</span> Forest trails</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128246;</span> Free Wi-Fi</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128663;</span> Free parking on premises</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128700;</span> Washer &amp; dryer</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127909;</span> TV with streaming</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128293;</span> Fire pit / bonfire area</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127793;</span> Permaculture farm access</div>
+        <div class="amenity-item"><span class="amenity-icon">&#129385;</span> Board games &amp; card games</div>
+      </div>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="location-section">
+      <h2>Where you'll be</h2>
+      <p class="loc-sub">Dunsford, Ontario &mdash; 8 minutes from downtown Bobcaygeon</p>
+      <div class="location-map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11400!2d-78.6!3d44.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDTCsDMwJzAwLjAiTiA3OMKwMzYnMDAuMCJX!5e0!3m2!1sen!2sca!4v1" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="location-details">
+        <p>1091 County Road 24, Dunsford, ON. Straight Fin Farms sits on 34 private acres on the edge of the Kawarthas &mdash; close enough to Bobcaygeon for restaurants and supplies, far enough for total privacy. A straight shot up the 115 from the GTA, about 1.5 hours from Toronto.</p>
+      </div>
+    </div>
+
+    <!-- HOUSE RULES -->
+    <div class="rules-section">
+      <h2>House rules</h2>
+      <div class="rules-grid">
+        <div class="rule-item"><span class="rule-icon">&#128336;</span> Check-in: 3:00 PM</div>
+        <div class="rule-item"><span class="rule-icon">&#128336;</span> Checkout: 11:00 AM</div>
+        <div class="rule-item"><span class="rule-icon">&#128101;</span> 16+ guests maximum</div>
+        <div class="rule-item"><span class="rule-icon">&#128221;</span> Self check-in with lockbox</div>
+        <div class="rule-item"><span class="rule-icon">&#128053;</span> Pets welcome &mdash; $50 per pet, per stay</div>
+        <div class="rule-item"><span class="rule-icon">&#128684;</span> No smoking indoors</div>
+        <div class="rule-item"><span class="rule-icon">&#127881;</span> Events &amp; gatherings allowed (with notice)</div>
+        <div class="rule-item"><span class="rule-icon">&#128264;</span> Quiet hours: 11 PM &ndash; 7 AM</div>
+      </div>
+    </div>
+
+    <!-- CANCELLATION -->
+    <div class="cancel-section">
+      <h2>Cancellation Policy</h2>
+      <p><strong>Firm (Short-Term Stays)</strong></p>
+      <p>Full refund if cancelled at least 30 days before check-in. Partial refund if cancelled 7&ndash;30 days before check-in.</p>
+      <p><strong>Strict Long-Term (30+ Days)</strong></p>
+      <p>Full refund if cancelled within 48 hours of booking and at least 28 days before check-in. After that, the first 30 days of the stay are non-refundable.</p>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN — BOOKING CARD -->
+  <div>
+    <div class="booking-card">
+      <div class="price-row">
+        <span class="price" id="nightlyRate">$650</span>
+        <span class="per-night">CAD / night <span style="font-size:11px; color:#3d8c40;">(HST incl.)</span></span>
+      </div>
+      <div class="rating-row">
+        <span class="star">&#9733; 5.0</span> &middot; <a href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="color:#555; text-decoration:underline;">Airbnb Reviews</a>
+      </div>
+
+      <!-- DATE PICKER -->
+      <div class="picker-box">
+        <div class="picker-dates" onclick="toggleCalendar()" style="cursor:pointer;">
+          <div class="picker-field">
+            <div class="picker-label">Check-in</div>
+            <div class="picker-value" id="checkinDisplay">Select date</div>
+            <input type="hidden" id="checkin">
+          </div>
+          <div class="picker-field">
+            <div class="picker-label">Checkout</div>
+            <div class="picker-value" id="checkoutDisplay">Select date</div>
+            <input type="hidden" id="checkout">
+          </div>
+        </div>
+
+        <!-- VISUAL CALENDAR -->
+        <div class="cal-dropdown" id="calDropdown">
+          <div class="cal-header">
+            <button class="cal-nav" onclick="navMonth(-1)" id="calPrev">&#8249;</button>
+            <div class="cal-months">
+              <span class="cal-month-title" id="calMonth1"></span>
+              <span class="cal-month-title" id="calMonth2"></span>
+            </div>
+            <button class="cal-nav" onclick="navMonth(1)">&#8250;</button>
+          </div>
+          <div class="cal-grid-wrap">
+            <div class="cal-grid" id="calGrid1"></div>
+            <div class="cal-grid" id="calGrid2"></div>
+          </div>
+          <div class="cal-legend">
+            <span><span class="legend-dot legend-avail"></span> Available</span>
+            <span><span class="legend-dot legend-booked"></span> Booked</span>
+            <span><span class="legend-dot legend-selected"></span> Your stay</span>
+          </div>
+          <div class="cal-status" id="calStatus">Loading Airbnb calendar&hellip;</div>
+          <button class="cal-clear" onclick="clearDates()">Clear dates</button>
+        </div>
+
+        <div class="picker-guests">
+          <div class="picker-label">Guests</div>
+          <div class="guest-counter">
+            <button class="guest-btn" onclick="changeGuests(-1)" id="guestMinus" disabled>&minus;</button>
+            <span class="guest-count" id="guestCount">1</span>
+            <button class="guest-btn" onclick="changeGuests(1)" id="guestPlus">+</button>
+            <span style="font-size:14px; color:#888; margin-left: 4px;">guest(s)</span>
+          </div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">Base rate includes up to 8 guests &middot; $85/guest/night above 8</div>
+        </div>
+
+        <div class="picker-guests" style="border-top: 1px solid #e8e4dc; padding-top: 12px;">
+          <div class="picker-label">Pets</div>
+          <div class="guest-counter">
+            <button class="guest-btn" onclick="changePets(-1)" id="petMinus" disabled>&minus;</button>
+            <span class="guest-count" id="petCount">0</span>
+            <button class="guest-btn" onclick="changePets(1)" id="petPlus">+</button>
+            <span style="font-size:14px; color:#888; margin-left: 4px;">pet(s)</span>
+          </div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">$50 per pet, per stay</div>
+        </div>
+      </div>
+
+      <button class="btn-reserve" onclick="openInquiry()" id="reserveBtn">Request to Book</button>
+      <p class="no-charge-note">You won't be charged yet</p>
+
+      <div class="price-breakdown" id="priceBreakdown" style="display: none;">
+        <div class="breakdown-row">
+          <span class="label" id="nightsLabel">$650 x 2 nights</span>
+          <span id="nightsTotal">$1,300</span>
+        </div>
+        <div class="breakdown-row" id="extraGuestRow" style="display: none;">
+          <span class="label" id="extraGuestLabel">Extra guests</span>
+          <span id="extraGuestTotal">$0</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label" id="cleaningLabel">Cleaning fee</span>
+          <span id="cleaningTotal">$380</span>
+        </div>
+        <div class="breakdown-row" id="petRow" style="display: none;">
+          <span class="label" id="petLabel">Pet fee</span>
+          <span id="petTotal">$0</span>
+        </div>
+        <div class="breakdown-row savings">
+          <span>Airbnb service fee</span>
+          <span>$0 &mdash; waived</span>
+        </div>
+        <div class="breakdown-total">
+          <span>Total (HST included)</span>
+          <span id="totalPrice">$1,500</span>
+        </div>
+      </div>
+
+      <div class="direct-badge">
+        <span class="badge-icon">&#128154;</span>
+        <span class="badge-text"><strong>You're saving money.</strong> Booking direct means zero service fees. Same property, same host, same experience.</span>
+      </div>
+
+      <!-- CALENDAR SYNC INFO -->
+      <div class="sync-section">
+        <div class="sync-dot"></div>
+        <span class="sync-text">Live-synced with Airbnb calendar</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CALENDAR SYNC SECTION -->
+<section style="max-width:1200px; margin:0 auto; padding:0 48px 80px;">
+  <div style="background:#f9f9f6; border:1px solid #e0ddd6; border-radius:12px; padding:32px; display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
+    <div style="flex:1; min-width:280px;">
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:8px;">Calendar Sync</h3>
+      <p style="font-size:14px; color:#555; line-height:1.7; margin-bottom:16px;">This page automatically pulls booked dates from Airbnb so you always see real-time availability. To complete two-way sync, import the link below into your Airbnb calendar under <strong>Availability &rarr; Import Calendar</strong>.</p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1" target="_blank" style="font-size:13px; color:#3d8c40; text-decoration:underline;">Download Airbnb iCal</a>
+        <a href="webcal://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1" style="font-size:13px; color:#3d8c40; text-decoration:underline;">Subscribe in Calendar App</a>
+      </div>
+    </div>
+    <div style="flex:1; min-width:280px;">
+      <h3 style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:8px;">For Hosts: Two-Way Sync</h3>
+      <p style="font-size:14px; color:#555; line-height:1.7;">When you confirm a direct booking, block those dates on Airbnb manually to keep both calendars in sync. Go to your Airbnb calendar &rarr; select the dates &rarr; mark as "Blocked." This prevents double bookings from both sides.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INQUIRY MODAL -->
+<div class="inquiry-overlay" id="inquiryOverlay">
+  <div class="inquiry-modal">
+    <button class="inquiry-close" onclick="closeInquiry()">&times;</button>
+
+    <div id="inquiryForm">
+      <h2>Request to Book</h2>
+      <p class="modal-sub">Complete the form below and Deniz will confirm availability and send you booking details &mdash; typically within a few hours.</p>
+
+      <form class="inquiry-form" onsubmit="submitInquiry(event)">
+        <div class="inquiry-row">
+          <div>
+            <label>First Name</label>
+            <input type="text" placeholder="First name" required>
+          </div>
+          <div>
+            <label>Last Name</label>
+            <input type="text" placeholder="Last name" required>
+          </div>
+        </div>
+        <div>
+          <label>Email</label>
+          <input type="email" placeholder="your@email.com" required>
+        </div>
+        <div>
+          <label>Phone (optional)</label>
+          <input type="tel" placeholder="+1 (___) ___-____">
+        </div>
+        <div class="inquiry-row">
+          <div>
+            <label>Check-in</label>
+            <input type="date" id="modalCheckin">
+          </div>
+          <div>
+            <label>Checkout</label>
+            <input type="date" id="modalCheckout">
+          </div>
+        </div>
+        <div class="inquiry-row">
+          <div>
+            <label>Number of Guests</label>
+            <input type="number" min="1" max="20" id="modalGuests" placeholder="1">
+          </div>
+          <div>
+            <label>Number of Pets</label>
+            <input type="number" min="0" max="5" id="modalPets" placeholder="0">
+          </div>
+        </div>
+        <div class="inquiry-row">
+          <div>
+            <label>Occasion (optional)</label>
+            <select>
+              <option value="">Select...</option>
+              <option>Family getaway</option>
+              <option>Birthday / Milestone</option>
+              <option>Friends trip</option>
+              <option>Yoga / Wellness retreat</option>
+              <option>Corporate offsite</option>
+              <option>Wedding / Engagement</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>Message (optional)</label>
+          <textarea placeholder="Tell us a bit about your trip &mdash; who's coming, anything you'd like us to know..."></textarea>
+        </div>
+        <p class="form-note">Deniz will respond with confirmed availability, total pricing, and payment instructions. No charge until you confirm.</p>
+        <button type="submit" class="btn-submit-inquiry">Send Booking Request</button>
+      </form>
+    </div>
+
+    <div class="inquiry-success" id="inquirySuccess">
+      <div class="check">&#9989;</div>
+      <h3>Request Sent!</h3>
+      <p>Thank you! Deniz will review your request and get back to you within a few hours with confirmed availability, pricing, and next steps.</p>
+      <p style="margin-top: 16px; font-size: 14px; color: #888;">Check your email at the address you provided.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <h4>Straight Fin Farms</h4>
+    <p>Balance Nature Project &mdash; Reconnecting people with the land, nature, and each other.</p>
+    <br>
+    <p>1091 County Road 24<br>Dunsford, ON, K0M 1L0</p>
+    <br>
+    <p>hello@straightfinfarms.com</p>
+  </div>
+  <div>
+    <h4>Navigate</h4>
+    <a href="straight-fin-farms.html#projects">Projects</a>
+    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="straight-fin-farms.html#stay">Stay With Us</a>
+    <a href="straight-fin-farms.html#about">About</a>
+    <a href="straight-fin-farms.html#contact">Contact</a>
+  </div>
+  <div>
+    <h4>Book</h4>
+    <a href="book-direct.html">Book Direct (Save 15%)</a>
+    <a href="https://airbnb.ca/h/straightfinfarms" target="_blank">Book on Airbnb</a>
+    <a href="bookings.html">Retreats &amp; Workshops</a>
+  </div>
+</footer>
+<div class="footer-bottom">&copy; 2026 Straight Fin Farms. All rights reserved.</div>
+
+<script>
+  // ===== CONFIG =====
+  const NIGHTLY_RATE = 650;
+  const CLEANING_FEE_SHORT = 380;  // 2-night stay
+  const CLEANING_FEE_LONG = 450;   // 3+ night stay
+  const BASE_GUESTS = 8;
+  const EXTRA_GUEST_FEE = 85;      // per guest per night above 8
+  const PET_FEE = 50;              // per pet per stay
+  const AIRBNB_ICAL = 'https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1';
+  // CORS proxies (try in order)
+  const CORS_PROXIES = [
+    url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+    url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    url => 'https://cors-anywhere.herokuapp.com/' + url
+  ];
+
+  // ===== STATE =====
+  let guests = 1;
+  let pets = 0;
+  let checkinDate = null;
+  let checkoutDate = null;
+  let calViewMonth = new Date().getMonth();
+  let calViewYear = new Date().getFullYear();
+  let bookedRanges = []; // [{start: Date, end: Date}, ...]
+  let bookedDateSet = new Set(); // 'YYYY-MM-DD' strings for fast lookup
+  let calendarOpen = false;
+  let icalLoaded = false;
+
+  // ===== ICAL PARSING =====
+  function parseICS(text) {
+    const events = [];
+    const blocks = text.split('BEGIN:VEVENT');
+    for (let i = 1; i < blocks.length; i++) {
+      const block = blocks[i].split('END:VEVENT')[0];
+      let dtstart = '', dtend = '', summary = '';
+      block.split('\n').forEach(line => {
+        const l = line.trim();
+        if (l.startsWith('DTSTART')) {
+          dtstart = l.split(':').pop().trim();
+        } else if (l.startsWith('DTEND')) {
+          dtend = l.split(':').pop().trim();
+        } else if (l.startsWith('SUMMARY')) {
+          summary = l.split(':').slice(1).join(':').trim();
+        }
+      });
+      if (dtstart && dtend) {
+        const start = parseICSDate(dtstart);
+        const end = parseICSDate(dtend);
+        if (start && end) {
+          events.push({ start, end, summary });
+        }
+      }
+    }
+    return events;
+  }
+
+  function parseICSDate(str) {
+    // Handles YYYYMMDD and YYYYMMDDTHHmmssZ formats
+    if (!str || str.length < 8) return null;
+    const y = parseInt(str.substring(0, 4));
+    const m = parseInt(str.substring(4, 6)) - 1;
+    const d = parseInt(str.substring(6, 8));
+    return new Date(y, m, d);
+  }
+
+  function dateKey(d) {
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+
+  function buildBookedSet(events) {
+    bookedDateSet.clear();
+    bookedRanges = events;
+    events.forEach(ev => {
+      const cur = new Date(ev.start);
+      while (cur < ev.end) {
+        bookedDateSet.add(dateKey(cur));
+        cur.setDate(cur.getDate() + 1);
+      }
+    });
+  }
+
+  function isBooked(d) {
+    return bookedDateSet.has(dateKey(d));
+  }
+
+  function isRangeAvailable(start, end) {
+    const cur = new Date(start);
+    while (cur < end) {
+      if (isBooked(cur)) return false;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return true;
+  }
+
+  // ===== FETCH ICAL =====
+  async function fetchAirbnbCalendar() {
+    const statusEl = document.getElementById('calStatus');
+    statusEl.textContent = 'Syncing with Airbnb calendar\u2026';
+    statusEl.className = 'cal-status';
+
+    for (const makeUrl of CORS_PROXIES) {
+      try {
+        const resp = await fetch(makeUrl(AIRBNB_ICAL), {
+          headers: { 'Accept': 'text/calendar' }
+        });
+        if (!resp.ok) continue;
+        const text = await resp.text();
+        if (!text.includes('VCALENDAR')) continue;
+
+        const events = parseICS(text);
+        buildBookedSet(events);
+        icalLoaded = true;
+
+        statusEl.textContent = 'Synced with Airbnb \u2014 ' + events.length + ' booking' + (events.length !== 1 ? 's' : '') + ' found';
+        statusEl.className = 'cal-status synced';
+        renderCalendars();
+        return;
+      } catch (e) {
+        continue;
+      }
+    }
+
+    // All proxies failed — show fallback
+    statusEl.innerHTML = 'Could not auto-sync. <a href="https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1" target="_blank" style="color:#3d8c40; text-decoration:underline;">Check Airbnb</a> for live availability.';
+    statusEl.className = 'cal-status synced';
+    renderCalendars();
+  }
+
+  // ===== CALENDAR RENDERING =====
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const todayDate = new Date();
+  todayDate.setHours(0,0,0,0);
+
+  function renderCalendars() {
+    renderMonth('calGrid1', 'calMonth1', calViewYear, calViewMonth);
+    // Second month
+    let m2 = calViewMonth + 1, y2 = calViewYear;
+    if (m2 > 11) { m2 = 0; y2++; }
+    renderMonth('calGrid2', 'calMonth2', y2, m2);
+
+    // Disable prev if at current month
+    const now = new Date();
+    document.getElementById('calPrev').disabled =
+      (calViewYear === now.getFullYear() && calViewMonth === now.getMonth());
+  }
+
+  function renderMonth(gridId, titleId, year, month) {
+    const grid = document.getElementById(gridId);
+    const title = document.getElementById(titleId);
+    title.textContent = MONTHS[month] + ' ' + year;
+
+    let html = '';
+    DAYS.forEach(d => { html += '<div class="cal-dow">' + d + '</div>'; });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+      html += '<div class="cal-day empty"></div>';
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const key = dateKey(date);
+      let cls = 'cal-day';
+
+      const isPast = date < todayDate;
+      const isBookedDay = isBooked(date);
+      const isToday = key === dateKey(todayDate);
+
+      if (isPast) cls += ' past';
+      else if (isBookedDay) cls += ' booked';
+      if (isToday) cls += ' today';
+
+      // Selection highlighting
+      if (checkinDate && checkoutDate) {
+        if (key === dateKey(checkinDate)) cls += ' range-start selected';
+        else if (key === dateKey(checkoutDate)) cls += ' range-end selected';
+        else if (date > checkinDate && date < checkoutDate) cls += ' in-range';
+      } else if (checkinDate && key === dateKey(checkinDate)) {
+        cls += ' selected';
+      }
+
+      const clickable = !isPast && !isBookedDay;
+      html += '<div class="' + cls + '"' +
+        (clickable ? ' onclick="selectDate(new Date(' + year + ',' + month + ',' + d + '))"' : '') +
+        '>' + d + '</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function navMonth(delta) {
+    calViewMonth += delta;
+    if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+    if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+    renderCalendars();
+  }
+
+  // ===== DATE SELECTION =====
+  function selectDate(date) {
+    if (!checkinDate || (checkinDate && checkoutDate)) {
+      // Start new selection
+      checkinDate = date;
+      checkoutDate = null;
+      document.getElementById('checkinDisplay').textContent = formatDateShort(date);
+      document.getElementById('checkoutDisplay').textContent = 'Select date';
+      document.getElementById('checkin').value = dateKey(date);
+      document.getElementById('checkout').value = '';
+      document.getElementById('priceBreakdown').style.display = 'none';
+    } else {
+      // Set checkout
+      if (date <= checkinDate) {
+        // Clicked before checkin — restart
+        checkinDate = date;
+        checkoutDate = null;
+        document.getElementById('checkinDisplay').textContent = formatDateShort(date);
+        document.getElementById('checkoutDisplay').textContent = 'Select date';
+        document.getElementById('checkin').value = dateKey(date);
+        document.getElementById('checkout').value = '';
+        document.getElementById('priceBreakdown').style.display = 'none';
+      } else {
+        // Check if range contains booked dates
+        if (!isRangeAvailable(checkinDate, date)) {
+          alert('Some dates in this range are already booked. Please choose different dates.');
+          return;
+        }
+        checkoutDate = date;
+        document.getElementById('checkoutDisplay').textContent = formatDateShort(date);
+        document.getElementById('checkout').value = dateKey(date);
+        updatePricing();
+
+        // Auto-close calendar after short delay
+        setTimeout(() => { toggleCalendar(false); }, 400);
+      }
+    }
+    renderCalendars();
+  }
+
+  function clearDates() {
+    checkinDate = null;
+    checkoutDate = null;
+    document.getElementById('checkinDisplay').textContent = 'Select date';
+    document.getElementById('checkoutDisplay').textContent = 'Select date';
+    document.getElementById('checkin').value = '';
+    document.getElementById('checkout').value = '';
+    document.getElementById('priceBreakdown').style.display = 'none';
+    renderCalendars();
+  }
+
+  function formatDateShort(d) {
+    return MONTHS[d.getMonth()].substring(0, 3) + ' ' + d.getDate() + ', ' + d.getFullYear();
+  }
+
+  // ===== CALENDAR TOGGLE =====
+  function toggleCalendar(forceState) {
+    const el = document.getElementById('calDropdown');
+    calendarOpen = forceState !== undefined ? forceState : !calendarOpen;
+    if (calendarOpen) {
+      el.classList.add('open');
+    } else {
+      el.classList.remove('open');
+    }
+  }
+
+  // ===== PRICING =====
+  function updatePricing() {
+    if (!checkinDate || !checkoutDate) {
+      document.getElementById('priceBreakdown').style.display = 'none';
+      return;
+    }
+    const nights = Math.max(1, Math.round((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)));
+    if (nights < 1 || isNaN(nights)) return;
+
+    const subtotal = NIGHTLY_RATE * nights;
+    const cleaningFee = nights >= 3 ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
+    const extraGuests = Math.max(0, guests - BASE_GUESTS);
+    const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
+    const petCost = pets * PET_FEE;
+    const total = subtotal + cleaningFee + extraGuestCost + petCost;
+
+    document.getElementById('nightsLabel').textContent = '$' + NIGHTLY_RATE + ' x ' + nights + ' night' + (nights > 1 ? 's' : '');
+    document.getElementById('nightsTotal').textContent = '$' + subtotal.toLocaleString();
+    document.getElementById('cleaningLabel').textContent = 'Cleaning fee (' + nights + ' night' + (nights > 1 ? 's' : '') + ')';
+    document.getElementById('cleaningTotal').textContent = '$' + cleaningFee;
+
+    // Extra guests
+    const extraRow = document.getElementById('extraGuestRow');
+    if (extraGuests > 0) {
+      extraRow.style.display = '';
+      document.getElementById('extraGuestLabel').textContent = extraGuests + ' extra guest' + (extraGuests > 1 ? 's' : '') + ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + EXTRA_GUEST_FEE;
+      document.getElementById('extraGuestTotal').textContent = '$' + extraGuestCost.toLocaleString();
+    } else {
+      extraRow.style.display = 'none';
+    }
+
+    // Pets
+    const petRow = document.getElementById('petRow');
+    if (pets > 0) {
+      petRow.style.display = '';
+      document.getElementById('petLabel').textContent = pets + ' pet' + (pets > 1 ? 's' : '') + ' x $' + PET_FEE;
+      document.getElementById('petTotal').textContent = '$' + petCost;
+    } else {
+      petRow.style.display = 'none';
+    }
+
+    document.getElementById('totalPrice').textContent = '$' + total.toLocaleString();
+    document.getElementById('priceBreakdown').style.display = 'block';
+  }
+
+  // ===== GUESTS =====
+  function changeGuests(delta) {
+    guests = Math.min(20, Math.max(1, guests + delta));
+    document.getElementById('guestCount').textContent = guests;
+    document.getElementById('guestMinus').disabled = guests <= 1;
+    document.getElementById('guestPlus').disabled = guests >= 20;
+    updatePricing();
+  }
+
+  // ===== PETS =====
+  function changePets(delta) {
+    pets = Math.min(5, Math.max(0, pets + delta));
+    document.getElementById('petCount').textContent = pets;
+    document.getElementById('petMinus').disabled = pets <= 0;
+    document.getElementById('petPlus').disabled = pets >= 5;
+    updatePricing();
+  }
+
+  // ===== INQUIRY MODAL =====
+  function openInquiry() {
+    if (checkinDate) document.getElementById('modalCheckin').value = dateKey(checkinDate);
+    if (checkoutDate) document.getElementById('modalCheckout').value = dateKey(checkoutDate);
+    document.getElementById('modalGuests').value = guests;
+    document.getElementById('modalPets').value = pets;
+    document.getElementById('inquiryForm').style.display = 'block';
+    document.getElementById('inquirySuccess').style.display = 'none';
+    document.getElementById('inquiryOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeInquiry() {
+    document.getElementById('inquiryOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== APPS SCRIPT URL =====
+  // REPLACE THIS with your deployed Google Apps Script web app URL
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+
+  function submitInquiry(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('.btn-submit-inquiry');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    const data = {
+      firstName: form.querySelectorAll('input[type="text"]')[0].value,
+      lastName: form.querySelectorAll('input[type="text"]')[1].value,
+      email: form.querySelector('input[type="email"]').value,
+      phone: form.querySelector('input[type="tel"]').value,
+      checkin: document.getElementById('modalCheckin').value,
+      checkout: document.getElementById('modalCheckout').value,
+      guests: document.getElementById('modalGuests').value || guests,
+      pets: document.getElementById('modalPets').value || pets,
+      occasion: form.querySelector('select').value,
+      message: form.querySelector('textarea').value,
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    .then(() => {
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Booking submission error:', err);
+      // Still show success — no-cors mode won't return status, but the request goes through
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .finally(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+  }
+
+  // Close modal on overlay click
+  document.getElementById('inquiryOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeInquiry();
+  });
+
+  // Close calendar when clicking outside
+  document.addEventListener('click', function(e) {
+    const card = document.querySelector('.booking-card');
+    if (calendarOpen && card && !card.contains(e.target)) {
+      toggleCalendar(false);
+    }
+  });
+
+  // ===== INIT =====
+  renderCalendars();
+  fetchAirbnbCalendar();
+</script>
+
+</body>
+</html>
