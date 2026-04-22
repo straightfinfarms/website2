@@ -983,8 +983,8 @@
 <script>
   // ===== CONFIG =====
   const NIGHTLY_RATE = 650;
-  const CLEANING_FEE_SHORT = 380;  // 2-night stay
-  const CLEANING_FEE_LONG = 450;   // 3+ night stay
+  const CLEANING_FEE_SHORT = 340;  // 2-night stay
+  const CLEANING_FEE_LONG = 440;   // 3+ night stay
   const BASE_GUESTS = 8;
   const EXTRA_GUEST_FEE = 85;      // per guest per night above 8
   const PET_FEE = 50;              // per pet per stay
@@ -1257,9 +1257,9 @@
     }
     const nights = Math.max(1, Math.round((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)));
     if (nights < 1 || isNaN(nights)) return;
-
+    document.getElementById('priceBreakdown').style.display = 'block';
     const subtotal = NIGHTLY_RATE * nights;
-    const cleaningFee = nights >= 3 ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
+    const cleaningFee = guests >= BASE_GUESTS ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
     const extraGuests = Math.max(0, guests - BASE_GUESTS);
     const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
     const petCost = pets * PET_FEE;
@@ -1267,7 +1267,7 @@
 
     document.getElementById('nightsLabel').textContent = '$' + NIGHTLY_RATE + ' x ' + nights + ' night' + (nights > 1 ? 's' : '');
     document.getElementById('nightsTotal').textContent = '$' + subtotal.toLocaleString();
-    document.getElementById('cleaningLabel').textContent = 'Cleaning fee (' + nights + ' night' + (nights > 1 ? 's' : '') + ')';
+    document.getElementById('cleaningLabel').textContent = 'Cleaning fee';
     document.getElementById('cleaningTotal').textContent = '$' + cleaningFee;
 
     // Extra guests
