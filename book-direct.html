@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book Direct Ã¢ÂÂ Straight Fin Farms</title>
+<title>Book Direct — Straight Fin Farms</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -159,7 +159,7 @@
   .sleeping-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .sleeping-card p { font-size: 13px; color: #888; }
 
-  /* RIGHT COLUMN Ã¢ÂÂ BOOKING CARD */
+  /* RIGHT COLUMN — BOOKING CARD */
   .booking-card {
     background: #fff; border: 1px solid #ddd; border-radius: 12px;
     padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.08);
@@ -728,7 +728,7 @@
 
   </div>
 
-  <!-- RIGHT COLUMN Ã¢ÂÂ BOOKING CARD -->
+  <!-- RIGHT COLUMN — BOOKING CARD -->
   <div>
     <div class="booking-card">
       <div class="price-row">
@@ -819,10 +819,6 @@
         <div class="breakdown-row" id="petRow" style="display: none;">
           <span class="label" id="petLabel">Pet fee</span>
           <span id="petTotal">$0</span>
-        </div>
-        <div class="breakdown-row savings">
-          <span>Airbnb service fee</span>
-          <span>$0 &mdash; waived</span>
         </div>
         <div class="breakdown-row" style="border-top: 1px solid #e0ddd6; padding-top: 12px; margin-top: 4px;">
           <span class="label">Subtotal</span>
@@ -989,7 +985,7 @@
   const EXTRA_GUEST_FEE = 85;      // per guest per night above 8
   const PET_FEE = 50;              // per pet per stay
   const AIRBNB_ICAL = 'https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1';
-  // CORS proxies (try in order â own Apps Script proxy first, then fallbacks)
+  // CORS proxies (try in order — own Apps Script proxy first, then fallbacks)
   const CORS_PROXIES = [
     url => APPS_SCRIPT_URL + '?action=ical',
     url => 'https://corsproxy.io/?' + encodeURIComponent(url),
@@ -1104,7 +1100,7 @@
       }
     }
 
-    // All proxies failed Ã¢ÂÂ show fallback
+    // All proxies failed — show fallback
     statusEl.innerHTML = 'Could not auto-sync. <a href="https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1" target="_blank" style="color:#3d8c40; text-decoration:underline;">Check Airbnb</a> for live availability.';
     statusEl.className = 'cal-status synced';
     renderCalendars();
@@ -1197,7 +1193,7 @@
     } else {
       // Set checkout
       if (date <= checkinDate) {
-        // Clicked before checkin Ã¢ÂÂ restart
+        // Clicked before checkin — restart
         checkinDate = date;
         checkoutDate = null;
         document.getElementById('checkinDisplay').textContent = formatDateShort(date);
@@ -1370,7 +1366,7 @@
     })
     .catch(err => {
       console.error('Booking submission error:', err);
-      // Still show success Ã¢ÂÂ no-cors mode won't return status, but the request goes through
+      // Still show success — no-cors mode won't return status, but the request goes through
       document.getElementById('inquiryForm').style.display = 'none';
       document.getElementById('inquirySuccess').style.display = 'block';
     })
