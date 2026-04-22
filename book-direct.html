@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Book Direct â Straight Fin Farms</title>
+<title>Book Direct Ã¢ÂÂ Straight Fin Farms</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -159,7 +159,7 @@
   .sleeping-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .sleeping-card p { font-size: 13px; color: #888; }
 
-  /* RIGHT COLUMN â BOOKING CARD */
+  /* RIGHT COLUMN Ã¢ÂÂ BOOKING CARD */
   .booking-card {
     background: #fff; border: 1px solid #ddd; border-radius: 12px;
     padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.08);
@@ -728,12 +728,12 @@
 
   </div>
 
-  <!-- RIGHT COLUMN â BOOKING CARD -->
+  <!-- RIGHT COLUMN Ã¢ÂÂ BOOKING CARD -->
   <div>
     <div class="booking-card">
       <div class="price-row">
         <span class="price" id="nightlyRate">$650</span>
-        <span class="per-night">CAD / night <span style="font-size:11px; color:#3d8c40;">(HST incl.)</span></span>
+        <span class="per-night">CAD / night</span>
       </div>
       <div class="rating-row">
         <span class="star">&#9733; 5.0</span> &middot; <a href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="color:#555; text-decoration:underline;">Airbnb Reviews</a>
@@ -824,9 +824,17 @@
           <span>Airbnb service fee</span>
           <span>$0 &mdash; waived</span>
         </div>
+        <div class="breakdown-row" style="border-top: 1px solid #e0ddd6; padding-top: 12px; margin-top: 4px;">
+          <span class="label">Subtotal</span>
+          <span id="subtotalPrice">$1,680</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="label">HST (13%)</span>
+          <span id="hstAmount">$218.40</span>
+        </div>
         <div class="breakdown-total">
-          <span>Total (HST included)</span>
-          <span id="totalPrice">$1,500</span>
+          <span>Total</span>
+          <span id="totalPrice">$1,898.40</span>
         </div>
       </div>
 
@@ -981,7 +989,7 @@
   const EXTRA_GUEST_FEE = 85;      // per guest per night above 8
   const PET_FEE = 50;              // per pet per stay
   const AIRBNB_ICAL = 'https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1';
-  // CORS proxies (try in order — own Apps Script proxy first, then fallbacks)
+  // CORS proxies (try in order â own Apps Script proxy first, then fallbacks)
   const CORS_PROXIES = [
     url => APPS_SCRIPT_URL + '?action=ical',
     url => 'https://corsproxy.io/?' + encodeURIComponent(url),
@@ -1096,7 +1104,7 @@
       }
     }
 
-    // All proxies failed â show fallback
+    // All proxies failed Ã¢ÂÂ show fallback
     statusEl.innerHTML = 'Could not auto-sync. <a href="https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1" target="_blank" style="color:#3d8c40; text-decoration:underline;">Check Airbnb</a> for live availability.';
     statusEl.className = 'cal-status synced';
     renderCalendars();
@@ -1189,7 +1197,7 @@
     } else {
       // Set checkout
       if (date <= checkinDate) {
-        // Clicked before checkin â restart
+        // Clicked before checkin Ã¢ÂÂ restart
         checkinDate = date;
         checkoutDate = null;
         document.getElementById('checkinDisplay').textContent = formatDateShort(date);
@@ -1282,7 +1290,324 @@
       petRow.style.display = 'none';
     }
 
-    document.getElementById('totalPrice').textContent = '$' + total.toLocaleString();
+    const hst = Math.round(total * 0.13 * 100) / 100;
+    const grandTotal = total + hst;
+
+    document.getElementById('subtotalPrice').textContent = '
+
+  // ===== GUESTS =====
+  function changeGuests(delta) {
+    guests = Math.min(20, Math.max(1, guests + delta));
+    document.getElementById('guestCount').textContent = guests;
+    document.getElementById('guestMinus').disabled = guests <= 1;
+    document.getElementById('guestPlus').disabled = guests >= 20;
+    updatePricing();
+  }
+
+  // ===== PETS =====
+  function changePets(delta) {
+    pets = Math.min(5, Math.max(0, pets + delta));
+    document.getElementById('petCount').textContent = pets;
+    document.getElementById('petMinus').disabled = pets <= 0;
+    document.getElementById('petPlus').disabled = pets >= 5;
+    updatePricing();
+  }
+
+  // ===== INQUIRY MODAL =====
+  function openInquiry() {
+    if (checkinDate) document.getElementById('modalCheckin').value = dateKey(checkinDate);
+    if (checkoutDate) document.getElementById('modalCheckout').value = dateKey(checkoutDate);
+    document.getElementById('modalGuests').value = guests;
+    document.getElementById('modalPets').value = pets;
+    document.getElementById('inquiryForm').style.display = 'block';
+    document.getElementById('inquirySuccess').style.display = 'none';
+    document.getElementById('inquiryOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeInquiry() {
+    document.getElementById('inquiryOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== APPS SCRIPT URL =====
+  // REPLACE THIS with your deployed Google Apps Script web app URL
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+
+  function submitInquiry(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('.btn-submit-inquiry');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    const data = {
+      firstName: form.querySelectorAll('input[type="text"]')[0].value,
+      lastName: form.querySelectorAll('input[type="text"]')[1].value,
+      email: form.querySelector('input[type="email"]').value,
+      phone: form.querySelector('input[type="tel"]').value,
+      checkin: document.getElementById('modalCheckin').value,
+      checkout: document.getElementById('modalCheckout').value,
+      guests: document.getElementById('modalGuests').value || guests,
+      pets: document.getElementById('modalPets').value || pets,
+      occasion: form.querySelector('select').value,
+      message: form.querySelector('textarea').value,
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    .then(() => {
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Booking submission error:', err);
+      // Still show success Ã¢ÂÂ no-cors mode won't return status, but the request goes through
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .finally(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+  }
+
+  // Close modal on overlay click
+  document.getElementById('inquiryOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeInquiry();
+  });
+
+  // Close calendar when clicking outside
+  document.addEventListener('click', function(e) {
+    const card = document.querySelector('.booking-card');
+    if (calendarOpen && card && !card.contains(e.target)) {
+      toggleCalendar(false);
+    }
+  });
+
+  // ===== INIT =====
+  renderCalendars();
+  fetchAirbnbCalendar();
+</script>
+
+</body>
+</html>
+ + total.toLocaleString('en-CA', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+    document.getElementById('hstAmount').textContent = '
+
+  // ===== GUESTS =====
+  function changeGuests(delta) {
+    guests = Math.min(20, Math.max(1, guests + delta));
+    document.getElementById('guestCount').textContent = guests;
+    document.getElementById('guestMinus').disabled = guests <= 1;
+    document.getElementById('guestPlus').disabled = guests >= 20;
+    updatePricing();
+  }
+
+  // ===== PETS =====
+  function changePets(delta) {
+    pets = Math.min(5, Math.max(0, pets + delta));
+    document.getElementById('petCount').textContent = pets;
+    document.getElementById('petMinus').disabled = pets <= 0;
+    document.getElementById('petPlus').disabled = pets >= 5;
+    updatePricing();
+  }
+
+  // ===== INQUIRY MODAL =====
+  function openInquiry() {
+    if (checkinDate) document.getElementById('modalCheckin').value = dateKey(checkinDate);
+    if (checkoutDate) document.getElementById('modalCheckout').value = dateKey(checkoutDate);
+    document.getElementById('modalGuests').value = guests;
+    document.getElementById('modalPets').value = pets;
+    document.getElementById('inquiryForm').style.display = 'block';
+    document.getElementById('inquirySuccess').style.display = 'none';
+    document.getElementById('inquiryOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeInquiry() {
+    document.getElementById('inquiryOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== APPS SCRIPT URL =====
+  // REPLACE THIS with your deployed Google Apps Script web app URL
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+
+  function submitInquiry(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('.btn-submit-inquiry');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    const data = {
+      firstName: form.querySelectorAll('input[type="text"]')[0].value,
+      lastName: form.querySelectorAll('input[type="text"]')[1].value,
+      email: form.querySelector('input[type="email"]').value,
+      phone: form.querySelector('input[type="tel"]').value,
+      checkin: document.getElementById('modalCheckin').value,
+      checkout: document.getElementById('modalCheckout').value,
+      guests: document.getElementById('modalGuests').value || guests,
+      pets: document.getElementById('modalPets').value || pets,
+      occasion: form.querySelector('select').value,
+      message: form.querySelector('textarea').value,
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    .then(() => {
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Booking submission error:', err);
+      // Still show success Ã¢ÂÂ no-cors mode won't return status, but the request goes through
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .finally(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+  }
+
+  // Close modal on overlay click
+  document.getElementById('inquiryOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeInquiry();
+  });
+
+  // Close calendar when clicking outside
+  document.addEventListener('click', function(e) {
+    const card = document.querySelector('.booking-card');
+    if (calendarOpen && card && !card.contains(e.target)) {
+      toggleCalendar(false);
+    }
+  });
+
+  // ===== INIT =====
+  renderCalendars();
+  fetchAirbnbCalendar();
+</script>
+
+</body>
+</html>
+ + hst.toLocaleString('en-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('totalPrice').textContent = '
+
+  // ===== GUESTS =====
+  function changeGuests(delta) {
+    guests = Math.min(20, Math.max(1, guests + delta));
+    document.getElementById('guestCount').textContent = guests;
+    document.getElementById('guestMinus').disabled = guests <= 1;
+    document.getElementById('guestPlus').disabled = guests >= 20;
+    updatePricing();
+  }
+
+  // ===== PETS =====
+  function changePets(delta) {
+    pets = Math.min(5, Math.max(0, pets + delta));
+    document.getElementById('petCount').textContent = pets;
+    document.getElementById('petMinus').disabled = pets <= 0;
+    document.getElementById('petPlus').disabled = pets >= 5;
+    updatePricing();
+  }
+
+  // ===== INQUIRY MODAL =====
+  function openInquiry() {
+    if (checkinDate) document.getElementById('modalCheckin').value = dateKey(checkinDate);
+    if (checkoutDate) document.getElementById('modalCheckout').value = dateKey(checkoutDate);
+    document.getElementById('modalGuests').value = guests;
+    document.getElementById('modalPets').value = pets;
+    document.getElementById('inquiryForm').style.display = 'block';
+    document.getElementById('inquirySuccess').style.display = 'none';
+    document.getElementById('inquiryOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeInquiry() {
+    document.getElementById('inquiryOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== APPS SCRIPT URL =====
+  // REPLACE THIS with your deployed Google Apps Script web app URL
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+
+  function submitInquiry(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('.btn-submit-inquiry');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    const data = {
+      firstName: form.querySelectorAll('input[type="text"]')[0].value,
+      lastName: form.querySelectorAll('input[type="text"]')[1].value,
+      email: form.querySelector('input[type="email"]').value,
+      phone: form.querySelector('input[type="tel"]').value,
+      checkin: document.getElementById('modalCheckin').value,
+      checkout: document.getElementById('modalCheckout').value,
+      guests: document.getElementById('modalGuests').value || guests,
+      pets: document.getElementById('modalPets').value || pets,
+      occasion: form.querySelector('select').value,
+      message: form.querySelector('textarea').value,
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    .then(() => {
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .catch(err => {
+      console.error('Booking submission error:', err);
+      // Still show success Ã¢ÂÂ no-cors mode won't return status, but the request goes through
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+    })
+    .finally(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+  }
+
+  // Close modal on overlay click
+  document.getElementById('inquiryOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeInquiry();
+  });
+
+  // Close calendar when clicking outside
+  document.addEventListener('click', function(e) {
+    const card = document.querySelector('.booking-card');
+    if (calendarOpen && card && !card.contains(e.target)) {
+      toggleCalendar(false);
+    }
+  });
+
+  // ===== INIT =====
+  renderCalendars();
+  fetchAirbnbCalendar();
+</script>
+
+</body>
+</html>
+ + grandTotal.toLocaleString('en-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     document.getElementById('priceBreakdown').style.display = 'block';
   }
 
@@ -1358,7 +1683,7 @@
     })
     .catch(err => {
       console.error('Booking submission error:', err);
-      // Still show success â no-cors mode won't return status, but the request goes through
+      // Still show success Ã¢ÂÂ no-cors mode won't return status, but the request goes through
       document.getElementById('inquiryForm').style.display = 'none';
       document.getElementById('inquirySuccess').style.display = 'block';
     })
