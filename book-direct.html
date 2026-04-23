@@ -731,6 +731,16 @@
   <!-- RIGHT COLUMN — BOOKING CARD -->
   <div>
     <div class="booking-card">
+      <div id="bookingCardSuccess" style="display:none; padding: 32px 8px; text-align: center;">
+        <div style="width:56px; height:56px; border-radius:50%; background:#e6f4ea; display:inline-flex; align-items:center; justify-content:center; margin-bottom:16px;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#2e6e31" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="margin: 0 0 8px; font-size: 22px; color: #1a1a1a; font-family:'Playfair Display', serif;">Request Received</h3>
+        <p id="bookingCardSuccessDetails" style="margin: 0 0 12px; color: #555; font-size: 14px; line-height: 1.5;"></p>
+        <p style="margin: 0 0 24px; color: #888; font-size: 13px;">Check your inbox for a confirmation. Deniz typically responds within a few hours to confirm availability and send payment details.</p>
+        <button onclick="resetBookingCard()" style="background: transparent; border: 1px solid #ddd; padding: 10px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555;">Make another request</button>
+      </div>
+      <div id="bookingCardContent">
       <div class="price-row">
         <span class="price" id="nightlyRate">$650</span>
         <span class="per-night">CAD / night</span>
@@ -873,6 +883,7 @@
         <div class="sync-dot"></div>
         <span class="sync-text">Live-synced with Airbnb calendar</span>
       </div>
+      </div><!-- /#bookingCardContent -->
     </div>
   </div>
 
@@ -1424,26 +1435,48 @@
       message: form.querySelector('textarea').value,
     };
 
+    const markSuccess = () => {
+      document.getElementById('inquiryForm').style.display = 'none';
+      document.getElementById('inquirySuccess').style.display = 'block';
+      showBookingCardSuccess(data);
+    };
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    .then(() => {
-      document.getElementById('inquiryForm').style.display = 'none';
-      document.getElementById('inquirySuccess').style.display = 'block';
-    })
+    .then(markSuccess)
     .catch(err => {
       console.error('Booking submission error:', err);
       // Still show success — no-cors mode won't return status, but the request goes through
-      document.getElementById('inquiryForm').style.display = 'none';
-      document.getElementById('inquirySuccess').style.display = 'block';
+      markSuccess();
     })
     .finally(() => {
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
     });
+  }
+
+  function showBookingCardSuccess(data) {
+    const total = adults + children + infants;
+    const parts = [adults + ' adult' + (adults !== 1 ? 's' : '')];
+    if (children > 0) parts.push(children + ' ' + (children === 1 ? 'child' : 'children'));
+    if (infants > 0) parts.push(infants + ' infant' + (infants !== 1 ? 's' : ''));
+    const guestStr = parts.join(', ');
+    const checkinStr = data.checkin || '';
+    const checkoutStr = data.checkout || '';
+    const details = document.getElementById('bookingCardSuccessDetails');
+    if (details) {
+      details.innerHTML = '<strong>' + checkinStr + ' &rarr; ' + checkoutStr + '</strong><br>' + guestStr + (data.pets && data.pets > 0 ? ' &middot; ' + data.pets + ' pet' + (data.pets > 1 ? 's' : '') : '');
+    }
+    document.getElementById('bookingCardContent').style.display = 'none';
+    document.getElementById('bookingCardSuccess').style.display = 'block';
+  }
+
+  function resetBookingCard() {
+    document.getElementById('bookingCardSuccess').style.display = 'none';
+    document.getElementById('bookingCardContent').style.display = 'block';
   }
 
   // Close modal on overlay click
