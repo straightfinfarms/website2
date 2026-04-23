@@ -778,14 +778,43 @@
         </div>
 
         <div class="picker-guests">
-          <div class="picker-label">Guests</div>
+          <div class="picker-label">Adults</div>
           <div class="guest-counter">
-            <button class="guest-btn" onclick="changeGuests(-1)" id="guestMinus" disabled>&minus;</button>
-            <span class="guest-count" id="guestCount">1</span>
-            <button class="guest-btn" onclick="changeGuests(1)" id="guestPlus">+</button>
-            <span style="font-size:14px; color:#888; margin-left: 4px;">guest(s)</span>
+            <button class="guest-btn" onclick="changeAdults(-1)" id="adultsMinus" disabled>&minus;</button>
+            <span class="guest-count" id="adultsCount">1</span>
+            <button class="guest-btn" onclick="changeAdults(1)" id="adultsPlus">+</button>
+            <span style="font-size:14px; color:#888; margin-left: 4px;">Age 13+</span>
           </div>
-          <div style="font-size:12px; color:#888; margin-top:4px;">Base rate includes up to 8 guests &middot; $85/guest/night above 8</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">Base rate includes up to 8 adults &middot; $85/adult/night above 8</div>
+        </div>
+
+        <div class="picker-guests" style="border-top: 1px solid #e8e4dc; padding-top: 12px;">
+          <div class="picker-label">Children</div>
+          <div class="guest-counter">
+            <button class="guest-btn" onclick="changeChildren(-1)" id="childrenMinus" disabled>&minus;</button>
+            <span class="guest-count" id="childrenCount">0</span>
+            <button class="guest-btn" onclick="changeChildren(1)" id="childrenPlus">+</button>
+            <span style="font-size:14px; color:#888; margin-left: 4px;">Ages 2&ndash;12</span>
+          </div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">No additional cost</div>
+        </div>
+
+        <div class="picker-guests" style="border-top: 1px solid #e8e4dc; padding-top: 12px;">
+          <div class="picker-label">Infants</div>
+          <div class="guest-counter">
+            <button class="guest-btn" onclick="changeInfants(-1)" id="infantsMinus" disabled>&minus;</button>
+            <span class="guest-count" id="infantsCount">0</span>
+            <button class="guest-btn" onclick="changeInfants(1)" id="infantsPlus">+</button>
+            <span style="font-size:14px; color:#888; margin-left: 4px;">Under 2</span>
+          </div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">No additional cost</div>
+        </div>
+
+        <div id="extraSleepingRow" style="display:none; margin-top:12px; padding:10px 12px; background:#fff8e1; border:1px solid #f1c232; border-radius:8px; font-size:13px;">
+          <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+            <input type="checkbox" id="extraSleepingConfirmed" style="margin-top:3px;">
+            <span>Total is over 16. I'll coordinate with the host for extra sleeping arrangements.</span>
+          </label>
         </div>
 
         <div class="picker-guests" style="border-top: 1px solid #e8e4dc; padding-top: 12px;">
@@ -993,7 +1022,9 @@
   ];
 
   // ===== STATE =====
-  let guests = 1;
+  let adults = 1;
+  let children = 0;
+  let infants = 0;
   let pets = 0;
   let checkinDate = null;
   let checkoutDate = null;
@@ -1255,8 +1286,8 @@
     if (nights < 1 || isNaN(nights)) return;
     document.getElementById('priceBreakdown').style.display = 'block';
     const subtotal = NIGHTLY_RATE * nights;
-    const cleaningFee = guests >= BASE_GUESTS ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
-    const extraGuests = Math.max(0, guests - BASE_GUESTS);
+    const cleaningFee = (adults + children) >= BASE_GUESTS ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
+    const extraGuests = Math.max(0, adults - BASE_GUESTS);
     const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
     const petCost = pets * PET_FEE;
     const total = subtotal + cleaningFee + extraGuestCost + petCost;
@@ -1270,7 +1301,7 @@
     const extraRow = document.getElementById('extraGuestRow');
     if (extraGuests > 0) {
       extraRow.style.display = '';
-      document.getElementById('extraGuestLabel').textContent = extraGuests + ' extra guest' + (extraGuests > 1 ? 's' : '') + ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + EXTRA_GUEST_FEE;
+      document.getElementById('extraGuestLabel').textContent = extraGuests + ' extra adult' + (extraGuests > 1 ? 's' : '') + ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + EXTRA_GUEST_FEE;
       document.getElementById('extraGuestTotal').textContent = '$' + extraGuestCost.toLocaleString();
     } else {
       extraRow.style.display = 'none';
@@ -1295,12 +1326,46 @@
   }
 
   // ===== GUESTS =====
-  function changeGuests(delta) {
-    guests = Math.min(20, Math.max(1, guests + delta));
-    document.getElementById('guestCount').textContent = guests;
-    document.getElementById('guestMinus').disabled = guests <= 1;
-    document.getElementById('guestPlus').disabled = guests >= 20;
+  function changeAdults(delta) {
+    const others = children + infants;
+    adults = Math.min(20 - others, Math.max(1, adults + delta));
+    document.getElementById('adultsCount').textContent = adults;
+    document.getElementById('adultsMinus').disabled = adults <= 1;
+    updateAllSteppers();
     updatePricing();
+  }
+
+  function changeChildren(delta) {
+    const others = adults + infants;
+    children = Math.min(20 - others, Math.max(0, children + delta));
+    document.getElementById('childrenCount').textContent = children;
+    document.getElementById('childrenMinus').disabled = children <= 0;
+    updateAllSteppers();
+    updatePricing();
+  }
+
+  function changeInfants(delta) {
+    const others = adults + children;
+    infants = Math.min(20 - others, Math.max(0, infants + delta));
+    document.getElementById('infantsCount').textContent = infants;
+    document.getElementById('infantsMinus').disabled = infants <= 0;
+    updateAllSteppers();
+    updatePricing();
+  }
+
+  function updateAllSteppers() {
+    const total = adults + children + infants;
+    document.getElementById('adultsPlus').disabled = total >= 20;
+    document.getElementById('childrenPlus').disabled = total >= 20;
+    document.getElementById('infantsPlus').disabled = total >= 20;
+    const extra = document.getElementById('extraSleepingRow');
+    if (total > 16) {
+      extra.style.display = 'block';
+    } else {
+      extra.style.display = 'none';
+      const cb = document.getElementById('extraSleepingConfirmed');
+      if (cb) cb.checked = false;
+    }
   }
 
   // ===== PETS =====
@@ -1316,7 +1381,7 @@
   function openInquiry() {
     if (checkinDate) document.getElementById('modalCheckin').value = dateKey(checkinDate);
     if (checkoutDate) document.getElementById('modalCheckout').value = dateKey(checkoutDate);
-    document.getElementById('modalGuests').value = guests;
+    document.getElementById('modalGuests').value = adults + children + infants;
     document.getElementById('modalPets').value = pets;
     document.getElementById('inquiryForm').style.display = 'block';
     document.getElementById('inquirySuccess').style.display = 'none';
@@ -1348,7 +1413,11 @@
       phone: form.querySelector('input[type="tel"]').value,
       checkin: document.getElementById('modalCheckin').value,
       checkout: document.getElementById('modalCheckout').value,
-      guests: document.getElementById('modalGuests').value || guests,
+      guests: document.getElementById('modalGuests').value || (adults + children + infants),
+      adults: adults,
+      children: children,
+      infants: infants,
+      extraSleepingConfirmed: document.getElementById('extraSleepingConfirmed')?.checked || false,
       pets: document.getElementById('modalPets').value || pets,
       occasion: form.querySelector('select').value,
       message: form.querySelector('textarea').value,
