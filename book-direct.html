@@ -785,7 +785,7 @@
             <button class="guest-btn" onclick="changeAdults(1)" id="adultsPlus">+</button>
             <span style="font-size:14px; color:#888; margin-left: 4px;">Age 13+</span>
           </div>
-          <div style="font-size:12px; color:#888; margin-top:4px;">Base rate includes up to 8 adults &middot; $85/adult/night above 8</div>
+          <div style="font-size:12px; color:#888; margin-top:4px;">Base rate includes up to 10 adults &middot; $50/adult/night above 10</div>
         </div>
 
         <div class="picker-guests" style="border-top: 1px solid #e8e4dc; padding-top: 12px;">
@@ -1010,8 +1010,9 @@
   const NIGHTLY_RATE = 650;
   const CLEANING_FEE_SHORT = 340;  // 2-night stay
   const CLEANING_FEE_LONG = 440;   // 3+ night stay
-  const BASE_GUESTS = 8;
-  const EXTRA_GUEST_FEE = 85;      // per guest per night above 8
+  const BASE_GUESTS = 8;           // cleaning fee tier threshold (adults + children)
+  const ADULT_FEE_THRESHOLD = 10;  // extra-adult surcharge only kicks in above this many adults
+  const EXTRA_GUEST_FEE = 50;      // per additional adult per night above ADULT_FEE_THRESHOLD
   const PET_FEE = 50;              // per pet per stay
   const AIRBNB_ICAL = 'https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1';
   // CORS proxies (try in order — own Apps Script proxy first, then fallbacks)
@@ -1287,7 +1288,7 @@
     document.getElementById('priceBreakdown').style.display = 'block';
     const subtotal = NIGHTLY_RATE * nights;
     const cleaningFee = (adults + children) >= BASE_GUESTS ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
-    const extraGuests = Math.max(0, adults - BASE_GUESTS);
+    const extraGuests = Math.max(0, adults - ADULT_FEE_THRESHOLD);
     const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
     const petCost = pets * PET_FEE;
     const total = subtotal + cleaningFee + extraGuestCost + petCost;
