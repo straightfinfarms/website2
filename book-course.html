@@ -16,7 +16,31 @@
   .nav-links a { font-size: 14px; color: #1a1a1a; text-decoration: none; }
   .nav-links a:hover { text-decoration: underline; }
 
-  .hero-title { padding: 60px 48px 20px; max-width: 1200px; margin: 0 auto; }
+  /* PAGE HERO IMAGE */
+  .page-hero { position: relative; height: 44vh; min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
+  .page-hero-bg { position: absolute; inset: 0; z-index: 0; background: url('images/IMG_3492 Large.jpeg') center/cover no-repeat; }
+  .page-hero::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.62) 100%); }
+  .page-hero-content { position: relative; z-index: 2; padding: 0 20px; max-width: 760px; }
+  .page-hero .tag { font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.78); margin-bottom: 14px; }
+  .page-hero h1 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(34px, 5vw, 56px); line-height: 1.1; color: #fff; margin-bottom: 14px; }
+  .page-hero p { font-size: 16px; color: rgba(255,255,255,0.92); line-height: 1.6; max-width: 600px; margin: 0 auto; }
+  .page-hero a { color: #b8e0bb; text-decoration: underline; }
+
+  /* COURSE OPTION IMAGES */
+  .course-option .opt-thumb { width: 100%; height: 140px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 14px; }
+
+  /* ACCOMMODATION IMAGES — replace emoji with photo */
+  .stay-option .stay-thumb { width: 56px; height: 56px; border-radius: 8px; background-size: cover; background-position: center; flex-shrink: 0; background-color: #f0eee6; }
+
+  /* GALLERY */
+  .booking-gallery { max-width: 1200px; margin: 0 auto; padding: 10px 48px 60px; }
+  .booking-gallery h3 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px; margin-bottom: 6px; }
+  .booking-gallery p.gallery-sub { font-size: 14px; color: #666; margin-bottom: 18px; max-width: 640px; line-height: 1.6; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .gallery-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 6px; display: block; }
+  @media (max-width: 720px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .hero-title { padding: 50px 48px 20px; max-width: 1200px; margin: 0 auto; }
   .hero-title h1 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(30px, 4.5vw, 46px); line-height: 1.1; margin-bottom: 8px; }
   .hero-title p { font-size: 15px; color: #666; max-width: 640px; line-height: 1.6; }
   .hero-title a { color: #3d8c40; text-decoration: none; }
@@ -37,10 +61,10 @@
   .course-option:hover { border-color: #3d8c40; background: #f9f9f6; }
   .course-option.selected { border-color: #3d8c40; background: #f0f7ee; }
   .course-option input { position: absolute; opacity: 0; pointer-events: none; }
-  .course-option .opt-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; margin-bottom: 4px; padding-right: 80px; }
+  .course-option .opt-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; margin-bottom: 4px; }
   .course-option .opt-dates { font-size: 13px; color: #3d8c40; font-weight: 500; margin-bottom: 6px; }
   .course-option .opt-desc { font-size: 13px; color: #666; line-height: 1.55; }
-  .course-option .opt-price { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; color: #1a1a1a; position: absolute; top: 18px; right: 20px; }
+  .course-option .opt-price { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 16px; color: #1a1a1a; background: rgba(255,255,255,0.95); padding: 6px 12px; border-radius: 999px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); position: absolute; top: 30px; right: 32px; }
 
   /* ACCOMMODATION RADIO */
   .stay-option { border: 1.5px solid #e0ddd6; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -113,6 +137,9 @@
     .summary-card { position: static; }
     nav { padding: 16px 20px; }
     .hero-title { padding: 40px 20px 10px; }
+    .booking-gallery { padding: 10px 20px 40px; }
+    .page-hero { height: 38vh; min-height: 280px; }
+    .course-option .opt-thumb { height: 110px; }
   }
 </style>
 </head>
@@ -125,10 +152,15 @@
   </div>
 </nav>
 
-<div class="hero-title">
-  <h1>Enroll in the Permaculture Course</h1>
-  <p>Pick your course, your accommodation, tell us who's coming. We'll confirm availability and send a payment link. <a href="permaculture-course.html">Full course details here</a>.</p>
-</div>
+<!-- HERO IMAGE -->
+<section class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-content">
+    <div class="tag">Enroll · Permaculture Course 2026</div>
+    <h1>Reserve your seat</h1>
+    <p>Pick your course, choose where you'll sleep, and tell us who's coming. We'll confirm availability and send a secure payment link. <a href="permaculture-course.html">Full course details</a>.</p>
+  </div>
+</section>
 
 <div class="layout">
   <!-- LEFT: FORM -->
@@ -141,6 +173,7 @@
       <h3>1. Choose your course</h3>
       <label class="course-option" data-course="3day" data-tuition="725">
         <input type="radio" name="course" value="3day">
+        <div class="opt-thumb" style="background-image:url('images/IMG_1949 Large.jpeg')" role="img" aria-label="Outdoor course session under canopies on the lawn"></div>
         <span class="opt-price" id="coursePrice3">$725</span>
         <div class="opt-title">3-Day Permaculture Intensive</div>
         <div class="opt-dates">Fri Sep 4 – Mon Sep 7, 2026 · Labour Day weekend</div>
@@ -148,6 +181,7 @@
       </label>
       <label class="course-option" data-course="7day" data-tuition="1625">
         <input type="radio" name="course" value="7day">
+        <div class="opt-thumb" style="background-image:url('images/IMG_2006 Large.jpeg')" role="img" aria-label="Indoor classroom session in the farmhouse with projector"></div>
         <span class="opt-price" id="coursePrice7">$1,625</span>
         <div class="opt-title">7-Day Immersive Course</div>
         <div class="opt-dates">Mon Aug 24 – Sun Aug 30, 2026</div>
@@ -160,27 +194,42 @@
       <h3>2. Accommodation</h3>
       <label class="stay-option" data-stay="commuter" data-cost="0">
         <input type="radio" name="stay" value="commuter">
-        <div class="stay-option-label"><span class="ico">🏠</span><div><div class="name">No accommodation (commuter)</div><div class="sub">Stay elsewhere; come for sessions and meals</div></div></div>
+        <div class="stay-option-label">
+          <div class="stay-thumb" style="background-image:url('images/IMG_4908 Large.jpeg')" role="img" aria-label="Farmhouse driveway"></div>
+          <div><div class="name">No accommodation (commuter)</div><div class="sub">Stay elsewhere; come for sessions and meals</div></div>
+        </div>
         <div class="price">Free</div>
       </label>
       <label class="stay-option" data-stay="byo" data-cost="0">
         <input type="radio" name="stay" value="byo">
-        <div class="stay-option-label"><span class="ico">🎒</span><div><div class="name">Bring your own tent</div><div class="sub">Camping area · washroom &amp; shower access</div></div></div>
+        <div class="stay-option-label">
+          <div class="stay-thumb" style="background-image:url('images/IMG_4810 Large.jpeg')" role="img" aria-label="Personal tents pitched in the camping area at sunset"></div>
+          <div><div class="name">Bring your own tent</div><div class="sub">Camping area · washroom &amp; shower access</div></div>
+        </div>
         <div class="price">Free</div>
       </label>
       <label class="stay-option" data-stay="bell" data-cost3="225" data-cost7="525">
         <input type="radio" name="stay" value="bell">
-        <div class="stay-option-label"><span class="ico">⛺</span><div><div class="name">Bell Tent Glamping</div><div class="sub" id="bellSub">$225 for 3 nights · $525 for 7 nights</div></div></div>
+        <div class="stay-option-label">
+          <div class="stay-thumb" style="background-image:url('images/IMG_4979 Large.jpeg')" role="img" aria-label="Canvas bell tent in the field"></div>
+          <div><div class="name">Bell Tent Glamping</div><div class="sub" id="bellSub">$225 for 3 nights · $525 for 7 nights</div></div>
+        </div>
         <div class="price" id="bellPrice">–</div>
       </label>
       <label class="stay-option" data-stay="bunkie" data-cost3="275" data-cost7="635">
         <input type="radio" name="stay" value="bunkie">
-        <div class="stay-option-label"><span class="ico">🛖</span><div><div class="name">Bunkie Cabin</div><div class="sub" id="bunkieSub">$275 / $635 · Private rustic cabin</div></div></div>
+        <div class="stay-option-label">
+          <div class="stay-thumb" style="background-image:url('images/bunkie Large.jpeg')" role="img" aria-label="The bunkie cabin — barn-roof rustic cabin in the woods"></div>
+          <div><div class="name">Bunkie Cabin</div><div class="sub" id="bunkieSub">$275 / $635 · Private rustic cabin</div></div>
+        </div>
         <div class="price" id="bunkiePrice">–</div>
       </label>
       <label class="stay-option" data-stay="room" data-cost3="450" data-cost7="1050">
         <input type="radio" name="stay" value="room">
-        <div class="stay-option-label"><span class="ico">🏡</span><div><div class="name">Private Farmhouse Room</div><div class="sub" id="roomSub">$450 / $1,050 · Queen or double bed</div></div></div>
+        <div class="stay-option-label">
+          <div class="stay-thumb" style="background-image:url('images/Master Bedroom Large.jpeg')" role="img" aria-label="A private farmhouse bedroom with king bed"></div>
+          <div><div class="name">Private Farmhouse Room</div><div class="sub" id="roomSub">$450 / $1,050 · Queen or double bed</div></div>
+        </div>
         <div class="price" id="roomPrice">–</div>
       </label>
     </div>
@@ -255,6 +304,22 @@
     <p style="font-size:11px; color:#888; margin-top:12px; line-height:1.6;">All prices in CAD. You won't be charged until we confirm availability and send you a secure payment link.</p>
   </div>
 </div>
+
+<!-- GALLERY -->
+<section class="booking-gallery">
+  <h3>A taste of what you're booking</h3>
+  <p class="gallery-sub">Scenes from past course weekends, the gardens, the wetland, and the evenings around the fire.</p>
+  <div class="gallery-grid">
+    <img src="images/IMG_3010 Large.jpeg" alt="Kayaking through the lily-pad wetland">
+    <img src="images/IMG_4499 Large.jpeg" alt="Course participants around the campfire at dusk">
+    <img src="images/IMG_1949 Large.jpeg" alt="Outdoor classroom session under canopies on the lawn">
+    <img src="images/dji_fly_20230909_142826_82_1694707575972_photo Large.jpeg" alt="Aerial view of the dock and wetland">
+    <img src="images/IMG_3110 Large.jpeg" alt="Raised vegetable beds in the kitchen garden">
+    <img src="images/IMG_3103 Large.jpeg" alt="Picking apples in the orchard">
+    <img src="images/IMG_4143 Large.jpeg" alt="The chicken coop on the farm">
+    <img src="images/IMG_4597 Large.jpeg" alt="Adirondack chairs and kayaks at the dock at sunset">
+  </div>
+</section>
 
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
