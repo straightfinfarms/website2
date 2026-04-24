@@ -33,14 +33,14 @@
   .form-section h3 { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 16px; margin-bottom: 14px; color: #1a1a1a; }
 
   /* COURSE RADIO */
-  .course-option { border: 2px solid #e0ddd6; border-radius: 10px; padding: 18px 20px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; }
+  .course-option { display: block; border: 2px solid #e0ddd6; border-radius: 10px; padding: 18px 20px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; position: relative; }
   .course-option:hover { border-color: #3d8c40; background: #f9f9f6; }
   .course-option.selected { border-color: #3d8c40; background: #f0f7ee; }
-  .course-option input { display: none; }
-  .course-option .opt-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; margin-bottom: 4px; }
+  .course-option input { position: absolute; opacity: 0; pointer-events: none; }
+  .course-option .opt-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; margin-bottom: 4px; padding-right: 80px; }
   .course-option .opt-dates { font-size: 13px; color: #3d8c40; font-weight: 500; margin-bottom: 6px; }
   .course-option .opt-desc { font-size: 13px; color: #666; line-height: 1.55; }
-  .course-option .opt-price { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; color: #1a1a1a; float: right; }
+  .course-option .opt-price { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; color: #1a1a1a; position: absolute; top: 18px; right: 20px; }
 
   /* ACCOMMODATION RADIO */
   .stay-option { border: 1.5px solid #e0ddd6; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -203,7 +203,7 @@
         <label>
           <input type="checkbox" id="couplesCheck">
           <span>
-            We're booking as a couple sharing accommodation
+            Booking for 2 sharing accommodation <span style="color:#888; font-weight:400;">(couple, family, or friends — anyone willing to share one room)</span>
             <span class="savings" id="couplesSavings">Save 25% on combined tuition</span>
           </span>
         </label>
@@ -247,7 +247,7 @@
       <div class="summary-row"><span class="label">Accommodation</span><span class="value" id="sumStay">—</span></div>
       <div class="summary-divider"></div>
       <div class="summary-row"><span class="label">Tuition</span><span class="value" id="sumTuition">—</span></div>
-      <div class="summary-row discount" id="couplesRow" style="display:none"><span class="label">Couples discount (-25%)</span><span class="value" id="sumCouples">—</span></div>
+      <div class="summary-row discount" id="couplesRow" style="display:none"><span class="label">Shared-booking discount (-25%)</span><span class="value" id="sumCouples">—</span></div>
       <div class="summary-row"><span class="label">Accommodation</span><span class="value" id="sumStayCost">—</span></div>
       <div class="summary-row"><span class="label">HST (13%)</span><span class="value" id="sumHst">—</span></div>
     </div>
@@ -370,7 +370,7 @@
 
     // Participants
     let pText = s.adults + ' adult' + (s.adults !== 1 ? 's' : '');
-    if (s.isCouple) pText = '2 adults (couple)';
+    if (s.isCouple) pText = '2 adults (sharing)';
     document.getElementById('sumParticipants').textContent = pText;
 
     // Accommodation label
@@ -387,7 +387,8 @@
 
     const nights = course ? course.nights : 3;
     const stayCostPerPerson = stay ? (stay['cost' + nights] || 0) : 0;
-    const stayCost = stayCostPerPerson * s.adults;
+    // If booking as a pair sharing accommodation, only charge for one unit (one room/tent)
+    const stayCost = (s.isCouple && s.adults === 2) ? stayCostPerPerson : stayCostPerPerson * s.adults;
 
     const subtotal = tuitionAfterDiscount + stayCost;
     const hst = Math.round(subtotal * HST_RATE * 100) / 100;
@@ -471,7 +472,7 @@
       document.getElementById('successCard').style.display = 'block';
       document.getElementById('successDetails').innerHTML =
         '<strong>' + course.name + '</strong><br>' + course.dates + '<br>' +
-        (state.isCouple ? '2 adults (couple)' : state.adults + ' adult' + (state.adults !== 1 ? 's' : '')) + ' · ' + stay.name + '<br>' +
+        (state.isCouple ? '2 adults (sharing accommodation)' : state.adults + ' adult' + (state.adults !== 1 ? 's' : '')) + ' · ' + stay.name + '<br>' +
         'Estimated total: ' + fmt(state._total) + ' CAD';
     };
 
