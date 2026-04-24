@@ -109,12 +109,26 @@
 
   /* ACCOMMODATION */
   .stay-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 32px; }
-  .stay-card { background: #fff; border-radius: 10px; padding: 22px 20px; border: 1px solid #e0ddd6; text-align: center; }
+  .stay-card { background: #fff; border-radius: 10px; border: 1px solid #e0ddd6; text-align: center; overflow: hidden; display: flex; flex-direction: column; }
+  .stay-card .stay-photo { width: 100%; aspect-ratio: 4/3; background-size: cover; background-position: center; background-color: #f0eee6; }
+  .stay-card .stay-body { padding: 18px 20px 22px; flex-grow: 1; display: flex; flex-direction: column; }
   .stay-card .icon { font-size: 34px; margin-bottom: 10px; }
   .stay-card h4 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 16px; margin-bottom: 6px; }
   .stay-card .avail { font-size: 11px; color: #3d8c40; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; font-weight: 600; }
   .stay-card .avail.sold-out { color: #888; }
   .stay-card p { font-size: 13px; color: #555; line-height: 1.6; }
+
+  /* COURSE CARD HEADER PHOTO */
+  .course-card { overflow: hidden; }
+  .course-card .card-photo { width: calc(100% + 64px); margin: -36px -32px 22px; aspect-ratio: 16/9; background-size: cover; background-position: center; }
+
+  /* RETREAT FEEL — photo backed feature cards */
+  .retreat-feat .feat-photo { width: 100%; aspect-ratio: 4/3; background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 14px; }
+
+  /* PERMACULTURE GALLERY */
+  .perma-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 24px; }
+  .perma-gallery img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 6px; display: block; }
+  @media (max-width: 760px) { .perma-gallery { grid-template-columns: repeat(2, 1fr); } }
 
   /* PRICING TABLE */
   .pricing-table-wrap { margin-top: 32px; overflow-x: auto; }
@@ -228,6 +242,7 @@
   <div class="course-options">
 
     <div class="course-card">
+      <div class="card-photo" style="background-image:url('images/IMG_1949 Large.jpeg')" role="img" aria-label="Outdoor course session under canopies on the lawn"></div>
       <span class="tag">Weekend Intensive</span>
       <h3>3-Day Permaculture Intensive</h3>
       <div class="theme">Learn · Build · Apply</div>
@@ -253,6 +268,7 @@
     </div>
 
     <div class="course-card">
+      <div class="card-photo" style="background-image:url('images/IMG_2006 Large.jpeg')" role="img" aria-label="Indoor classroom session in the farmhouse with projector"></div>
       <span class="tag featured">⭐ Full Immersive Experience</span>
       <h3>7-Day Immersive Permaculture Course</h3>
       <div class="theme">Design · Build · Live the System</div>
@@ -431,28 +447,36 @@
 
   <div class="stay-grid">
     <div class="stay-card">
-      <div class="icon">🏡</div>
-      <h4>Private Farmhouse Room</h4>
-      <div class="avail">3 rooms available</div>
-      <p>Queen or double bed, shared bathroom, full access to the farmhouse kitchen and living areas. The most comfortable option.</p>
+      <div class="stay-photo" style="background-image:url('images/Master Bedroom Large.jpeg')" role="img" aria-label="A private farmhouse bedroom with king bed"></div>
+      <div class="stay-body">
+        <h4>Private Farmhouse Room</h4>
+        <div class="avail">3 rooms available</div>
+        <p>Queen or double bed, shared bathroom, full access to the farmhouse kitchen and living areas. The most comfortable option.</p>
+      </div>
     </div>
     <div class="stay-card">
-      <div class="icon">🛖</div>
-      <h4>Bunkie Cabin</h4>
-      <div class="avail">1 cabin (1–2 people)</div>
-      <p>A rustic private cabin on the grounds. Perfect for guests who want seclusion without the tent-life exposure.</p>
+      <div class="stay-photo" style="background-image:url('images/bunkie Large.jpeg')" role="img" aria-label="The bunkie cabin — barn-roof rustic cabin in the woods"></div>
+      <div class="stay-body">
+        <h4>Bunkie Cabin</h4>
+        <div class="avail">1 cabin (1–2 people)</div>
+        <p>A rustic private cabin on the grounds. Perfect for guests who want seclusion without the tent-life exposure.</p>
+      </div>
     </div>
     <div class="stay-card">
-      <div class="icon">⛺</div>
-      <h4>Bell Tent Glamping</h4>
-      <div class="avail">Multiple tents</div>
-      <p>Luxury canvas bell tents with real beds, lanterns, and rugs. All the sensory immersion, none of the backpacker compromises.</p>
+      <div class="stay-photo" style="background-image:url('images/IMG_4979 Large.jpeg')" role="img" aria-label="Canvas bell tent in the field"></div>
+      <div class="stay-body">
+        <h4>Bell Tent Glamping</h4>
+        <div class="avail">Multiple tents</div>
+        <p>Luxury canvas bell tents with real beds, lanterns, and rugs. All the sensory immersion, none of the backpacker compromises.</p>
+      </div>
     </div>
     <div class="stay-card">
-      <div class="icon">🎒</div>
-      <h4>Bring Your Own Tent</h4>
-      <div class="avail">Unlimited</div>
-      <p>Budget-friendly eco camping. Pitch where you like (within the designated camping area). Access to farmhouse washrooms and showers.</p>
+      <div class="stay-photo" style="background-image:url('images/IMG_4810 Large.jpeg')" role="img" aria-label="Personal tents pitched in the camping area at sunset"></div>
+      <div class="stay-body">
+        <h4>Bring Your Own Tent</h4>
+        <div class="avail">Unlimited</div>
+        <p>Budget-friendly eco camping. Pitch where you like (within the designated camping area). Access to farmhouse washrooms and showers.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -474,13 +498,13 @@
       <tbody>
         <tr>
           <td>No accommodation (commuter)</td>
-          <td class="price-cell">$725<span class="sub">tuition only</span></td>
-          <td class="price-cell">$1,625<span class="sub">tuition only</span></td>
+          <td class="price-cell">$725<span class="sub">$725 + $0</span></td>
+          <td class="price-cell">$1,625<span class="sub">$1,625 + $0</span></td>
         </tr>
         <tr>
           <td>Bring your own tent</td>
-          <td class="price-cell">$725<span class="sub">camping free</span></td>
-          <td class="price-cell">$1,625<span class="sub">camping free</span></td>
+          <td class="price-cell">$725<span class="sub">$725 + $0</span></td>
+          <td class="price-cell">$1,625<span class="sub">$1,625 + $0</span></td>
         </tr>
         <tr>
           <td>Bell Tent Glamping</td>
@@ -512,10 +536,38 @@
     <h2>More than a course — a retreat</h2>
     <p>This isn't a classroom with a permaculture badge on the door. It's a full retreat experience: morning farm chores, sunrise walks through the gardens, shared meals, evening bonfires, and the kind of deep-breath quiet that only a 34-acre farm can provide.</p>
     <div class="retreat-features">
-      <div class="retreat-feat"><div class="icon">🌅</div><h4>Morning chores &amp; garden walks</h4><p>Optional start-of-day rituals to connect with the land before the formal sessions begin.</p></div>
-      <div class="retreat-feat"><div class="icon">🥬</div><h4>Farm-to-table every meal</h4><p>Most ingredients come from the farm itself. Wild-foraged, hand-gathered, carefully plated.</p></div>
-      <div class="retreat-feat"><div class="icon">🔥</div><h4>Evening bonfires</h4><p>End each day by the fire. Stories, reflections, quiet — whatever you need.</p></div>
+      <div class="retreat-feat">
+        <div class="feat-photo" style="background-image:url('images/IMG_3110 Large.jpeg')" role="img" aria-label="Raised vegetable beds in the kitchen garden"></div>
+        <h4>Morning chores &amp; garden walks</h4>
+        <p>Optional start-of-day rituals to connect with the land before the formal sessions begin.</p>
+      </div>
+      <div class="retreat-feat">
+        <div class="feat-photo" style="background-image:url('images/IMG_3103 Large.jpeg')" role="img" aria-label="Picking apples in the orchard"></div>
+        <h4>Farm-to-table every meal</h4>
+        <p>Most ingredients come from the farm itself. Wild-foraged, hand-gathered, carefully plated.</p>
+      </div>
+      <div class="retreat-feat">
+        <div class="feat-photo" style="background-image:url('images/IMG_4499 Large.jpeg')" role="img" aria-label="Course participants around the campfire at dusk"></div>
+        <h4>Evening bonfires</h4>
+        <p>End each day by the fire. Stories, reflections, quiet — whatever you need.</p>
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="section bg-alt">
+  <h2 style="text-align:center">Scenes from the farm</h2>
+  <p style="text-align:center; max-width:640px; margin:0 auto;">A few moments from past course weekends — the gardens, the wetland, the dock at sunset, and the evenings around the fire.</p>
+  <div class="perma-gallery">
+    <img src="images/IMG_3492 Large.jpeg" alt="Rainbow over the farm landscape">
+    <img src="images/IMG_3010 Large.jpeg" alt="Kayaking through the lily-pad wetland">
+    <img src="images/IMG_4597 Large.jpeg" alt="Adirondack chairs and kayaks at the dock at sunset">
+    <img src="images/dji_fly_20230909_142826_82_1694707575972_photo Large.jpeg" alt="Aerial view of the dock and wetland">
+    <img src="images/IMG_1949 Large.jpeg" alt="Outdoor classroom session under canopies on the lawn">
+    <img src="images/IMG_4143 Large.jpeg" alt="The chicken coop on the farm">
+    <img src="images/IMG_3886 Large.jpeg" alt="Canvas bell tent in a forest clearing">
+    <img src="images/IMG_4499 Large.jpeg" alt="Course participants around the campfire at dusk">
   </div>
 </section>
 
