@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enroll — Permaculture Course — Straight Fin Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #f5f3ee; color: #1a1a1a; min-height: 100vh; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; background: #fff; border-bottom: 1px solid #e0ddd6; position: sticky; top: 0; z-index: 100; }
+  .nav-logo { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 15px; max-width: 260px; line-height: 1.3; color: #1a1a1a; text-decoration: none; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { font-size: 14px; color: #1a1a1a; text-decoration: none; }
+  .nav-links a:hover { text-decoration: underline; }
+
+  .hero-title { padding: 60px 48px 20px; max-width: 1200px; margin: 0 auto; }
+  .hero-title h1 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(30px, 4.5vw, 46px); line-height: 1.1; margin-bottom: 8px; }
+  .hero-title p { font-size: 15px; color: #666; max-width: 640px; line-height: 1.6; }
+  .hero-title a { color: #3d8c40; text-decoration: none; }
+
+  /* LAYOUT */
+  .layout { display: grid; grid-template-columns: 1fr 400px; gap: 32px; max-width: 1200px; margin: 0 auto; padding: 20px 48px 80px; align-items: start; }
+
+  /* LEFT — FORM */
+  .form-card { background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .form-card h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px; margin-bottom: 8px; }
+  .form-card .sub { font-size: 14px; color: #666; margin-bottom: 24px; line-height: 1.6; }
+  .form-section { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid #eee; }
+  .form-section:last-child { border-bottom: none; margin-bottom: 0; }
+  .form-section h3 { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 16px; margin-bottom: 14px; color: #1a1a1a; }
+
+  /* COURSE RADIO */
+  .course-option { border: 2px solid #e0ddd6; border-radius: 10px; padding: 18px 20px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; }
+  .course-option:hover { border-color: #3d8c40; background: #f9f9f6; }
+  .course-option.selected { border-color: #3d8c40; background: #f0f7ee; }
+  .course-option input { display: none; }
+  .course-option .opt-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; margin-bottom: 4px; }
+  .course-option .opt-dates { font-size: 13px; color: #3d8c40; font-weight: 500; margin-bottom: 6px; }
+  .course-option .opt-desc { font-size: 13px; color: #666; line-height: 1.55; }
+  .course-option .opt-price { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; color: #1a1a1a; float: right; }
+
+  /* ACCOMMODATION RADIO */
+  .stay-option { border: 1.5px solid #e0ddd6; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .stay-option:hover { border-color: #3d8c40; }
+  .stay-option.selected { border-color: #3d8c40; background: #f0f7ee; }
+  .stay-option input { display: none; }
+  .stay-option-label { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
+  .stay-option .ico { font-size: 22px; }
+  .stay-option .name { font-weight: 600; font-size: 14px; }
+  .stay-option .sub { font-size: 12px; color: #666; }
+  .stay-option .price { font-weight: 700; font-size: 15px; white-space: nowrap; }
+  .stay-option.disabled { opacity: 0.4; cursor: not-allowed; }
+  .stay-option.disabled:hover { border-color: #e0ddd6; }
+
+  /* GUESTS */
+  .guest-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+  .guest-row:last-child { border-bottom: none; }
+  .guest-row .info { }
+  .guest-row .label { font-weight: 600; font-size: 14px; }
+  .guest-row .sub { font-size: 12px; color: #666; }
+  .guest-row .counter { display: flex; align-items: center; gap: 12px; }
+  .guest-row .counter button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 16px; }
+  .guest-row .counter button:disabled { opacity: 0.3; cursor: not-allowed; }
+  .guest-row .counter .count { min-width: 20px; text-align: center; font-weight: 600; }
+
+  /* COUPLES CHECKBOX */
+  .couples-box { background: #fff8e1; border: 1px solid #f1c232; border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+  .couples-box label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 14px; line-height: 1.5; }
+  .couples-box input { margin-top: 3px; }
+  .couples-box .savings { color: #2e6e31; font-weight: 600; display: block; margin-top: 2px; font-size: 13px; }
+
+  /* INPUTS */
+  label.field-label { display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; font-weight: 500; }
+  input[type=text], input[type=email], input[type=tel], textarea, select {
+    width: 100%; padding: 11px 13px; border: 1px solid #ddd; border-radius: 6px;
+    font-size: 14px; font-family: inherit; background: #fff;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: #3d8c40; }
+  textarea { resize: vertical; min-height: 80px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-group { margin-bottom: 14px; }
+
+  /* RIGHT — SUMMARY */
+  .summary-card { background: #fff; border-radius: 12px; padding: 28px 26px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: sticky; top: 100px; }
+  .summary-card h3 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 18px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #eee; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; color: #444; }
+  .summary-row .label { }
+  .summary-row .value { font-weight: 500; color: #1a1a1a; }
+  .summary-row.discount { color: #2e6e31; }
+  .summary-divider { border-top: 1px solid #eee; margin: 12px 0; }
+  .summary-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; margin-top: 10px; }
+  .summary-total .value { font-family: 'Playfair Display', serif; }
+
+  .btn-submit { width: 100%; padding: 15px; background: #3d8c40; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; margin-top: 20px; font-family: inherit; }
+  .btn-submit:hover { background: #2e6e31; }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  #msg { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 14px; display: none; line-height: 1.5; }
+  .msg-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .msg-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* Success overlay */
+  #enrollSuccess { display: none; text-align: center; padding: 40px 20px; }
+  #enrollSuccess .check { width: 64px; height: 64px; border-radius: 50%; background: #e6f4ea; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 32px; color: #2e6e31; }
+  #enrollSuccess h2 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 10px; }
+  #enrollSuccess p { font-size: 15px; color: #444; line-height: 1.7; max-width: 480px; margin: 0 auto 14px; }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; padding: 20px 20px 60px; }
+    .summary-card { position: static; }
+    nav { padding: 16px 20px; }
+    .hero-title { padding: 40px 20px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="straight-fin-farms.html">Welcome to Balance Nature Project at Straight Fin Farms</a>
+  <div class="nav-links">
+    <a href="permaculture-course.html">← Course details</a>
+  </div>
+</nav>
+
+<div class="hero-title">
+  <h1>Enroll in the Permaculture Course</h1>
+  <p>Pick your course, your accommodation, tell us who's coming. We'll confirm availability and send a payment link. <a href="permaculture-course.html">Full course details here</a>.</p>
+</div>
+
+<div class="layout">
+  <!-- LEFT: FORM -->
+  <div class="form-card" id="formCard">
+    <h2>Your booking</h2>
+    <p class="sub">Your seat isn't reserved until payment is received — but you'll only be invoiced after we've confirmed availability for your chosen course.</p>
+
+    <!-- COURSE -->
+    <div class="form-section">
+      <h3>1. Choose your course</h3>
+      <label class="course-option" data-course="3day" data-tuition="725">
+        <input type="radio" name="course" value="3day">
+        <span class="opt-price" id="coursePrice3">$725</span>
+        <div class="opt-title">3-Day Permaculture Intensive</div>
+        <div class="opt-dates">Fri Sep 4 – Mon Sep 7, 2026 · Labour Day weekend</div>
+        <div class="opt-desc">3 full days of instruction · 3 nights accommodation · All meals included · Certificate of completion</div>
+      </label>
+      <label class="course-option" data-course="7day" data-tuition="1625">
+        <input type="radio" name="course" value="7day">
+        <span class="opt-price" id="coursePrice7">$1,625</span>
+        <div class="opt-title">7-Day Immersive Course</div>
+        <div class="opt-dates">Mon Aug 24 – Sun Aug 30, 2026</div>
+        <div class="opt-desc">Full 20-chapter curriculum · 7 nights · All meals included · Capstone build day · Certificate</div>
+      </label>
+    </div>
+
+    <!-- ACCOMMODATION -->
+    <div class="form-section">
+      <h3>2. Accommodation</h3>
+      <label class="stay-option" data-stay="commuter" data-cost="0">
+        <input type="radio" name="stay" value="commuter">
+        <div class="stay-option-label"><span class="ico">🏠</span><div><div class="name">No accommodation (commuter)</div><div class="sub">Stay elsewhere; come for sessions and meals</div></div></div>
+        <div class="price">Free</div>
+      </label>
+      <label class="stay-option" data-stay="byo" data-cost="0">
+        <input type="radio" name="stay" value="byo">
+        <div class="stay-option-label"><span class="ico">🎒</span><div><div class="name">Bring your own tent</div><div class="sub">Camping area · washroom &amp; shower access</div></div></div>
+        <div class="price">Free</div>
+      </label>
+      <label class="stay-option" data-stay="bell" data-cost3="225" data-cost7="525">
+        <input type="radio" name="stay" value="bell">
+        <div class="stay-option-label"><span class="ico">⛺</span><div><div class="name">Bell Tent Glamping</div><div class="sub" id="bellSub">$225 for 3 nights · $525 for 7 nights</div></div></div>
+        <div class="price" id="bellPrice">–</div>
+      </label>
+      <label class="stay-option" data-stay="bunkie" data-cost3="275" data-cost7="635">
+        <input type="radio" name="stay" value="bunkie">
+        <div class="stay-option-label"><span class="ico">🛖</span><div><div class="name">Bunkie Cabin</div><div class="sub" id="bunkieSub">$275 / $635 · Private rustic cabin</div></div></div>
+        <div class="price" id="bunkiePrice">–</div>
+      </label>
+      <label class="stay-option" data-stay="room" data-cost3="450" data-cost7="1050">
+        <input type="radio" name="stay" value="room">
+        <div class="stay-option-label"><span class="ico">🏡</span><div><div class="name">Private Farmhouse Room</div><div class="sub" id="roomSub">$450 / $1,050 · Queen or double bed</div></div></div>
+        <div class="price" id="roomPrice">–</div>
+      </label>
+    </div>
+
+    <!-- PARTICIPANTS -->
+    <div class="form-section">
+      <h3>3. Who's attending</h3>
+      <div class="guest-row">
+        <div class="info">
+          <div class="label">Adults</div>
+          <div class="sub">Age 18+ · full tuition applies</div>
+        </div>
+        <div class="counter">
+          <button type="button" onclick="changeCount('adults', -1)" id="adultsMinus">−</button>
+          <span class="count" id="adultsCount">1</span>
+          <button type="button" onclick="changeCount('adults', 1)" id="adultsPlus">+</button>
+        </div>
+      </div>
+      <div class="couples-box">
+        <label>
+          <input type="checkbox" id="couplesCheck">
+          <span>
+            We're booking as a couple sharing accommodation
+            <span class="savings" id="couplesSavings">Save 25% on combined tuition</span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="form-section">
+      <h3>4. Contact info</h3>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">First name</label><input type="text" id="firstName" required></div>
+        <div class="field-group"><label class="field-label">Last name</label><input type="text" id="lastName" required></div>
+      </div>
+      <div class="field-group"><label class="field-label">Email</label><input type="email" id="email" required></div>
+      <div class="field-group"><label class="field-label">Phone</label><input type="tel" id="phone"></div>
+      <div class="field-group"><label class="field-label">Dietary restrictions / accessibility needs (optional)</label><textarea id="dietary" placeholder="Vegan, gluten-free, nut allergy, mobility needs, etc."></textarea></div>
+      <div class="field-group"><label class="field-label">Anything else we should know? (optional)</label><textarea id="message" placeholder="What draws you to permaculture? Specific questions or topics you're hoping to cover?"></textarea></div>
+    </div>
+
+    <button type="button" class="btn-submit" id="submitBtn" onclick="submitEnrollment()">Request Enrollment</button>
+    <div id="msg"></div>
+  </div>
+
+  <!-- SUCCESS STATE (replaces form on submit) -->
+  <div class="form-card" id="successCard" style="display:none; text-align:center">
+    <div id="enrollSuccess" style="display:block">
+      <div class="check">✓</div>
+      <h2>Enrollment Request Sent</h2>
+      <p id="successDetails"></p>
+      <p style="color:#888; font-size:13px;">Deniz will review your request and send you a confirmation with the payment link within a few hours. Check your inbox.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT: SUMMARY -->
+  <div class="summary-card">
+    <h3>Booking summary</h3>
+    <div id="summaryRows">
+      <div class="summary-row"><span class="label">Course</span><span class="value" id="sumCourse">—</span></div>
+      <div class="summary-row"><span class="label">Dates</span><span class="value" id="sumDates">—</span></div>
+      <div class="summary-row"><span class="label">Participants</span><span class="value" id="sumParticipants">1 adult</span></div>
+      <div class="summary-row"><span class="label">Accommodation</span><span class="value" id="sumStay">—</span></div>
+      <div class="summary-divider"></div>
+      <div class="summary-row"><span class="label">Tuition</span><span class="value" id="sumTuition">—</span></div>
+      <div class="summary-row discount" id="couplesRow" style="display:none"><span class="label">Couples discount (-25%)</span><span class="value" id="sumCouples">—</span></div>
+      <div class="summary-row"><span class="label">Accommodation</span><span class="value" id="sumStayCost">—</span></div>
+      <div class="summary-row"><span class="label">HST (13%)</span><span class="value" id="sumHst">—</span></div>
+    </div>
+    <div class="summary-total"><span>Total</span><span class="value" id="sumTotal">—</span></div>
+    <p style="font-size:11px; color:#888; margin-top:12px; line-height:1.6;">All prices in CAD. You won't be charged until we confirm availability and send you a secure payment link.</p>
+  </div>
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+  const HST_RATE = 0.13;
+
+  const state = {
+    course: null,        // '3day' | '7day'
+    stay: null,          // 'commuter' | 'byo' | 'bell' | 'bunkie' | 'room'
+    adults: 1,
+    isCouple: false,
+  };
+
+  const COURSES = {
+    '3day': { name: '3-Day Intensive', dates: 'Sep 4–7, 2026', tuition: 725, nights: 3 },
+    '7day': { name: '7-Day Immersive', dates: 'Aug 24–30, 2026', tuition: 1625, nights: 7 },
+  };
+  const STAYS = {
+    commuter: { name: 'No accommodation', cost3: 0, cost7: 0 },
+    byo: { name: 'Bring your own tent', cost3: 0, cost7: 0 },
+    bell: { name: 'Bell Tent Glamping', cost3: 225, cost7: 525 },
+    bunkie: { name: 'Bunkie Cabin', cost3: 275, cost7: 635 },
+    room: { name: 'Private Farmhouse Room', cost3: 450, cost7: 1050 },
+  };
+
+  // Read URL query ?course=3day or 7day for auto-select
+  const urlParams = new URLSearchParams(window.location.search);
+  const preSelect = urlParams.get('course');
+
+  function init() {
+    // Bind course radios
+    document.querySelectorAll('.course-option').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.course-option').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        el.querySelector('input').checked = true;
+        state.course = el.dataset.course;
+        updateStayPrices();
+        recalc();
+      });
+    });
+    // Bind stay radios
+    document.querySelectorAll('.stay-option').forEach(el => {
+      el.addEventListener('click', () => {
+        if (el.classList.contains('disabled')) return;
+        document.querySelectorAll('.stay-option').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        el.querySelector('input').checked = true;
+        state.stay = el.dataset.stay;
+        recalc();
+      });
+    });
+    // Couples checkbox
+    document.getElementById('couplesCheck').addEventListener('change', e => {
+      state.isCouple = e.target.checked;
+      if (state.isCouple && state.adults < 2) {
+        state.adults = 2;
+        document.getElementById('adultsCount').textContent = state.adults;
+      }
+      recalc();
+    });
+    // Pre-select from URL
+    if (preSelect && COURSES[preSelect]) {
+      const el = document.querySelector(`.course-option[data-course="${preSelect}"]`);
+      if (el) el.click();
+    }
+    updateStayPrices();
+    recalc();
+  }
+
+  function changeCount(field, delta) {
+    const min = field === 'adults' ? 1 : 0;
+    state[field] = Math.max(min, Math.min(8, state[field] + delta));
+    if (state.isCouple && state.adults > 2) {
+      // Couple discount only applies to 2 adults
+      state.isCouple = false;
+      document.getElementById('couplesCheck').checked = false;
+    }
+    document.getElementById(field + 'Count').textContent = state[field];
+    document.getElementById(field + 'Minus').disabled = state[field] <= min;
+    document.getElementById(field + 'Plus').disabled = state[field] >= 8;
+    recalc();
+  }
+
+  function updateStayPrices() {
+    // If no course selected, show range
+    if (!state.course) {
+      document.getElementById('bellPrice').textContent = '–';
+      document.getElementById('bunkiePrice').textContent = '–';
+      document.getElementById('roomPrice').textContent = '–';
+      document.getElementById('bellSub').textContent = '$225 for 3 nights · $525 for 7 nights';
+      document.getElementById('bunkieSub').textContent = '$275 / $635 · Private rustic cabin';
+      document.getElementById('roomSub').textContent = '$450 / $1,050 · Queen or double bed';
+      return;
+    }
+    const nights = COURSES[state.course].nights;
+    const suffix = nights + ' night' + (nights > 1 ? 's' : '');
+    document.getElementById('bellPrice').textContent = '$' + STAYS.bell['cost' + nights].toLocaleString() + '/person';
+    document.getElementById('bunkiePrice').textContent = '$' + STAYS.bunkie['cost' + nights].toLocaleString() + '/person';
+    document.getElementById('roomPrice').textContent = '$' + STAYS.room['cost' + nights].toLocaleString() + '/person';
+    document.getElementById('bellSub').textContent = suffix + ' · luxury canvas tent';
+    document.getElementById('bunkieSub').textContent = suffix + ' · rustic private cabin';
+    document.getElementById('roomSub').textContent = suffix + ' · queen/double bed, shared bathroom';
+  }
+
+  function recalc() {
+    const s = state;
+    const course = COURSES[s.course];
+    const stay = STAYS[s.stay];
+
+    // Course & Dates
+    document.getElementById('sumCourse').textContent = course ? course.name : '—';
+    document.getElementById('sumDates').textContent = course ? course.dates : '—';
+
+    // Participants
+    let pText = s.adults + ' adult' + (s.adults !== 1 ? 's' : '');
+    if (s.isCouple) pText = '2 adults (couple)';
+    document.getElementById('sumParticipants').textContent = pText;
+
+    // Accommodation label
+    document.getElementById('sumStay').textContent = stay ? stay.name : '—';
+
+    // Pricing (pre-HST)
+    const tuitionPerPerson = course ? course.tuition : 0;
+    let tuitionSubtotal = tuitionPerPerson * s.adults;
+    let couplesDiscount = 0;
+    if (s.isCouple && s.adults === 2) {
+      couplesDiscount = tuitionSubtotal * 0.25;
+    }
+    const tuitionAfterDiscount = tuitionSubtotal - couplesDiscount;
+
+    const nights = course ? course.nights : 3;
+    const stayCostPerPerson = stay ? (stay['cost' + nights] || 0) : 0;
+    const stayCost = stayCostPerPerson * s.adults;
+
+    const subtotal = tuitionAfterDiscount + stayCost;
+    const hst = Math.round(subtotal * HST_RATE * 100) / 100;
+    const total = subtotal + hst;
+
+    document.getElementById('sumTuition').textContent = course ? fmt(tuitionSubtotal) : '—';
+    if (couplesDiscount > 0) {
+      document.getElementById('couplesRow').style.display = '';
+      document.getElementById('sumCouples').textContent = '−' + fmt(couplesDiscount);
+    } else {
+      document.getElementById('couplesRow').style.display = 'none';
+    }
+    document.getElementById('sumStayCost').textContent = stay ? fmt(stayCost) : '—';
+    document.getElementById('sumHst').textContent = course ? fmt(hst) : '—';
+    document.getElementById('sumTotal').textContent = course ? fmt(total) : '—';
+
+    // Store computed for submit
+    state._tuitionSubtotal = tuitionSubtotal;
+    state._couplesDiscount = couplesDiscount;
+    state._stayCost = stayCost;
+    state._subtotal = subtotal;
+    state._hst = hst;
+    state._total = total;
+  }
+  function fmt(n) { return '$' + Number(n).toLocaleString('en-CA', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+  function showMsg(text, type) {
+    const m = document.getElementById('msg');
+    m.className = type === 'error' ? 'msg-error' : 'msg-success';
+    m.style.display = 'block';
+    m.textContent = text;
+  }
+
+  function submitEnrollment() {
+    if (!state.course) return showMsg('Please choose a course.', 'error');
+    if (!state.stay) return showMsg('Please choose an accommodation option.', 'error');
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (!firstName || !lastName || !email) return showMsg('Please fill in your name and email.', 'error');
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    const course = COURSES[state.course];
+    const stay = STAYS[state.stay];
+    const payload = {
+      type: 'course',
+      course: state.course,
+      courseName: course.name,
+      courseDates: course.dates,
+      checkin: state.course === '3day' ? '2026-09-04' : '2026-08-24',
+      checkout: state.course === '3day' ? '2026-09-07' : '2026-08-30',
+      stay: state.stay,
+      stayName: stay.name,
+      nights: course.nights,
+      adults: state.adults,
+      children: 0,
+      infants: 0,
+      guests: state.adults,
+      pets: 0,
+      isCouple: state.isCouple,
+      tuitionSubtotal: state._tuitionSubtotal,
+      couplesDiscount: state._couplesDiscount,
+      stayCost: state._stayCost,
+      subtotal: state._subtotal,
+      hst: state._hst,
+      estimatedTotal: state._total,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: document.getElementById('phone').value.trim(),
+      dietary: document.getElementById('dietary').value.trim(),
+      occasion: 'Permaculture Course · ' + course.name,
+      message: document.getElementById('message').value.trim(),
+    };
+
+    const success = () => {
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('successCard').style.display = 'block';
+      document.getElementById('successDetails').innerHTML =
+        '<strong>' + course.name + '</strong><br>' + course.dates + '<br>' +
+        (state.isCouple ? '2 adults (couple)' : state.adults + ' adult' + (state.adults !== 1 ? 's' : '')) + ' · ' + stay.name + '<br>' +
+        'Estimated total: ' + fmt(state._total) + ' CAD';
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).then(success).catch(() => success()).finally(() => {
+      btn.disabled = false;
+      btn.textContent = 'Request Enrollment';
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>
