@@ -742,6 +742,11 @@
       <p>Full refund if cancelled at least 30 days before check-in. Partial refund if cancelled 7&ndash;30 days before check-in.</p>
       <p><strong>Strict Long-Term (30+ Days)</strong></p>
       <p>Full refund if cancelled within 48 hours of booking and at least 28 days before check-in. After that, the first 30 days of the stay are non-refundable.</p>
+      <h2 style="margin-top:32px;">Security Deposit</h2>
+      <p>A <strong>$500 refundable hold</strong> protects against accidental damages. Here's how it works:</p>
+      <p><strong>1. At booking</strong> &mdash; You securely save your card on file via Stripe. No charge, no hold.</p>
+      <p><strong>2. 1&ndash;2 days before arrival</strong> &mdash; Stripe places a $500 authorization hold on your saved card. This is <em>not</em> a charge; the funds are temporarily reserved (your bank may show it as "pending") but no money is transferred.</p>
+      <p><strong>3. After checkout</strong> &mdash; A routine property inspection is performed. If everything is in order, the hold is released within 7 days (often within 24 hours). If damages or extra cleaning are needed, only the corresponding amount is captured from the hold and an itemized statement is sent.</p>
     </div>
 
   </div>
@@ -755,7 +760,7 @@
         </div>
         <h3 style="margin: 0 0 8px; font-size: 22px; color: #1a1a1a; font-family:'Playfair Display', serif;">Request Received</h3>
         <p id="bookingCardSuccessDetails" style="margin: 0 0 12px; color: #555; font-size: 14px; line-height: 1.5;"></p>
-        <p style="margin: 0 0 24px; color: #888; font-size: 13px;">Check your inbox for a confirmation. Deniz typically responds within a few hours to confirm availability and send payment details.</p>
+        <p style="margin: 0 0 16px; color: #888; font-size: 13px;">Check your inbox for a confirmation. Deniz typically responds within a few hours with a link to securely save your card on file (no charge yet) and a payment link for the stay total. A <strong>refundable $500 hold</strong> is placed on your card 1&ndash;2 days before arrival and released after checkout, pending a routine property inspection.</p>
         <button onclick="resetBookingCard()" style="background: transparent; border: 1px solid #ddd; padding: 10px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; color: #555;">Make another request</button>
       </div>
       <div id="bookingCardContent">
@@ -889,6 +894,9 @@
           <span>Total</span>
           <span id="totalPrice">$1,898.40</span>
         </div>
+        <p style="font-size:11px; color:#888; margin-top:10px; line-height:1.5; padding:10px 12px; background:#f5f3ee; border-radius:6px;">
+          <strong>+ $500 refundable security hold</strong> &mdash; not a charge. We securely save your card at booking, place a $500 authorization hold 1&ndash;2 days before your arrival, then release it after checkout pending a routine property inspection.
+        </p>
       </div>
 
       <div class="direct-badge">
@@ -992,7 +1000,7 @@
           <label>Message (optional)</label>
           <textarea placeholder="Tell us a bit about your trip &mdash; who's coming, anything you'd like us to know..."></textarea>
         </div>
-        <p class="form-note">Deniz will respond with confirmed availability, total pricing, and payment instructions. No charge until you confirm.</p>
+        <p class="form-note">Deniz will respond with confirmed availability, total pricing, and payment instructions. No charge until you confirm. Your card is saved at booking; a refundable $500 hold (not a charge) is placed 1&ndash;2 days before arrival and released after checkout pending property inspection.</p>
         <button type="submit" class="btn-submit-inquiry">Send Booking Request</button>
       </form>
     </div>
