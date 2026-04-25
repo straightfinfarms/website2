@@ -9,6 +9,9 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'Inter', sans-serif; background: #e8e4dc; color: #1a1a1a; }
+  /* Anchor offset for sticky nav */
+  [id] { scroll-margin-top: 80px; }
+
 
   /* NAV */
   nav {
@@ -55,7 +58,7 @@
   .page-hero-content { position: relative; z-index: 2; padding: 0 20px; }
   .page-hero h1 {
     font-family: 'Playfair Display', serif; font-weight: 900;
-    font-size: clamp(40px, 6vw, 72px); color: #fff;
+    font-size: clamp(30px, 6vw, 72px); color: #fff;
     line-height: 1.08; margin-bottom: 16px;
   }
   .page-hero p {
@@ -450,18 +453,37 @@
 </section>
 
 <!-- COMMUNITY GALLERY -->
-<section style="padding: 96px 48px;">
-  <h2 style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(28px, 3.5vw, 44px); text-align: center; color: #1a1a1a; margin-bottom: 48px;">Community Life</h2>
-  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1100px; margin: 0 auto;">
-    <img src="images/PHOTO-2022-08-16-22-36-53.jpg" alt="Community walking through the farm fields with the husky" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/PHOTO-2022-09-19-19-54-38.jpg" alt="Outdoor community gathering in the garden" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/IMG_2460.jpg" alt="Workshop circle inside the farmhouse" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/IMG_4955 Large.jpeg" alt="Community dinner around the farmhouse table" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/PHOTO-2022-09-19-22-48-28.jpg" alt="Farm-to-table charcuterie board" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/PHOTO-2022-09-19-17-14-04 2.jpg" alt="Nighttime campfire gathering on the farm" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/IMG_5225 Large.jpeg" alt="Relaxing on the tiny house deck" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/PHOTO-2022-09-02-10-36-29.jpg" alt="Farm work day with equipment" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
-    <img src="images/IMG_5167 Large.jpeg" alt="Loading lumber for building projects in the forest" style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:4px; display:block;">
+<style>
+  .community-gallery-section { padding: 96px 48px; }
+  .community-gallery-section h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(28px, 3.5vw, 44px); text-align: center; color: #1a1a1a; margin-bottom: 48px; }
+  .community-gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1100px; margin: 0 auto; }
+  .community-gallery-grid img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px; display: block; }
+  @media (max-width: 720px) {
+    .community-gallery-section { padding: 56px 0; }
+    .community-gallery-section h2 { padding: 0 24px; margin-bottom: 28px; }
+    .community-gallery-grid {
+      display: flex; gap: 10px;
+      overflow-x: auto; scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 24px 8px;
+    }
+    .community-gallery-grid img { flex: 0 0 82%; scroll-snap-align: center; }
+    .community-gallery-grid::-webkit-scrollbar { height: 4px; }
+    .community-gallery-grid::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+  }
+</style>
+<section class="community-gallery-section">
+  <h2>Community Life</h2>
+  <div class="community-gallery-grid">
+    <img src="images/PHOTO-2022-08-16-22-36-53.jpg" alt="Community walking through the farm fields with the husky">
+    <img src="images/PHOTO-2022-09-19-19-54-38.jpg" alt="Outdoor community gathering in the garden">
+    <img src="images/IMG_2460.jpg" alt="Workshop circle inside the farmhouse">
+    <img src="images/IMG_4955 Large.jpeg" alt="Community dinner around the farmhouse table">
+    <img src="images/PHOTO-2022-09-19-22-48-28.jpg" alt="Farm-to-table charcuterie board">
+    <img src="images/PHOTO-2022-09-19-17-14-04 2.jpg" alt="Nighttime campfire gathering on the farm">
+    <img src="images/IMG_5225 Large.jpeg" alt="Relaxing on the tiny house deck">
+    <img src="images/PHOTO-2022-09-02-10-36-29.jpg" alt="Farm work day with equipment">
+    <img src="images/IMG_5167 Large.jpeg" alt="Loading lumber for building projects in the forest">
   </div>
 </section>
 

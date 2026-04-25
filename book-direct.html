@@ -9,6 +9,9 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'Inter', sans-serif; background: #fff; color: #1a1a1a; }
+  /* Anchor offset for sticky nav */
+  [id] { scroll-margin-top: 80px; }
+
 
   /* NAV */
   nav {
@@ -502,11 +505,23 @@
     .nav-links.open { display: flex; }
     .hamburger { display: block; }
     .gallery {
-      grid-template-columns: 1fr; grid-template-rows: 280px;
-      padding: 0 20px; border-radius: 12px;
+      display: flex; flex-direction: column; gap: 8px;
+      grid-template-columns: none; grid-template-rows: none;
+      padding: 0 20px; border-radius: 0;
     }
-    .gallery-main { border-radius: 12px; }
-    .gallery-sub { display: none; }
+    .gallery-main { border-radius: 12px; height: 280px; }
+    .gallery-sub {
+      display: flex; flex-direction: row; gap: 8px;
+      overflow-x: auto; scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 6px;
+    }
+    .gallery-sub .gallery-thumb {
+      flex: 0 0 60%; height: 140px; border-radius: 10px !important;
+      scroll-snap-align: center;
+    }
+    .gallery-sub::-webkit-scrollbar { height: 4px; }
+    .gallery-sub::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
     .listing-header { padding: 20px 20px 0; }
     .listing-header h1 { font-size: 24px; }
     .listing-body { padding: 28px 20px 60px; gap: 36px; }
@@ -515,6 +530,9 @@
     .rules-grid { grid-template-columns: 1fr; }
     .inquiry-row { grid-template-columns: 1fr; }
     .cal-grid-wrap { grid-template-columns: 1fr; }
+    .cal-grid { gap: 4px; }
+    .cal-day { font-size: 13px; }
+    .cal-dow { font-size: 10px; padding: 4px 0 6px; }
     .cal-months { gap: 0; }
     .cal-month-title:last-child { display: none; }
     #calGrid2 { display: none; }

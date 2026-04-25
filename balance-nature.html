@@ -9,6 +9,9 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'Inter', sans-serif; background: #e8e4dc; color: #1a1a1a; }
+  /* Anchor offset for sticky nav */
+  [id] { scroll-margin-top: 80px; }
+
 
   /* NAV */
   nav {
@@ -55,7 +58,7 @@
   .page-hero-content { position: relative; z-index: 2; padding: 0 20px; }
   .page-hero h1 {
     font-family: 'Playfair Display', serif; font-weight: 900;
-    font-size: clamp(40px, 6vw, 72px); color: #fff;
+    font-size: clamp(30px, 6vw, 72px); color: #fff;
     line-height: 1.08; margin-bottom: 16px;
   }
   .page-hero p {
@@ -129,9 +132,19 @@
   .gallery-grid img {
     width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px; display: block;
   }
-  @media (max-width: 768px) {
-    .gallery-grid { grid-template-columns: 1fr 1fr; }
-    .gallery-section { padding: 60px 24px; }
+  @media (max-width: 720px) {
+    .gallery-section { padding: 56px 0; }
+    .gallery-section h2 { padding: 0 24px; margin-bottom: 28px; }
+    .gallery-grid {
+      display: flex; gap: 10px;
+      grid-template-columns: none;
+      overflow-x: auto; scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 24px 8px;
+    }
+    .gallery-grid img { flex: 0 0 82%; scroll-snap-align: center; }
+    .gallery-grid::-webkit-scrollbar { height: 4px; }
+    .gallery-grid::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
   }
 
   /* HIGHLIGHT BANNER */

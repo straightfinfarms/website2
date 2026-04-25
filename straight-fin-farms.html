@@ -9,6 +9,9 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body { font-family: 'Inter', sans-serif; background: #e8e4dc; color: #1a1a1a; }
+  /* Anchor offset for sticky nav */
+  [id] { scroll-margin-top: 80px; }
+
 
   /* NAV */
   nav {
@@ -55,8 +58,8 @@
   .hero-content { position: relative; z-index: 2; padding: 0 20px; }
   .hero h1 {
     font-family: 'Playfair Display', serif; font-weight: 900;
-    font-size: clamp(48px, 7vw, 88px); color: #fff;
-    line-height: 1.05; margin-bottom: 18px;
+    font-size: clamp(34px, 7vw, 88px); color: #fff;
+    line-height: 1.1; margin-bottom: 18px;
   }
   .hero p {
     font-size: 18px; color: rgba(255,255,255,0.92); margin-bottom: 48px;
