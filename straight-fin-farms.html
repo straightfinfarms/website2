@@ -323,15 +323,12 @@
   .area-section { background: #f0ede6; padding: 80px 7vw; }
   .area-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3vw, 38px); margin-bottom: 12px; }
   .area-section .section-sub { color: #666; font-size: 17px; line-height: 1.7; max-width: 680px; margin-bottom: 40px; }
-  .area-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .area-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1100px; margin: 0 auto; }
   .area-card { background: #fff; border-radius: 10px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
   .area-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 8px; }
   .area-card p { color: #555; font-size: 15px; line-height: 1.6; }
   .area-card .distance { font-size: 13px; color: #3d8c40; font-weight: 600; margin-bottom: 6px; }
   /* Mobile override (must come AFTER the desktop rule above due to source order) */
-  @media (max-width: 1024px) {
-    .area-grid { grid-template-columns: 1fr 1fr; }
-  }
   @media (max-width: 720px) {
     .area-section { padding: 56px 24px; }
     .area-grid { grid-template-columns: 1fr; gap: 16px; }
