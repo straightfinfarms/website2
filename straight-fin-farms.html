@@ -323,6 +323,10 @@
     footer { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
     .area-grid { grid-template-columns: 1fr; }
+    /* On mobile, restore full-width button for bigger tap target */
+    .escape-text .btn-primary,
+    .discover-text .btn-primary,
+    .contact-form-wrap .btn-primary { align-self: stretch; text-align: center; }
   }
 
   /* BOBCAYGEON AREA HIGHLIGHTS */
@@ -363,7 +367,7 @@
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-content">
-    <h1>Reconnect with Nature</h1>
+    <h1>Disconnect to Connect with Nature</h1>
     <p>Step away from the busy world and reconnect with nature, yourself, and your community.</p>
     <a class="btn-primary" href="#projects">OUR PROJECTS</a>
   </div>
