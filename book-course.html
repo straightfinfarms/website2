@@ -96,6 +96,19 @@
   .couples-box input { margin-top: 3px; }
   .couples-box .savings { color: #2e6e31; font-weight: 600; display: block; margin-top: 2px; font-size: 13px; }
 
+  /* PROMO CODE */
+  .promo-row { display: flex; gap: 8px; align-items: stretch; }
+  .promo-row input { flex-grow: 1; text-transform: uppercase; letter-spacing: 0.05em; }
+  .promo-row button { padding: 0 18px; background: #1a1a1a; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .promo-row button:hover { background: #3d8c40; }
+  .promo-row button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .promo-feedback { margin-top: 10px; font-size: 13px; line-height: 1.5; display: none; }
+  .promo-feedback.success { display: block; background: #e6f4ea; border: 1px solid #c3e6cb; color: #155724; padding: 10px 12px; border-radius: 6px; }
+  .promo-feedback.success .applied-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .promo-feedback.success .remove-link { background: none; border: none; color: #2e6e31; text-decoration: underline; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
+  .promo-feedback.error { display: block; background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 10px 12px; border-radius: 6px; }
+  .promo-hint { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.5; }
+
   /* INPUTS */
   label.field-label { display: block; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; font-weight: 500; }
   input[type=text], input[type=email], input[type=tel], textarea, select {
@@ -272,6 +285,17 @@
       <div class="field-group"><label class="field-label">Anything else we should know? (optional)</label><textarea id="message" placeholder="What draws you to permaculture? Specific questions or topics you're hoping to cover?"></textarea></div>
     </div>
 
+    <!-- PROMO CODE -->
+    <div class="form-section">
+      <h3>5. Have a promo code?</h3>
+      <div class="promo-row">
+        <input type="text" id="promoInput" placeholder="e.g. INSTAGRAM10" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <button type="button" id="promoApplyBtn" onclick="applyPromoCode()">Apply</button>
+      </div>
+      <div id="promoFeedback" class="promo-feedback"></div>
+      <p class="promo-hint">Optional. Discount applies to tuition (after any shared-booking discount).</p>
+    </div>
+
     <button type="button" class="btn-submit" id="submitBtn" onclick="submitEnrollment()">Request Enrollment</button>
     <div id="msg"></div>
   </div>
@@ -297,6 +321,7 @@
       <div class="summary-divider"></div>
       <div class="summary-row"><span class="label">Tuition</span><span class="value" id="sumTuition">—</span></div>
       <div class="summary-row discount" id="couplesRow" style="display:none"><span class="label">Shared-booking discount (-25%)</span><span class="value" id="sumCouples">—</span></div>
+      <div class="summary-row discount" id="promoRow" style="display:none"><span class="label" id="promoRowLabel">Promo</span><span class="value" id="sumPromo">—</span></div>
       <div class="summary-row"><span class="label">Accommodation</span><span class="value" id="sumStayCost">—</span></div>
       <div class="summary-row"><span class="label">HST (13%)</span><span class="value" id="sumHst">—</span></div>
     </div>
@@ -330,6 +355,9 @@
     stay: null,          // 'commuter' | 'byo' | 'bell' | 'bunkie' | 'room'
     adults: 1,
     isCouple: false,
+    promoCode: null,     // e.g. 'INSTAGRAM10'
+    promoPercent: 0,     // % off tuition (after couples discount)
+    promoLabel: null,    // human-readable label, e.g. 'Instagram 10% off'
   };
 
   const COURSES = {
@@ -385,7 +413,70 @@
       const el = document.querySelector(`.course-option[data-course="${preSelect}"]`);
       if (el) el.click();
     }
+    // Pre-fill promo code from URL ?promo=INSTAGRAM10
+    const preCode = urlParams.get('promo');
+    if (preCode) {
+      document.getElementById('promoInput').value = preCode.toUpperCase();
+      applyPromoCode();
+    }
+    // Allow Enter in promo input to apply
+    document.getElementById('promoInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); applyPromoCode(); }
+    });
     updateStayPrices();
+    recalc();
+  }
+
+  function applyPromoCode() {
+    const input = document.getElementById('promoInput');
+    const fb = document.getElementById('promoFeedback');
+    const btn = document.getElementById('promoApplyBtn');
+    const code = input.value.trim().toUpperCase();
+    if (!code) {
+      fb.className = 'promo-feedback error';
+      fb.textContent = 'Enter a code first.';
+      return;
+    }
+    btn.disabled = true; btn.textContent = '…';
+    fb.className = 'promo-feedback';
+    fb.textContent = '';
+    fetch(APPS_SCRIPT_URL + '?action=validateCode&code=' + encodeURIComponent(code), { method: 'GET' })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.valid) {
+          state.promoCode = res.code;
+          state.promoPercent = res.percent;
+          state.promoLabel = res.label || (res.percent + '% off tuition');
+          fb.className = 'promo-feedback success';
+          fb.innerHTML = '<div class="applied-row"><span><strong>✓ ' + state.promoCode + '</strong> — ' + state.promoLabel + '</span><button type="button" class="remove-link" onclick="removePromoCode()">Remove</button></div>';
+          input.disabled = true;
+          recalc();
+        } else {
+          state.promoCode = null; state.promoPercent = 0; state.promoLabel = null;
+          fb.className = 'promo-feedback error';
+          fb.textContent = (res && res.error) ? res.error : 'Code not recognized.';
+          recalc();
+        }
+      })
+      .catch(() => {
+        // Fall back: accept the code locally and let the server re-validate on submit
+        state.promoCode = code;
+        state.promoPercent = 0;
+        state.promoLabel = 'Pending validation';
+        fb.className = 'promo-feedback success';
+        fb.innerHTML = '<div class="applied-row"><span><strong>' + code + '</strong> — we\'ll confirm this on our end</span><button type="button" class="remove-link" onclick="removePromoCode()">Remove</button></div>';
+        input.disabled = true;
+        recalc();
+      })
+      .finally(() => { btn.disabled = false; btn.textContent = 'Apply'; });
+  }
+
+  function removePromoCode() {
+    state.promoCode = null; state.promoPercent = 0; state.promoLabel = null;
+    const input = document.getElementById('promoInput');
+    input.value = ''; input.disabled = false;
+    document.getElementById('promoFeedback').className = 'promo-feedback';
+    document.getElementById('promoFeedback').textContent = '';
     recalc();
   }
 
@@ -448,14 +539,21 @@
     if (s.isCouple && s.adults === 2) {
       couplesDiscount = tuitionSubtotal * 0.25;
     }
-    const tuitionAfterDiscount = tuitionSubtotal - couplesDiscount;
+    const tuitionAfterCouples = tuitionSubtotal - couplesDiscount;
+
+    // Promo discount (% off tuition AFTER couples discount)
+    let promoDiscount = 0;
+    if (s.promoCode && s.promoPercent > 0) {
+      promoDiscount = Math.round(tuitionAfterCouples * (s.promoPercent / 100) * 100) / 100;
+    }
+    const tuitionAfterAll = tuitionAfterCouples - promoDiscount;
 
     const nights = course ? course.nights : 3;
     const stayCostPerPerson = stay ? (stay['cost' + nights] || 0) : 0;
     // If booking as a pair sharing accommodation, only charge for one unit (one room/tent)
     const stayCost = (s.isCouple && s.adults === 2) ? stayCostPerPerson : stayCostPerPerson * s.adults;
 
-    const subtotal = tuitionAfterDiscount + stayCost;
+    const subtotal = tuitionAfterAll + stayCost;
     const hst = Math.round(subtotal * HST_RATE * 100) / 100;
     const total = subtotal + hst;
 
@@ -466,6 +564,13 @@
     } else {
       document.getElementById('couplesRow').style.display = 'none';
     }
+    if (promoDiscount > 0) {
+      document.getElementById('promoRow').style.display = '';
+      document.getElementById('promoRowLabel').textContent = (s.promoLabel || 'Promo') + ' (−' + s.promoPercent + '%)';
+      document.getElementById('sumPromo').textContent = '−' + fmt(promoDiscount);
+    } else {
+      document.getElementById('promoRow').style.display = 'none';
+    }
     document.getElementById('sumStayCost').textContent = stay ? fmt(stayCost) : '—';
     document.getElementById('sumHst').textContent = course ? fmt(hst) : '—';
     document.getElementById('sumTotal').textContent = course ? fmt(total) : '—';
@@ -473,6 +578,7 @@
     // Store computed for submit
     state._tuitionSubtotal = tuitionSubtotal;
     state._couplesDiscount = couplesDiscount;
+    state._promoDiscount = promoDiscount;
     state._stayCost = stayCost;
     state._subtotal = subtotal;
     state._hst = hst;
@@ -519,6 +625,10 @@
       isCouple: state.isCouple,
       tuitionSubtotal: state._tuitionSubtotal,
       couplesDiscount: state._couplesDiscount,
+      promoCode: state.promoCode || '',
+      promoLabel: state.promoLabel || '',
+      promoPercent: state.promoPercent || 0,
+      promoDiscount: state._promoDiscount || 0,
       stayCost: state._stayCost,
       subtotal: state._subtotal,
       hst: state._hst,
