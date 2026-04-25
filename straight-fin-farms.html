@@ -166,6 +166,12 @@
     font-size: 13px; color: #888; margin-top: -20px; margin-bottom: 24px;
     font-style: italic;
   }
+  /* Button shouldn't stretch full-width in the flex column on desktop —
+     keep it sized to its content. On mobile (handled by the @media block below)
+     it stretches for a bigger tap target. */
+  .escape-text .btn-primary,
+  .discover-text .btn-primary,
+  .contact-form-wrap .btn-primary { align-self: flex-start; }
 
   /* PERMACULTURE COURSE */
   .permaculture-section {
