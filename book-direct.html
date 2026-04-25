@@ -862,6 +862,7 @@
         </div>
       </div>
 
+      <div id="datesError" style="display:none; color:#c0392b; font-size:13px; margin: 8px 0 0; padding:10px 12px; background:#fdecea; border:1px solid #f5c6cb; border-radius:6px; line-height:1.4;">Please select your check-in and check-out dates first.</div>
       <button class="btn-reserve" onclick="openInquiry()" id="reserveBtn">Request to Book</button>
       <p class="no-charge-note">You won't be charged yet</p>
 
@@ -1417,8 +1418,20 @@
 
   // ===== INQUIRY MODAL =====
   function openInquiry() {
-    if (checkinDate) document.getElementById('modalCheckin').value = dateKey(checkinDate);
-    if (checkoutDate) document.getElementById('modalCheckout').value = dateKey(checkoutDate);
+    // Require check-in AND check-out dates before allowing booking request
+    if (!checkinDate || !checkoutDate) {
+      const err = document.getElementById('datesError');
+      if (err) {
+        err.style.display = 'block';
+        const pickerBox = document.querySelector('.picker-box');
+        if (pickerBox) pickerBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => { err.style.display = 'none'; }, 6000);
+      }
+      return;
+    }
+    document.getElementById('datesError').style.display = 'none';
+    document.getElementById('modalCheckin').value = dateKey(checkinDate);
+    document.getElementById('modalCheckout').value = dateKey(checkoutDate);
     document.getElementById('modalGuests').value = adults + children + infants;
     document.getElementById('modalPets').value = pets;
     document.getElementById('inquiryForm').style.display = 'block';
@@ -1438,6 +1451,11 @@
 
   function submitInquiry(e) {
     e.preventDefault();
+    // Defensive: dates should already be set via openInquiry, but block submission if somehow missing
+    if (!document.getElementById('modalCheckin').value || !document.getElementById('modalCheckout').value) {
+      alert('Please close this and select your check-in and check-out dates first.');
+      return;
+    }
     const form = e.target;
     const submitBtn = form.querySelector('.btn-submit-inquiry');
     const originalText = submitBtn.textContent;
