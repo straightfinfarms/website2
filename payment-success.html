@@ -51,6 +51,12 @@
     .body a { color: #3d8c40; text-decoration: none; }
     .body a:hover { text-decoration: underline; }
     .muted { font-size: 14px !important; color: #888 !important; margin-top: 24px !important; }
+    .actions { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .actions a { display: inline-block; padding: 12px 22px; border-radius: 50px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; }
+    .btn-go-home { background: #3d8c40; color: #fff !important; }
+    .btn-go-home:hover { background: #2e6e31; }
+    .btn-secondary { background: transparent; color: #1a1a1a !important; border: 1px solid #ccc; }
+    .btn-secondary:hover { border-color: #3d8c40; color: #3d8c40 !important; }
   </style>
 </head>
 <body>
@@ -62,7 +68,11 @@
     <div class="body">
       <p>Thank you! Your credit card payment has been successfully processed.</p>
       <p>Deniz will review your payment and send you a <strong>final confirmation email</strong> with check-in details and directions to the property shortly.</p>
-      <p class="muted">You can close this tab. Questions? Email <a href="mailto:straightfinfarms@gmail.com">straightfinfarms@gmail.com</a></p>
+      <div class="actions">
+        <a class="btn-go-home" href="straight-fin-farms.html">Return Home</a>
+        <a class="btn-secondary" href="bookings.html">Explore More Stays</a>
+      </div>
+      <p class="muted">You can close this tab when you're ready. Questions? Email <a href="mailto:hello@straightfinfarms.com">hello@straightfinfarms.com</a></p>
     </div>
   </div>
 </body>

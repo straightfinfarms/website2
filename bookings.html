@@ -338,7 +338,7 @@
   </button>
   <div class="nav-links">
     <a href="straight-fin-farms.html#projects">Projects</a>
-    <a href="straight-fin-farms.html#permaculture">Permaculture Course</a>
+    <a href="permaculture-course.html">Permaculture Course</a>
     <a href="straight-fin-farms.html#stay">Stay With Us</a>
     <a href="straight-fin-farms.html#about">About</a>
     <a href="straight-fin-farms.html#contact">Contact</a>
@@ -493,14 +493,15 @@
     </div>
     <div class="corporate-form">
       <h3>Request a Proposal</h3>
-      <form onsubmit="event.preventDefault(); alert('Thank you! We will be in touch about your retreat.');">
-        <input type="text" placeholder="Company Name" required>
-        <input type="text" placeholder="Contact Name" required>
-        <input type="email" placeholder="Email Address" required>
-        <input type="text" placeholder="Preferred Dates">
-        <input type="text" placeholder="Estimated Group Size">
-        <textarea placeholder="Tell us about your retreat goals, preferred activities, and accommodation needs"></textarea>
-        <button type="submit" class="btn-primary" style="width:100%; border:none; cursor:pointer;">SUBMIT INQUIRY</button>
+      <form id="corporateForm" onsubmit="submitCorporateInquiry(event)">
+        <input type="text" id="corpCompany" placeholder="Company Name" required>
+        <input type="text" id="corpContact" placeholder="Contact Name" required>
+        <input type="email" id="corpEmail" placeholder="Email Address" required>
+        <input type="text" id="corpDates" placeholder="Preferred Dates">
+        <input type="text" id="corpSize" placeholder="Estimated Group Size">
+        <textarea id="corpNotes" placeholder="Tell us about your retreat goals, preferred activities, and accommodation needs"></textarea>
+        <button type="submit" id="corpSubmit" class="btn-primary" style="width:100%; border:none; cursor:pointer;">SUBMIT INQUIRY</button>
+        <div id="corpStatus" style="display:none; margin-top:12px; padding:12px 14px; border-radius:8px; font-size:14px; line-height:1.5;"></div>
       </form>
     </div>
   </div>
@@ -608,23 +609,98 @@
 <section class="content-section" id="contact-retreat">
   <h2>Join the Waitlist</h2>
   <p>Permaculture workshops and certification retreats are coming soon. Sign up to be the first to know when dates and pricing are announced.</p>
-  <form style="max-width: 480px; margin-top: 32px;" onsubmit="event.preventDefault(); alert('Thank you! You\'re on the waitlist. We\'ll be in touch when retreat dates are announced.');">
+  <form id="waitlistForm" style="max-width: 480px; margin-top: 32px;" onsubmit="submitWaitlist(event)">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-      <input type="text" placeholder="First Name" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%;">
-      <input type="text" placeholder="Last Name" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%;">
+      <input type="text" id="wlFirst" placeholder="First Name" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%;">
+      <input type="text" id="wlLast" placeholder="Last Name" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%;">
     </div>
-    <input type="email" placeholder="Email Address" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; margin-bottom:14px;">
-    <select style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; margin-bottom:14px; background:#fff; color:#1a1a1a;">
+    <input type="email" id="wlEmail" placeholder="Email Address" required style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; margin-bottom:14px;">
+    <select id="wlInterest" style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; margin-bottom:14px; background:#fff; color:#1a1a1a;">
       <option value="">I'm interested in...</option>
       <option value="3-day">3-Day Weekend Intensive</option>
       <option value="7-day">7-Day Certification Retreat</option>
       <option value="corporate">Corporate / Team Retreat</option>
       <option value="general">General Updates</option>
     </select>
-    <textarea placeholder="Tell us about yourself, your group size, and what you're hoping to learn" style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; min-height:120px; resize:vertical; margin-bottom:14px;"></textarea>
-    <button type="submit" class="btn-primary" style="border:none; cursor:pointer;">JOIN THE WAITLIST</button>
+    <textarea id="wlMessage" placeholder="Tell us about yourself, your group size, and what you're hoping to learn" style="font-family:'Inter',sans-serif; font-size:14px; padding:14px 16px; border:1px solid #ccc; border-radius:6px; width:100%; min-height:120px; resize:vertical; margin-bottom:14px;"></textarea>
+    <button type="submit" id="wlSubmit" class="btn-primary" style="border:none; cursor:pointer;">JOIN THE WAITLIST</button>
+    <div id="wlStatus" style="display:none; margin-top:12px; padding:12px 14px; border-radius:8px; font-size:14px; line-height:1.5;"></div>
   </form>
 </section>
+
+<script>
+  // Both bookings.html forms POST to the same Apps Script endpoint as the booking system.
+  // doPost() falls through to logBooking() for non-'course' types so leads land in the sheet.
+  (function () {
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+
+    function postLead(payload, btn, status, successMsg) {
+      const original = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Sending…';
+      status.style.display = 'none';
+
+      const success = () => {
+        status.style.display = 'block';
+        status.style.background = '#e6f4ea';
+        status.style.color = '#1f5a22';
+        status.style.border = '1px solid #c3e6cb';
+        status.textContent = successMsg;
+      };
+
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then(success)
+        .catch(success)
+        .finally(() => { btn.disabled = false; btn.textContent = original; });
+    }
+
+    window.submitCorporateInquiry = function (e) {
+      e.preventDefault();
+      const form = document.getElementById('corporateForm');
+      const payload = {
+        type: 'corporate_inquiry',
+        firstName: document.getElementById('corpContact').value.trim(),
+        lastName: '',
+        email: document.getElementById('corpEmail').value.trim(),
+        company: document.getElementById('corpCompany').value.trim(),
+        preferredDates: document.getElementById('corpDates').value.trim(),
+        groupSize: document.getElementById('corpSize').value.trim(),
+        occasion: 'Corporate retreat inquiry',
+        message: document.getElementById('corpNotes').value.trim(),
+        source: 'bookings.html#corporate',
+      };
+      postLead(payload,
+        document.getElementById('corpSubmit'),
+        document.getElementById('corpStatus'),
+        'Thanks — your inquiry is in. We\'ll be in touch about your retreat.');
+      form.reset();
+    };
+
+    window.submitWaitlist = function (e) {
+      e.preventDefault();
+      const form = document.getElementById('waitlistForm');
+      const payload = {
+        type: 'waitlist',
+        firstName: document.getElementById('wlFirst').value.trim(),
+        lastName: document.getElementById('wlLast').value.trim(),
+        email: document.getElementById('wlEmail').value.trim(),
+        interest: document.getElementById('wlInterest').value,
+        occasion: 'Permaculture waitlist (' + (document.getElementById('wlInterest').value || 'general') + ')',
+        message: document.getElementById('wlMessage').value.trim(),
+        source: 'bookings.html#contact-retreat',
+      };
+      postLead(payload,
+        document.getElementById('wlSubmit'),
+        document.getElementById('wlStatus'),
+        'You\'re on the waitlist. We\'ll be in touch when retreat dates are announced.');
+      form.reset();
+    };
+  })();
+</script>
 
 <!-- FOOTER -->
 <footer>

@@ -358,7 +358,7 @@
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#">Welcome to Balance Nature Project at Straight Fin Farms</a>
+  <a class="nav-logo" href="straight-fin-farms.html">Welcome to Balance Nature Project at Straight Fin Farms</a>
   <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -583,19 +583,66 @@
   <div class="contact-form-wrap">
     <h2>Contact Us</h2>
     <p class="subtitle">Have questions about visiting the farm, our permaculture course, or joining the community? We'd love to hear from you.</p>
-    <form class="contact-form" onsubmit="event.preventDefault(); alert('Thank you! We will be in touch soon.');">
+    <form id="contactForm" class="contact-form" onsubmit="submitContact(event)">
       <div class="form-row">
-        <input type="text" placeholder="First Name" required>
-        <input type="text" placeholder="Last Name" required>
+        <input type="text" id="contactFirstName" placeholder="First Name" required>
+        <input type="text" id="contactLastName" placeholder="Last Name" required>
       </div>
-      <input type="email" placeholder="Email Address" required>
-      <input type="text" placeholder="Subject">
-      <textarea placeholder="Your Message" required></textarea>
-      <button type="submit" class="btn-primary" style="border: none; width: fit-content; cursor: pointer;">SEND MESSAGE</button>
+      <input type="email" id="contactEmail" placeholder="Email Address" required>
+      <input type="text" id="contactSubject" placeholder="Subject">
+      <textarea id="contactMessage" placeholder="Your Message" required></textarea>
+      <button type="submit" id="contactSubmit" class="btn-primary" style="border: none; width: fit-content; cursor: pointer;">SEND MESSAGE</button>
+      <div id="contactStatus" style="display:none; margin-top:12px; padding:12px 14px; border-radius:8px; font-size:14px; line-height:1.5;"></div>
     </form>
   </div>
   <div class="contact-img"></div>
 </section>
+
+<script>
+  // Contact form — POSTs to the booking Apps Script with type='contact'.
+  // The Apps Script's doPost falls through to logBooking() for unknown types,
+  // so the message lands in the same sheet as bookings (type column = 'contact').
+  (function () {
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+    window.submitContact = function (e) {
+      e.preventDefault();
+      const btn = document.getElementById('contactSubmit');
+      const status = document.getElementById('contactStatus');
+      const original = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Sending…';
+      status.style.display = 'none';
+
+      const payload = {
+        type: 'contact',
+        firstName: document.getElementById('contactFirstName').value.trim(),
+        lastName: document.getElementById('contactLastName').value.trim(),
+        email: document.getElementById('contactEmail').value.trim(),
+        occasion: 'Contact form: ' + (document.getElementById('contactSubject').value.trim() || 'general'),
+        message: document.getElementById('contactMessage').value.trim(),
+        source: 'straight-fin-farms.html#contact',
+      };
+
+      const success = () => {
+        document.getElementById('contactForm').reset();
+        status.style.display = 'block';
+        status.style.background = '#e6f4ea';
+        status.style.color = '#1f5a22';
+        status.style.border = '1px solid #c3e6cb';
+        status.textContent = 'Thanks — your message is in. We\'ll be in touch soon.';
+      };
+
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then(success)
+        .catch(success) // no-cors masks status; we treat both as success since the request fired
+        .finally(() => { btn.disabled = false; btn.textContent = original; });
+    };
+  })();
+</script>
 
 <!-- FOOTER -->
 <footer>
