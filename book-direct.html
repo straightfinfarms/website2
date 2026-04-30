@@ -175,6 +175,14 @@
   .sleeping-card .room-text { padding: 14px 16px 16px; }
   .sleeping-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .sleeping-card p { font-size: 13px; color: #888; }
+  .sleeping-card.optional { position: relative; }
+  .sleeping-card.optional .optional-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(61, 140, 64, 0.95); color: #fff;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 4px 9px; border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
 
   /* RIGHT COLUMN — BOOKING CARD */
   .booking-card {
@@ -762,6 +770,14 @@
             <p>Private cabin in the woods &middot; flexible sleeping</p>
           </div>
         </div>
+        <div class="sleeping-card optional">
+          <span class="optional-badge">Optional</span>
+          <img class="room-photo" src="images/Room/13 foot Bell Tent.jpeg" alt="Bell Tent" loading="lazy">
+          <div class="room-text">
+            <h4>Bell Tents</h4>
+            <p>Up to 4 13 ft White Duck tents &middot; mix of 2-single and double-bed configs &middot; available on request</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -786,7 +802,7 @@
         <div class="amenity-item"><span class="amenity-icon">&#127909;</span> TV with streaming</div>
         <div class="amenity-item"><span class="amenity-icon">&#128293;</span> Fire pit / bonfire area</div>
         <div class="amenity-item"><span class="amenity-icon">&#127793;</span> Permaculture farm access</div>
-        <div class="amenity-item" title="13 ft White Duck branded bell tent"><span class="amenity-icon">&#9962;</span> Bell tents available on request &mdash; 13 ft White Duck branded (2 singles or 1 double) &middot; <a href="images/Room/13 foot Bell Tent.jpeg" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">photo</a></div>
+        <div class="amenity-item" title="13 ft White Duck branded bell tents"><span class="amenity-icon">&#9962;</span> Bell tents available on request &mdash; up to 4 &middot; 13 ft White Duck branded (mix of 2-single and double-bed configs) &middot; <a href="images/Room/13 foot Bell Tent.jpeg" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">photo</a></div>
         <div class="amenity-item"><span class="amenity-icon">&#129385;</span> Board games &amp; card games</div>
       </div>
 
@@ -939,17 +955,19 @@
 
         <div class="picker-guests" style="border-top: 1px solid #e8e4dc; padding-top: 12px;">
           <div class="picker-label">Optional Add-Ons</div>
-          <div class="addon-row">
-            <div class="addon-text">
-              <div class="addon-title">Bell Tent</div>
-              <div class="addon-sub">13 ft White Duck branded &middot; 2 singles or 1 double &middot; available on request</div>
+
+          <div style="margin-bottom:12px;">
+            <div class="addon-title">Bell Tents</div>
+            <div class="addon-sub" style="margin-bottom:6px;">13 ft White Duck tents &middot; mix of 2-single and double-bed configs &middot; available on request</div>
+            <div class="guest-counter">
+              <button class="guest-btn" onclick="changeBellTents(-1)" id="bellTentMinus" disabled>&minus;</button>
+              <span class="guest-count" id="bellTentCount">0</span>
+              <button class="guest-btn" onclick="changeBellTents(1)" id="bellTentPlus">+</button>
+              <span style="font-size:14px; color:#888; margin-left: 4px;">tent(s) &middot; up to 4</span>
             </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="addBellTent" onchange="toggleBellTent()">
-              <span class="toggle-slider"></span>
-            </label>
           </div>
-          <div class="addon-row">
+
+          <div class="addon-row" style="border-top: 1px dashed #e0ddd6; padding-top:10px;">
             <div class="addon-text">
               <div class="addon-title">Forest Bunkie</div>
               <div class="addon-sub">Private cabin in the woods &middot; flexible sleeping</div>
@@ -959,7 +977,7 @@
               <span class="toggle-slider"></span>
             </label>
           </div>
-          <div style="font-size:12px; color:#888; margin-top:6px;">Bell Tent +$50/night &middot; Bunkie +$100/night</div>
+          <div style="font-size:12px; color:#888; margin-top:6px;">Bell Tent +$50/night each &middot; Bunkie +$100/night</div>
         </div>
       </div>
 
@@ -1191,8 +1209,9 @@
   let children = 0;
   let infants = 0;
   let pets = 0;
-  let addBellTent = false;
+  let bellTents = 0;       // 0–4
   let addBunkie = false;
+  const MAX_BELL_TENTS = 4;
   let checkinDate = null;
   let checkoutDate = null;
   // Cached price snapshot — written by updatePricing(), read by submitInquiry()
@@ -1459,7 +1478,7 @@
     const extraGuests = Math.max(0, adults - ADULT_FEE_THRESHOLD);
     const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
     const petCost = pets * PET_FEE;
-    const bellTentCost = addBellTent ? BELL_TENT_FEE * nights : 0;
+    const bellTentCost = bellTents * BELL_TENT_FEE * nights;
     const bunkieCost = addBunkie ? BUNKIE_FEE * nights : 0;
     const total = subtotal + cleaningFee + extraGuestCost + petCost + bellTentCost + bunkieCost;
 
@@ -1490,9 +1509,9 @@
 
     // Bell Tent add-on
     const bellTentRow = document.getElementById('bellTentRow');
-    if (addBellTent) {
+    if (bellTents > 0) {
       bellTentRow.style.display = '';
-      document.getElementById('bellTentLabel').textContent = 'Bell Tent x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + BELL_TENT_FEE;
+      document.getElementById('bellTentLabel').textContent = bellTents + ' Bell Tent' + (bellTents > 1 ? 's' : '') + ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + BELL_TENT_FEE;
       document.getElementById('bellTentTotal').textContent = '$' + bellTentCost.toLocaleString();
     } else {
       bellTentRow.style.display = 'none';
@@ -1531,9 +1550,12 @@
     };
   }
 
-  // ===== ADD-ON TOGGLES =====
-  function toggleBellTent() {
-    addBellTent = document.getElementById('addBellTent').checked;
+  // ===== ADD-ON CONTROLS =====
+  function changeBellTents(delta) {
+    bellTents = Math.min(MAX_BELL_TENTS, Math.max(0, bellTents + delta));
+    document.getElementById('bellTentCount').textContent = bellTents;
+    document.getElementById('bellTentMinus').disabled = bellTents <= 0;
+    document.getElementById('bellTentPlus').disabled = bellTents >= MAX_BELL_TENTS;
     updatePricing();
   }
   function toggleBunkie() {
@@ -1652,7 +1674,7 @@
       infants: infants,
       extraSleepingConfirmed: document.getElementById('extraSleepingConfirmed')?.checked || false,
       pets: document.getElementById('modalPets').value || pets,
-      addBellTent: addBellTent,
+      bellTents: bellTents,
       addBunkie: addBunkie,
       occasion: form.querySelector('select').value,
       message: form.querySelector('textarea').value,
@@ -1694,7 +1716,7 @@
     const details = document.getElementById('bookingCardSuccessDetails');
     if (details) {
       const addons = [];
-      if (data.addBellTent) addons.push('Bell Tent');
+      if (data.bellTents && data.bellTents > 0) addons.push(data.bellTents + ' Bell Tent' + (data.bellTents > 1 ? 's' : ''));
       if (data.addBunkie) addons.push('Forest Bunkie');
       const addonStr = addons.length > 0 ? '<br><span style="font-size:12px; color:#3d8c40;">+ ' + addons.join(' &middot; ') + '</span>' : '';
       details.innerHTML = '<strong>' + checkinStr + ' &rarr; ' + checkoutStr + '</strong><br>' + guestStr + (data.pets && data.pets > 0 ? ' &middot; ' + data.pets + ' pet' + (data.pets > 1 ? 's' : '') : '') + addonStr;
