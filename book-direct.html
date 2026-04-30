@@ -454,6 +454,84 @@
   }
   .rule-icon { font-size: 18px; width: 24px; text-align: center; }
 
+  /* PHOTO GALLERY CAROUSEL */
+  .photo-gallery-section {
+    max-width: 1200px; margin: 24px auto 0; padding: 48px 48px 24px;
+  }
+  .photo-gallery-section h2 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 28px; margin-bottom: 6px;
+  }
+  .photo-gallery-section .gallery-sub-title {
+    font-size: 14px; color: #888; margin-bottom: 20px;
+  }
+  .photo-gallery-wrapper { position: relative; }
+  .photo-gallery-track {
+    display: flex; gap: 12px; overflow-x: auto;
+    scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    padding-bottom: 14px; -webkit-overflow-scrolling: touch;
+  }
+  .photo-gallery-track::-webkit-scrollbar { height: 6px; }
+  .photo-gallery-track::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+  .photo-gallery-track::-webkit-scrollbar-track { background: #f3f0ea; border-radius: 3px; }
+  .photo-tile {
+    flex: 0 0 320px; height: 240px; border-radius: 12px;
+    overflow: hidden; cursor: zoom-in; scroll-snap-align: start;
+    background: #f0ede5; position: relative;
+    transition: transform 0.2s ease;
+  }
+  .photo-tile:hover { transform: translateY(-2px); }
+  .photo-tile img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .gallery-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.95); border: 1px solid #ddd;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 5; transition: 0.15s;
+  }
+  .gallery-nav:hover { background: #fff; color: #000; }
+  .gallery-nav.prev { left: -8px; }
+  .gallery-nav.next { right: -8px; }
+  .gallery-nav:disabled { opacity: 0.3; cursor: default; }
+  @media (max-width: 760px) {
+    .photo-gallery-section { padding: 32px 24px 16px; }
+    .photo-tile { flex: 0 0 75vw; height: 60vw; max-height: 280px; }
+    .gallery-nav { display: none; }
+  }
+
+  /* PHOTO LIGHTBOX */
+  .lightbox-overlay {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.92); align-items: center; justify-content: center;
+  }
+  .lightbox-overlay.open { display: flex; }
+  .lightbox-image {
+    max-width: 92vw; max-height: 92vh;
+    object-fit: contain; border-radius: 6px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  }
+  .lightbox-close, .lightbox-prev, .lightbox-next {
+    position: absolute; background: rgba(255,255,255,0.15);
+    color: #fff; border: none; cursor: pointer;
+    width: 48px; height: 48px; border-radius: 50%;
+    font-size: 22px; display: flex; align-items: center; justify-content: center;
+    transition: 0.15s;
+  }
+  .lightbox-close:hover, .lightbox-prev:hover, .lightbox-next:hover {
+    background: rgba(255,255,255,0.3);
+  }
+  .lightbox-close { top: 22px; right: 22px; }
+  .lightbox-prev { left: 22px; top: 50%; transform: translateY(-50%); }
+  .lightbox-next { right: 22px; top: 50%; transform: translateY(-50%); }
+  .lightbox-counter {
+    position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,0.85); font-size: 13px; letter-spacing: 0.05em;
+  }
+
   /* CANCELLATION */
   .cancel-section { padding: 28px 0; border-bottom: 1px solid #e8e4dc; }
   .cancel-section h2 {
@@ -1042,6 +1120,57 @@
     </div>
   </div>
 
+</div>
+
+<!-- PHOTO GALLERY CAROUSEL -->
+<section class="photo-gallery-section">
+  <h2>More photos of the property</h2>
+  <p class="gallery-sub-title">A scroll through the farm — interiors, waterfront, woods, and outdoor spaces. Click any photo to expand.</p>
+  <div class="photo-gallery-wrapper">
+    <button class="gallery-nav prev" id="galleryPrev" aria-label="Previous photos">&#8249;</button>
+    <button class="gallery-nav next" id="galleryNext" aria-label="Next photos">&#8250;</button>
+    <div class="photo-gallery-track" id="photoGalleryTrack">
+      <div class="photo-tile" data-i="0"><img src="images/ChatGPT Image Jan 19, 2026, 09_42_58 AM Large.jpeg" alt="Property view 1" loading="lazy"></div>
+      <div class="photo-tile" data-i="1"><img src="images/ChatGPT Image Jan 17, 2026, 07_55_01 AM Large.jpeg" alt="Property view 2" loading="lazy"></div>
+      <div class="photo-tile" data-i="2"><img src="images/ChatGPT Image Jan 17, 2026, 08_00_12 AM Large.jpeg" alt="Property view 3" loading="lazy"></div>
+      <div class="photo-tile" data-i="3"><img src="images/ChatGPT Image Jan 17, 2026, 08_01_46 AM Large.jpeg" alt="Property view 4" loading="lazy"></div>
+      <div class="photo-tile" data-i="4"><img src="images/ChatGPT Image Jan 19, 2026, 02_47_10 PM Large.jpeg" alt="Property view 5" loading="lazy"></div>
+      <div class="photo-tile" data-i="5"><img src="images/IMG_0285 Large.jpeg" alt="Property view 6" loading="lazy"></div>
+      <div class="photo-tile" data-i="6"><img src="images/IMG_0289 Large.jpeg" alt="Property view 7" loading="lazy"></div>
+      <div class="photo-tile" data-i="7"><img src="images/IMG_0328 Large.jpeg" alt="Property view 8" loading="lazy"></div>
+      <div class="photo-tile" data-i="8"><img src="images/IMG_0446 Large.jpeg" alt="Property view 9" loading="lazy"></div>
+      <div class="photo-tile" data-i="9"><img src="images/IMG_0666 Large.jpeg" alt="Property view 10" loading="lazy"></div>
+      <div class="photo-tile" data-i="10"><img src="images/IMG_0710 Large.jpeg" alt="Property view 11" loading="lazy"></div>
+      <div class="photo-tile" data-i="11"><img src="images/IMG_1187 Large.jpeg" alt="Property view 12" loading="lazy"></div>
+      <div class="photo-tile" data-i="12"><img src="images/IMG_1396 Large.jpeg" alt="Property view 13" loading="lazy"></div>
+      <div class="photo-tile" data-i="13"><img src="images/IMG_1884 Large.jpeg" alt="Property view 14" loading="lazy"></div>
+      <div class="photo-tile" data-i="14"><img src="images/IMG_1949 Large.jpeg" alt="Property view 15" loading="lazy"></div>
+      <div class="photo-tile" data-i="15"><img src="images/IMG_2006 Large.jpeg" alt="Property view 16" loading="lazy"></div>
+      <div class="photo-tile" data-i="16"><img src="images/IMG_3010 Large.jpeg" alt="Property view 17" loading="lazy"></div>
+      <div class="photo-tile" data-i="17"><img src="images/IMG_3110 Large.jpeg" alt="Property view 18" loading="lazy"></div>
+      <div class="photo-tile" data-i="18"><img src="images/IMG_3492 Large.jpeg" alt="Property view 19" loading="lazy"></div>
+      <div class="photo-tile" data-i="19"><img src="images/IMG_3886 Large.jpeg" alt="Property view 20" loading="lazy"></div>
+      <div class="photo-tile" data-i="20"><img src="images/IMG_4143 Large.jpeg" alt="Property view 21" loading="lazy"></div>
+      <div class="photo-tile" data-i="21"><img src="images/IMG_4408_clean_realistic Large.jpeg" alt="Property view 22" loading="lazy"></div>
+      <div class="photo-tile" data-i="22"><img src="images/IMG_4761 Large.jpeg" alt="Property view 23" loading="lazy"></div>
+      <div class="photo-tile" data-i="23"><img src="images/IMG_4929 Large.jpeg" alt="Property view 24" loading="lazy"></div>
+      <div class="photo-tile" data-i="24"><img src="images/IMG_5142 Large.jpeg" alt="Property view 25" loading="lazy"></div>
+      <div class="photo-tile" data-i="25"><img src="images/IMG_5238 Large.jpeg" alt="Property view 26" loading="lazy"></div>
+      <div class="photo-tile" data-i="26"><img src="images/IMG_5255 Large.jpeg" alt="Property view 27" loading="lazy"></div>
+      <div class="photo-tile" data-i="27"><img src="images/IMG_6091.jpg" alt="Property view 28" loading="lazy"></div>
+      <div class="photo-tile" data-i="28"><img src="images/IMG_7475.jpg" alt="Property view 29" loading="lazy"></div>
+      <div class="photo-tile" data-i="29"><img src="images/IMG_7639.jpg" alt="Property view 30" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX OVERLAY -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target===this)closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
+  <button class="lightbox-prev" onclick="lightboxStep(-1)" aria-label="Previous">&#8249;</button>
+  <img class="lightbox-image" id="lightboxImage" src="" alt="">
+  <button class="lightbox-next" onclick="lightboxStep(1)" aria-label="Next">&#8250;</button>
+  <div class="lightbox-counter" id="lightboxCounter">1 / 30</div>
 </div>
 
 <!-- CALENDAR SYNC SECTION -->
@@ -1742,6 +1871,47 @@
     if (calendarOpen && card && !card.contains(e.target)) {
       toggleCalendar(false);
     }
+  });
+
+  // ===== PHOTO GALLERY CAROUSEL + LIGHTBOX =====
+  const galleryTrack = document.getElementById('photoGalleryTrack');
+  const galleryTiles = galleryTrack ? Array.from(galleryTrack.querySelectorAll('.photo-tile img')) : [];
+  let lightboxIndex = 0;
+
+  function openLightbox(i) {
+    if (!galleryTiles.length) return;
+    lightboxIndex = i;
+    const img = galleryTiles[i];
+    document.getElementById('lightboxImage').src = img.src;
+    document.getElementById('lightboxImage').alt = img.alt || '';
+    document.getElementById('lightboxCounter').textContent = (i + 1) + ' / ' + galleryTiles.length;
+    document.getElementById('lightboxOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightboxOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function lightboxStep(delta) {
+    const next = (lightboxIndex + delta + galleryTiles.length) % galleryTiles.length;
+    openLightbox(next);
+  }
+  if (galleryTrack) {
+    galleryTrack.querySelectorAll('.photo-tile').forEach((tile) => {
+      tile.addEventListener('click', () => openLightbox(parseInt(tile.dataset.i, 10)));
+    });
+    document.getElementById('galleryPrev').addEventListener('click', () => {
+      galleryTrack.scrollBy({ left: -galleryTrack.clientWidth * 0.85, behavior: 'smooth' });
+    });
+    document.getElementById('galleryNext').addEventListener('click', () => {
+      galleryTrack.scrollBy({ left: galleryTrack.clientWidth * 0.85, behavior: 'smooth' });
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (!document.getElementById('lightboxOverlay').classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') lightboxStep(-1);
+    else if (e.key === 'ArrowRight') lightboxStep(1);
   });
 
   // ===== INIT =====
