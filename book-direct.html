@@ -165,9 +165,14 @@
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
   }
   .sleeping-card {
-    border: 1px solid #e0ddd6; border-radius: 12px; padding: 20px;
+    border: 1px solid #e0ddd6; border-radius: 12px; overflow: hidden;
+    background: #fff;
   }
-  .sleeping-card .bed-icon { font-size: 28px; margin-bottom: 10px; }
+  .sleeping-card .room-photo {
+    width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block;
+    background: #f0ede5;
+  }
+  .sleeping-card .room-text { padding: 14px 16px 16px; }
   .sleeping-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .sleeping-card p { font-size: 13px; color: #888; }
 
@@ -441,7 +446,29 @@
     font-size: 24px; margin-bottom: 8px;
   }
   .inquiry-modal .modal-sub {
-    font-size: 14px; color: #888; margin-bottom: 28px; line-height: 1.6;
+    font-size: 14px; color: #888; margin-bottom: 20px; line-height: 1.6;
+  }
+  .modal-policy {
+    background: #f8f5ef; border: 1px solid #e8e4dc; border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 22px;
+  }
+  .modal-policy summary {
+    cursor: pointer; font-weight: 600; font-size: 14px;
+    color: #2d4a2d; list-style: none; outline: none;
+  }
+  .modal-policy summary::-webkit-details-marker { display: none; }
+  .modal-policy summary::before {
+    content: "▸"; display: inline-block; margin-right: 8px;
+    transition: transform 0.2s ease;
+  }
+  .modal-policy[open] summary::before { transform: rotate(90deg); }
+  .modal-policy-body { padding-top: 12px; }
+  .modal-policy-body h4 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 16px; margin-bottom: 6px;
+  }
+  .modal-policy-body p {
+    font-size: 13px; color: #444; line-height: 1.7; margin-bottom: 8px;
   }
   .inquiry-form { display: flex; flex-direction: column; gap: 14px; }
   .inquiry-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -659,39 +686,53 @@
       <h2>Where you'll sleep</h2>
       <div class="sleeping-grid">
         <div class="sleeping-card">
-          <div class="bed-icon">&#128716;</div>
-          <h4>Bedroom 1</h4>
-          <p>1 king bed</p>
+          <img class="room-photo" src="images/Room/Maple Room.png" alt="The Maple Suite" loading="lazy">
+          <div class="room-text">
+            <h4>The Maple Suite</h4>
+            <p>1 king bed &middot; ensuite washroom</p>
+          </div>
         </div>
         <div class="sleeping-card">
-          <div class="bed-icon">&#128716;</div>
-          <h4>Bedroom 2</h4>
-          <p>1 queen bed</p>
+          <img class="room-photo" src="images/Room/Pond Room.png" alt="Pond Suite" loading="lazy">
+          <div class="room-text">
+            <h4>Pond Suite</h4>
+            <p>1 queen bed &middot; ensuite washroom</p>
+          </div>
         </div>
         <div class="sleeping-card">
-          <div class="bed-icon">&#128716;</div>
-          <h4>Bedroom 3</h4>
-          <p>1 queen bed</p>
+          <img class="room-photo" src="images/Room/Mushroom Room.png" alt="Mushroom Room" loading="lazy">
+          <div class="room-text">
+            <h4>Mushroom Room</h4>
+            <p>1 queen bed</p>
+          </div>
         </div>
         <div class="sleeping-card">
-          <div class="bed-icon">&#128716;</div>
-          <h4>Bedroom 4</h4>
-          <p>1 double bed</p>
+          <img class="room-photo" src="images/Room/King Room.png" alt="King Suite" loading="lazy">
+          <div class="room-text">
+            <h4>King Suite</h4>
+            <p>3 beds &mdash; 1 king &amp; bunk bed</p>
+          </div>
         </div>
         <div class="sleeping-card">
-          <div class="bed-icon">&#128716;</div>
-          <h4>Bedroom 5</h4>
-          <p>1 double bed</p>
+          <img class="room-photo" src="images/Room/Bikers Room.jpeg" alt="Bikers Room" loading="lazy">
+          <div class="room-text">
+            <h4>Bikers Room</h4>
+            <p>1 double bed</p>
+          </div>
         </div>
         <div class="sleeping-card">
-          <div class="bed-icon">&#128716;</div>
-          <h4>Bedroom 6</h4>
-          <p>2 single beds</p>
+          <img class="room-photo" src="images/Room/Beekeepers Room.jpeg" alt="Beekeeper's Room" loading="lazy">
+          <div class="room-text">
+            <h4>Beekeeper's Room</h4>
+            <p>2 single beds</p>
+          </div>
         </div>
         <div class="sleeping-card">
-          <div class="bed-icon">&#128716;</div>
-          <h4>Bedroom 7 &mdash; Bunkie</h4>
-          <p>Flexible sleeping</p>
+          <img class="room-photo" src="images/Room/Bunkie.jpeg" alt="Forest Bunkie" loading="lazy">
+          <div class="room-text">
+            <h4>Forest Bunkie</h4>
+            <p>Private cabin in the woods &middot; flexible sleeping</p>
+          </div>
         </div>
       </div>
     </div>
@@ -703,17 +744,29 @@
         <div class="amenity-item"><span class="amenity-icon">&#127754;</span> 500 ft private waterfront</div>
         <div class="amenity-item"><span class="amenity-icon">&#128752;</span> Outdoor hot tub</div>
         <div class="amenity-item"><span class="amenity-icon">&#127866;</span> Full kitchen</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127864;</span> Full bar</div>
         <div class="amenity-item"><span class="amenity-icon">&#128293;</span> Indoor fireplace</div>
         <div class="amenity-item"><span class="amenity-icon">&#128758;</span> Kayaks &amp; pedal boat</div>
+        <div class="amenity-item"><span class="amenity-icon">&#9875;</span> 2 docks on the water</div>
         <div class="amenity-item"><span class="amenity-icon">&#127869;</span> BBQ grill</div>
-        <div class="amenity-item"><span class="amenity-icon">&#127795;</span> Forest trails</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127795;</span> Forest trails through the woods</div>
+        <div class="amenity-item"><span class="amenity-icon">&#9917;</span> Soccer nets</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127919;</span> Corn hole</div>
         <div class="amenity-item"><span class="amenity-icon">&#128246;</span> Free Wi-Fi</div>
         <div class="amenity-item"><span class="amenity-icon">&#128663;</span> Free parking on premises</div>
         <div class="amenity-item"><span class="amenity-icon">&#128700;</span> Washer &amp; dryer</div>
         <div class="amenity-item"><span class="amenity-icon">&#127909;</span> TV with streaming</div>
         <div class="amenity-item"><span class="amenity-icon">&#128293;</span> Fire pit / bonfire area</div>
         <div class="amenity-item"><span class="amenity-icon">&#127793;</span> Permaculture farm access</div>
+        <div class="amenity-item" title="13 ft White Duck branded bell tent"><span class="amenity-icon">&#9962;</span> Bell tents available on request &mdash; 13 ft White Duck branded (2 singles or 1 double) &middot; <a href="images/Room/13 foot Bell Tent.jpeg" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">photo</a></div>
         <div class="amenity-item"><span class="amenity-icon">&#129385;</span> Board games &amp; card games</div>
+      </div>
+
+      <h2 style="font-family:'Playfair Display',serif; font-weight:700; font-size:22px; margin:32px 0 14px;">Optional Add-On Experiences</h2>
+      <div class="amenities-grid">
+        <div class="amenity-item"><span class="amenity-icon">&#127793;</span> Instructor-led permaculture immersion experience</div>
+        <div class="amenity-item"><span class="amenity-icon">&#128029;</span> Beekeeping classes</div>
+        <div class="amenity-item"><span class="amenity-icon">&#127812;</span> Mushroom growing classes</div>
       </div>
     </div>
 
@@ -735,27 +788,13 @@
       <div class="rules-grid">
         <div class="rule-item"><span class="rule-icon">&#128336;</span> Check-in: 4:00 PM</div>
         <div class="rule-item"><span class="rule-icon">&#128336;</span> Checkout: 11:00 AM</div>
-        <div class="rule-item"><span class="rule-icon">&#128101;</span> 16+ guests maximum</div>
+        <div class="rule-item"><span class="rule-icon">&#128101;</span> 16+ Guests</div>
         <div class="rule-item"><span class="rule-icon">&#128221;</span> Self check-in with lockbox</div>
         <div class="rule-item"><span class="rule-icon">&#128053;</span> Pets welcome &mdash; $50 per pet, per stay</div>
         <div class="rule-item"><span class="rule-icon">&#128684;</span> No smoking indoors</div>
         <div class="rule-item"><span class="rule-icon">&#127881;</span> Events &amp; gatherings allowed (with notice)</div>
         <div class="rule-item"><span class="rule-icon">&#128264;</span> Quiet hours: 11 PM &ndash; 7 AM</div>
       </div>
-    </div>
-
-    <!-- CANCELLATION -->
-    <div class="cancel-section">
-      <h2>Cancellation Policy</h2>
-      <p><strong>Firm (Short-Term Stays)</strong></p>
-      <p>Full refund if cancelled at least 30 days before check-in. Partial refund if cancelled 7&ndash;30 days before check-in.</p>
-      <p><strong>Strict Long-Term (30+ Days)</strong></p>
-      <p>Full refund if cancelled within 48 hours of booking and at least 28 days before check-in. After that, the first 30 days of the stay are non-refundable.</p>
-      <h2 style="margin-top:32px;">Security Deposit</h2>
-      <p>A <strong>$500 refundable hold</strong> protects against accidental damages. Here's how it works:</p>
-      <p><strong>1. At booking</strong> &mdash; You securely save your card on file via Stripe. No charge, no hold.</p>
-      <p><strong>2. 1&ndash;2 days before arrival</strong> &mdash; Stripe places a $500 authorization hold on your saved card. This is <em>not</em> a charge; the funds are temporarily reserved (your bank may show it as "pending") but no money is transferred.</p>
-      <p><strong>3. After checkout</strong> &mdash; A routine property inspection is performed. If everything is in order, the hold is released within 7 days (often within 24 hours). If damages or extra cleaning are needed, only the corresponding amount is captured from the hold and an itemized statement is sent.</p>
     </div>
 
   </div>
@@ -951,6 +990,20 @@
     <div id="inquiryForm">
       <h2>Request to Book</h2>
       <p class="modal-sub">Complete the form below and Deniz will confirm availability and send you booking details &mdash; typically within a few hours.</p>
+
+      <details class="modal-policy">
+        <summary>Cancellation Policy &amp; Security Deposit</summary>
+        <div class="modal-policy-body">
+          <h4>Cancellation Policy</h4>
+          <p><strong>Firm (Short-Term Stays)</strong> &mdash; Full refund if cancelled at least 30 days before check-in. Partial refund if cancelled 7&ndash;30 days before check-in.</p>
+          <p><strong>Long-Term (30+ Days)</strong> &mdash; Full refund if cancelled within 48 hours of booking and at least 28 days before check-in. After that, the first 30 days of the stay are non-refundable.</p>
+          <h4 style="margin-top:14px;">Security Deposit</h4>
+          <p>A <strong>$500 refundable hold</strong> protects against accidental damages. Here's how it works:</p>
+          <p><strong>1. At booking</strong> &mdash; You securely save your card on file via Stripe. No charge, no hold.</p>
+          <p><strong>2. 1&ndash;2 days before arrival</strong> &mdash; Stripe places a $500 authorization hold on your saved card. This is <em>not</em> a charge; the funds are temporarily reserved (your bank may show it as "pending") but no money is transferred.</p>
+          <p><strong>3. After checkout</strong> &mdash; A routine property inspection is performed. If everything is in order, the hold is released within 7 days (often within 24 hours). If damages or extra cleaning are needed, only the corresponding amount is captured from the hold and an itemized statement is sent.</p>
+        </div>
+      </details>
 
       <form class="inquiry-form" onsubmit="submitInquiry(event)">
         <div class="inquiry-row">
