@@ -240,6 +240,34 @@
   .guest-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .guest-count { font-size: 16px; font-weight: 500; min-width: 24px; text-align: center; }
 
+  /* ADD-ON TOGGLES */
+  .addon-row {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 14px; padding: 10px 0;
+  }
+  .addon-row + .addon-row { border-top: 1px dashed #e0ddd6; }
+  .addon-text { flex: 1; min-width: 0; }
+  .addon-title {
+    font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 0 0 2px;
+  }
+  .addon-sub { font-size: 12px; color: #888; line-height: 1.4; }
+  .toggle-switch {
+    position: relative; display: inline-block; width: 44px; height: 24px;
+    flex-shrink: 0; margin-top: 4px;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: #ccc; border-radius: 24px; transition: 0.2s;
+  }
+  .toggle-slider::before {
+    position: absolute; content: ""; height: 18px; width: 18px;
+    left: 3px; top: 3px; background: #fff; border-radius: 50%;
+    transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-switch input:checked + .toggle-slider { background: #3d8c40; }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
   .btn-reserve {
     width: 100%; padding: 16px; border: none; border-radius: 10px;
     background: linear-gradient(135deg, #3d8c40 0%, #2b6e2e 100%);
@@ -908,6 +936,31 @@
           </div>
           <div style="font-size:12px; color:#888; margin-top:4px;">$50 per pet, per stay</div>
         </div>
+
+        <div class="picker-guests" style="border-top: 1px solid #e8e4dc; padding-top: 12px;">
+          <div class="picker-label">Optional Add-Ons</div>
+          <div class="addon-row">
+            <div class="addon-text">
+              <div class="addon-title">Bell Tent</div>
+              <div class="addon-sub">13 ft White Duck branded &middot; 2 singles or 1 double &middot; available on request</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="addBellTent" onchange="toggleBellTent()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="addon-row">
+            <div class="addon-text">
+              <div class="addon-title">Forest Bunkie</div>
+              <div class="addon-sub">Private cabin in the woods &middot; flexible sleeping</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="addBunkie" onchange="toggleBunkie()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div style="font-size:12px; color:#888; margin-top:6px;">Bell Tent +$50/night &middot; Bunkie +$100/night</div>
+        </div>
       </div>
 
       <div id="datesError" style="display:none; color:#c0392b; font-size:13px; margin: 8px 0 0; padding:10px 12px; background:#fdecea; border:1px solid #f5c6cb; border-radius:6px; line-height:1.4;">Please select your check-in and check-out dates first.</div>
@@ -930,6 +983,14 @@
         <div class="breakdown-row" id="petRow" style="display: none;">
           <span class="label" id="petLabel">Pet fee</span>
           <span id="petTotal">$0</span>
+        </div>
+        <div class="breakdown-row" id="bellTentRow" style="display: none;">
+          <span class="label" id="bellTentLabel">Bell Tent</span>
+          <span id="bellTentTotal">$0</span>
+        </div>
+        <div class="breakdown-row" id="bunkieRow" style="display: none;">
+          <span class="label" id="bunkieLabel">Forest Bunkie</span>
+          <span id="bunkieTotal">$0</span>
         </div>
         <div class="breakdown-row" style="border-top: 1px solid #e0ddd6; padding-top: 12px; margin-top: 4px;">
           <span class="label">Subtotal</span>
@@ -1115,6 +1176,8 @@
   const ADULT_FEE_THRESHOLD = 10;  // extra-adult surcharge only kicks in above this many adults
   const EXTRA_GUEST_FEE = 50;      // per additional adult per night above ADULT_FEE_THRESHOLD
   const PET_FEE = 50;              // per pet per stay
+  const BELL_TENT_FEE = 50;        // per night, optional add-on
+  const BUNKIE_FEE = 100;          // per night, optional add-on (Forest Bunkie)
   const AIRBNB_ICAL = 'https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1';
   // CORS proxies (try in order — own Apps Script proxy first, then fallbacks)
   const CORS_PROXIES = [
@@ -1128,8 +1191,12 @@
   let children = 0;
   let infants = 0;
   let pets = 0;
+  let addBellTent = false;
+  let addBunkie = false;
   let checkinDate = null;
   let checkoutDate = null;
+  // Cached price snapshot — written by updatePricing(), read by submitInquiry()
+  let lastQuote = { nights: 0, subtotal: 0, cleaningFee: 0, extraGuestCost: 0, petCost: 0, bellTentCost: 0, bunkieCost: 0, preTaxTotal: 0, hst: 0, grandTotal: 0 };
   let calViewMonth = new Date().getMonth();
   let calViewYear = new Date().getFullYear();
   let bookedRanges = []; // [{start: Date, end: Date}, ...]
@@ -1392,7 +1459,9 @@
     const extraGuests = Math.max(0, adults - ADULT_FEE_THRESHOLD);
     const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
     const petCost = pets * PET_FEE;
-    const total = subtotal + cleaningFee + extraGuestCost + petCost;
+    const bellTentCost = addBellTent ? BELL_TENT_FEE * nights : 0;
+    const bunkieCost = addBunkie ? BUNKIE_FEE * nights : 0;
+    const total = subtotal + cleaningFee + extraGuestCost + petCost + bellTentCost + bunkieCost;
 
     document.getElementById('nightsLabel').textContent = '$' + NIGHTLY_RATE + ' x ' + nights + ' night' + (nights > 1 ? 's' : '');
     document.getElementById('nightsTotal').textContent = '$' + subtotal.toLocaleString();
@@ -1419,12 +1488,57 @@
       petRow.style.display = 'none';
     }
 
+    // Bell Tent add-on
+    const bellTentRow = document.getElementById('bellTentRow');
+    if (addBellTent) {
+      bellTentRow.style.display = '';
+      document.getElementById('bellTentLabel').textContent = 'Bell Tent x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + BELL_TENT_FEE;
+      document.getElementById('bellTentTotal').textContent = '$' + bellTentCost.toLocaleString();
+    } else {
+      bellTentRow.style.display = 'none';
+    }
+
+    // Bunkie add-on
+    const bunkieRow = document.getElementById('bunkieRow');
+    if (addBunkie) {
+      bunkieRow.style.display = '';
+      document.getElementById('bunkieLabel').textContent = 'Forest Bunkie x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + BUNKIE_FEE;
+      document.getElementById('bunkieTotal').textContent = '$' + bunkieCost.toLocaleString();
+    } else {
+      bunkieRow.style.display = 'none';
+    }
+
     const hst = Math.round(total * 0.13 * 100) / 100;
     const grandTotal = total + hst;
 
     document.getElementById('subtotalPrice').textContent = '$' + total.toLocaleString();
     document.getElementById('hstAmount').textContent = '$' + hst.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     document.getElementById('totalPrice').textContent = '$' + grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    // Cache for submission
+    lastQuote = {
+      nights: nights,
+      nightlyRate: NIGHTLY_RATE,
+      subtotal: subtotal,
+      cleaningFee: cleaningFee,
+      extraGuestCost: extraGuestCost,
+      petCost: petCost,
+      bellTentCost: bellTentCost,
+      bunkieCost: bunkieCost,
+      preTaxTotal: total,
+      hst: hst,
+      grandTotal: grandTotal,
+    };
+  }
+
+  // ===== ADD-ON TOGGLES =====
+  function toggleBellTent() {
+    addBellTent = document.getElementById('addBellTent').checked;
+    updatePricing();
+  }
+  function toggleBunkie() {
+    addBunkie = document.getElementById('addBunkie').checked;
+    updatePricing();
   }
 
   // ===== GUESTS =====
@@ -1538,8 +1652,12 @@
       infants: infants,
       extraSleepingConfirmed: document.getElementById('extraSleepingConfirmed')?.checked || false,
       pets: document.getElementById('modalPets').value || pets,
+      addBellTent: addBellTent,
+      addBunkie: addBunkie,
       occasion: form.querySelector('select').value,
       message: form.querySelector('textarea').value,
+      // Snapshot of the quote the guest saw at request time (all CAD, pre-confirmation)
+      quote: lastQuote,
     };
 
     const markSuccess = () => {
@@ -1575,7 +1693,11 @@
     const checkoutStr = data.checkout || '';
     const details = document.getElementById('bookingCardSuccessDetails');
     if (details) {
-      details.innerHTML = '<strong>' + checkinStr + ' &rarr; ' + checkoutStr + '</strong><br>' + guestStr + (data.pets && data.pets > 0 ? ' &middot; ' + data.pets + ' pet' + (data.pets > 1 ? 's' : '') : '');
+      const addons = [];
+      if (data.addBellTent) addons.push('Bell Tent');
+      if (data.addBunkie) addons.push('Forest Bunkie');
+      const addonStr = addons.length > 0 ? '<br><span style="font-size:12px; color:#3d8c40;">+ ' + addons.join(' &middot; ') + '</span>' : '';
+      details.innerHTML = '<strong>' + checkinStr + ' &rarr; ' + checkoutStr + '</strong><br>' + guestStr + (data.pets && data.pets > 0 ? ' &middot; ' + data.pets + ' pet' + (data.pets > 1 ? 's' : '') : '') + addonStr;
     }
     document.getElementById('bookingCardContent').style.display = 'none';
     document.getElementById('bookingCardSuccess').style.display = 'block';
