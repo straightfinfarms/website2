@@ -245,6 +245,39 @@
 
   /* SOCIAL */
   .social-section { padding: 96px 48px; background: #f0ede6; text-align: center; }
+  .social-sub-title { font-size: 14px; color: #666; margin: -32px 0 28px; letter-spacing: 0.04em; }
+  .farm-carousel-wrapper {
+    position: relative; max-width: 1100px; margin: 0 auto 48px;
+  }
+  .farm-carousel-track {
+    display: flex; gap: 12px; overflow-x: auto;
+    scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    padding-bottom: 14px; -webkit-overflow-scrolling: touch;
+  }
+  .farm-carousel-track::-webkit-scrollbar { height: 6px; }
+  .farm-carousel-track::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+  .farm-carousel-track::-webkit-scrollbar-track { background: #e3dfd6; border-radius: 3px; }
+  .farm-tile {
+    flex: 0 0 320px; aspect-ratio: 1/1; border-radius: 4px;
+    overflow: hidden; scroll-snap-align: start;
+    background: #d8d3c8;
+  }
+  .farm-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .farm-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.95); border: 1px solid #ddd;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px; color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 5;
+  }
+  .farm-nav:hover { background: #fff; color: #000; }
+  .farm-nav.prev { left: -8px; }
+  .farm-nav.next { right: -8px; }
+  @media (max-width: 760px) {
+    .farm-tile { flex: 0 0 75vw; }
+    .farm-nav { display: none; }
+  }
   .social-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 12px; max-width: 1100px; margin: 0 auto 48px;
@@ -560,23 +593,51 @@
 
 <!-- SOCIAL -->
 <section class="social-section">
-  <h2 class="section-title" style="margin-bottom: 48px;">Follow Us on Social</h2>
-  <div class="social-grid">
-    <div class="social-img">
-      <img src="images/IMG_2790.jpg" alt="Farmhouse at night under winter stars">
-    </div>
-    <div class="social-img">
-      <img src="images/IMG_3009.jpg" alt="Cozy tiny house interior with loft">
-    </div>
-    <div class="social-img">
-      <img src="images/IMG_7523.jpg" alt="Cabin in winter wonderland">
-    </div>
-    <div class="social-img">
-      <img src="images/IMG_7475.jpg" alt="Snowy trail through the farm">
+  <h2 class="section-title" style="margin-bottom: 12px;">Follow Us on Social</h2>
+  <p class="social-sub-title">The farm in action &mdash; courses, community, growing seasons.</p>
+  <div class="farm-carousel-wrapper">
+    <button class="farm-nav prev" id="farmPrev" aria-label="Previous">&#8249;</button>
+    <button class="farm-nav next" id="farmNext" aria-label="Next">&#8250;</button>
+    <div class="farm-carousel-track" id="farmCarouselTrack">
+      <div class="farm-tile"><img src="images/Airbnb/Community/community Large.jpeg" alt="Community gathering" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Community/IMG_2006 Large.jpeg" alt="Workshop in the living room" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/IMG_2460 Large.jpeg" alt="Group session on the floor" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Community/IMG_4810 Large.jpeg" alt="Friends gathered at sunset" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Community/IMG_5302 Large.jpeg" alt="Setting up the event canopy" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Community/IMG_1949 Large.jpeg" alt="Outdoor pavilion event" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Community/IMG_1952 Large.jpeg" alt="Course planning whiteboard" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Community/68c027_3e5f4108b8634ed3b467ce9705faf0e5~mv2.jpeg" alt="Team working at the picnic table" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Permaculture/IMG_0460 Large.jpeg" alt="Beehives" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/IMG_0666 Large.jpeg" alt="Beehives in the forest" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/IMG_1187 Large.jpeg" alt="Beekeeper at the hive" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/IMG_1189 Large.jpeg" alt="Pulling a frame of bees" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Permaculture/IMG_3106 Large.jpeg" alt="Tomatoes ripening in the garden" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Permaculture/IMG_3559 Large.jpeg" alt="Fresh lion's mane mushrooms" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Permaculture/IMG_3110 Large.jpeg" alt="Next generation in the garden" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Permaculture/IMG_5018 Large.jpeg" alt="Working in the greenhouse" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Permaculture/IMG_5076 Large.jpeg" alt="Mushrooms on the growing rack" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Outdoor/IMG_2069 Large.jpeg" alt="String lights over the firepit" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Outdoor/IMG_4499 Large.jpeg" alt="Bonfire under the stars" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Outdoor/IMG_4773 Large.jpeg" alt="Friends around the fire" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Outdoor/IMG_2019 Large.jpeg" alt="ATV adventures on the property" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Waterfront/IMG_3009 Large.jpeg" alt="Kayaking on the marsh" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Waterfront/IMG_4492 Large.jpeg" alt="Heading out from the dock" loading="lazy"></div>
+      <div class="farm-tile"><img src="images/Airbnb/Waterfront/IMG_4597 Large.jpeg" alt="Kayaks on shore" loading="lazy"></div>
     </div>
   </div>
   <a class="btn-green" href="https://www.instagram.com/straightfinfarms/" target="_blank" rel="noopener noreferrer">FOLLOW US</a>
 </section>
+
+<script>
+  (function() {
+    const track = document.getElementById('farmCarouselTrack');
+    if (!track) return;
+    const prev = document.getElementById('farmPrev');
+    const next = document.getElementById('farmNext');
+    if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -track.clientWidth * 0.85, behavior: 'smooth' }));
+    if (next) next.addEventListener('click', () => track.scrollBy({ left: track.clientWidth * 0.85, behavior: 'smooth' }));
+  })();
+</script>
 
 <!-- CONTACT -->
 <section class="contact-section" id="contact">
