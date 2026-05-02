@@ -1,2 +1,5 @@
 *.bak
 .DS_Store
+
+# sed leftovers (Box-locked, can't rm)
+*.html.bak
