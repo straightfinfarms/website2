@@ -266,13 +266,29 @@
         </div>
         <div class="price" id="bunkiePrice">–</div>
       </label>
-      <label class="stay-option" data-stay="room" data-cost3="450" data-cost7="1050">
-        <input type="radio" name="stay" value="room">
+      <label class="stay-option" data-stay="dorm" data-cost3="250" data-cost7="575">
+        <input type="radio" name="stay" value="dorm">
         <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Room/Master Bedroom Large.jpeg')" role="img" aria-label="A private farmhouse bedroom with king bed"></div>
-          <div><div class="name">Private Farmhouse Room</div><div class="sub" id="roomSub">$450 / $1,050 · Queen or double bed</div></div>
+          <div class="stay-thumb" style="background-image:url('images/Room/King Room Large.jpeg')" role="img" aria-label="The King Room dorm — three beds shared"></div>
+          <div><div class="name">King Room Dorm Bed</div><div class="sub" id="dormSub">$250 / $575 · 3 beds (King/Queen/Double), shared room</div></div>
         </div>
-        <div class="price" id="roomPrice">–</div>
+        <div class="price" id="dormPrice">–</div>
+      </label>
+      <label class="stay-option" data-stay="shared" data-cost3="400" data-cost7="925">
+        <input type="radio" name="stay" value="shared">
+        <div class="stay-option-label">
+          <div class="stay-thumb" style="background-image:url('images/Room/Mushroom Room Large.jpeg')" role="img" aria-label="The Mushroom Room — private bedroom with shared bathroom"></div>
+          <div><div class="name">Private Farmhouse Room (shared bath)</div><div class="sub" id="sharedSub">$400 / $925 · Mushroom or Beekeepers Room</div></div>
+        </div>
+        <div class="price" id="sharedPrice">–</div>
+      </label>
+      <label class="stay-option" data-stay="ensuite" data-cost3="500" data-cost7="1150">
+        <input type="radio" name="stay" value="ensuite">
+        <div class="stay-option-label">
+          <div class="stay-thumb" style="background-image:url('images/Room/Pond Room.png')" role="img" aria-label="The Pond View Room — private ensuite"></div>
+          <div><div class="name">Pond View Room (Ensuite)</div><div class="sub" id="ensuiteSub">$500 / $1,150 · Private ensuite bathroom, pond views</div></div>
+        </div>
+        <div class="price" id="ensuitePrice">–</div>
       </label>
     </div>
 
@@ -381,7 +397,7 @@
 
   const state = {
     course: null,        // '3day' | '7day'
-    stay: null,          // 'commuter' | 'byo' | 'bell' | 'bunkie' | 'room'
+    stay: null,          // 'commuter' | 'byo' | 'bell' | 'bunkie' | 'dorm' | 'shared' | 'ensuite'
     adults: 1,
     isCouple: false,
     promoCode: null,     // e.g. 'BALANCE10'
@@ -398,7 +414,9 @@
     byo: { name: 'Bring your own tent', cost3: 0, cost7: 0 },
     bell: { name: 'Bell Tent Glamping', cost3: 225, cost7: 525 },
     bunkie: { name: 'Bunkie Cabin', cost3: 275, cost7: 635 },
-    room: { name: 'Private Farmhouse Room', cost3: 450, cost7: 1050 },
+    dorm: { name: 'King Room Dorm Bed', cost3: 250, cost7: 575 },
+    shared: { name: 'Private Farmhouse Room (shared bath)', cost3: 400, cost7: 925 },
+    ensuite: { name: 'Pond View Room (Ensuite)', cost3: 500, cost7: 1150 },
   };
 
   // Read URL query ?course=3day or 7day for auto-select
@@ -528,20 +546,28 @@
     if (!state.course) {
       document.getElementById('bellPrice').textContent = '–';
       document.getElementById('bunkiePrice').textContent = '–';
-      document.getElementById('roomPrice').textContent = '–';
+      document.getElementById('dormPrice').textContent = '–';
+      document.getElementById('sharedPrice').textContent = '–';
+      document.getElementById('ensuitePrice').textContent = '–';
       document.getElementById('bellSub').textContent = '$225 for 3 nights · $525 for 7 nights';
       document.getElementById('bunkieSub').textContent = '$275 / $635 · Private rustic cabin';
-      document.getElementById('roomSub').textContent = '$450 / $1,050 · Queen or double bed';
+      document.getElementById('dormSub').textContent = '$250 / $575 · 3 beds (King/Queen/Double), shared room';
+      document.getElementById('sharedSub').textContent = '$400 / $925 · Mushroom or Beekeepers Room';
+      document.getElementById('ensuiteSub').textContent = '$500 / $1,150 · Private ensuite bathroom, pond views';
       return;
     }
     const nights = COURSES[state.course].nights;
     const suffix = nights + ' night' + (nights > 1 ? 's' : '');
     document.getElementById('bellPrice').textContent = '$' + STAYS.bell['cost' + nights].toLocaleString() + '/person';
     document.getElementById('bunkiePrice').textContent = '$' + STAYS.bunkie['cost' + nights].toLocaleString() + '/person';
-    document.getElementById('roomPrice').textContent = '$' + STAYS.room['cost' + nights].toLocaleString() + '/person';
+    document.getElementById('dormPrice').textContent = '$' + STAYS.dorm['cost' + nights].toLocaleString() + '/person';
+    document.getElementById('sharedPrice').textContent = '$' + STAYS.shared['cost' + nights].toLocaleString() + '/person';
+    document.getElementById('ensuitePrice').textContent = '$' + STAYS.ensuite['cost' + nights].toLocaleString() + '/person';
     document.getElementById('bellSub').textContent = suffix + ' · luxury canvas tent';
     document.getElementById('bunkieSub').textContent = suffix + ' · rustic private cabin';
-    document.getElementById('roomSub').textContent = suffix + ' · queen/double bed, shared bathroom';
+    document.getElementById('dormSub').textContent = suffix + ' · 3 beds, shared room (King/Queen/Double)';
+    document.getElementById('sharedSub').textContent = suffix + ' · private bedroom, shared bathroom';
+    document.getElementById('ensuiteSub').textContent = suffix + ' · private ensuite bathroom, pond views';
   }
 
   function recalc() {
