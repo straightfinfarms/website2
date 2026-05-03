@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Permaculture Course — Straight Fin Farms</title>
-<link rel="icon" type="image/png" href="images/favicon-192.png">
-<link rel="apple-touch-icon" href="images/favicon-192.png">
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link rel="apple-touch-icon" href="images/Logo/favicon-192.png">
 <meta property="og:title" content="Permaculture Course — Straight Fin Farms">
 <meta property="og:description" content="Immersive 3-day or 7-day permaculture course on a working 34-acre farm. Hands-on, farm-to-table meals included.">
-<meta property="og:image" content="https://straightfinfarms.com/images/Logo%202D%20White-bg.jpg">
+<meta property="og:image" content="https://straightfinfarms.com/images/Logo/Logo%202D%20White-bg.jpg">
 <meta property="og:url" content="https://straightfinfarms.com/permaculture-course.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://straightfinfarms.com/images/Logo%202D%20White-bg.jpg">
+<meta name="twitter:image" content="https://straightfinfarms.com/images/Logo/Logo%202D%20White-bg.jpg">
 <meta name="description" content="Immersive 3-day and 7-day permaculture courses at Straight Fin Farms. Learn soil, composting, food forests, beekeeping and regenerative design through hands-on farm experience. Meals included.">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -73,13 +73,29 @@
 
   /* COURSE OPTIONS */
   .course-options {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
     margin: 40px 0 0;
   }
   .course-card {
     background: #fff; border-radius: 12px; padding: 36px 32px;
     border: 1px solid #e0ddd6; position: relative; display: flex; flex-direction: column;
   }
+  .course-card.is-sold-out { opacity: 0.92; }
+  .course-card .sold-out-banner {
+    position: absolute; top: 18px; right: 18px; z-index: 2;
+    background: #b45309; color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 6px 12px; border-radius: 999px;
+  }
+  .course-card .btn-waitlist {
+    display: block; width: 100%; padding: 14px;
+    background: #fff; color: #1a1a1a;
+    border: 1.5px solid #1a1a1a; border-radius: 8px;
+    text-align: center; text-decoration: none;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    transition: background 0.15s, color 0.15s;
+  }
+  .course-card .btn-waitlist:hover { background: #1a1a1a; color: #fff; }
   .course-card .tag { display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #3d8c40; font-weight: 600; margin-bottom: 10px; }
   .course-card .tag.featured { color: #b45309; }
   .course-card h3 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 28px; line-height: 1.15; margin-bottom: 8px; color: #1a1a1a; }
@@ -197,7 +213,7 @@
 
   /* RESPONSIVE */
   @media (max-width: 1024px) {
-    .course-options { grid-template-columns: 1fr; }
+    .course-options { grid-template-columns: 1fr; max-width: 560px; margin-left: auto; margin-right: auto; }
     .included-grid { grid-template-columns: 1fr 1fr; }
     .stay-grid { grid-template-columns: 1fr 1fr; }
     .retreat-features { grid-template-columns: 1fr; }
@@ -258,14 +274,40 @@
 
 <!-- COURSE OPTIONS -->
 <section class="section bg-alt" id="courses">
-  <h2 style="text-align:center">Two ways to learn</h2>
-  <p style="text-align:center; max-width:640px; margin:0 auto 8px;">Pick the format that fits your schedule and depth. Both include meals, materials, and certification.</p>
+  <h2 style="text-align:center">Choose your course</h2>
+  <p style="text-align:center; max-width:640px; margin:0 auto 8px;">Pick the format and date that fits your schedule. Every option includes meals, materials, and certification.</p>
 
   <div class="course-options">
 
     <div class="course-card">
       <div class="card-photo" style="background-image:url('images/Permaculture/IMG_1949 Large.jpeg')" role="img" aria-label="Outdoor course session under canopies on the lawn"></div>
-      <span class="tag">Weekend Intensive</span>
+      <span class="tag">Weekend Intensive · Summer</span>
+      <h3>3-Day Permaculture Intensive</h3>
+      <div class="theme">Learn · Build · Apply</div>
+      <div class="dates">
+        <span class="dates-icon">📅</span>
+        <div><strong>Fri Aug 14 – Sun Aug 16, 2026</strong><br><span style="color:#888; font-size:13px">Mid-summer weekend · 2 nights, 3 full instructional days</span></div>
+      </div>
+      <div class="price-block">
+        <div class="price-main">$725<span class="cur">CAD</span></div>
+        <div class="price-sub">Tuition per person. Meals, materials, and certificate included. Accommodation add-on extra (see below).</div>
+      </div>
+      <ul>
+        <li>Foundations + Soil + Compost (Day 1)</li>
+        <li>Food Systems + Orchard + Mushrooms (Day 2)</li>
+        <li>Bees + Biodiversity + Mini Design Project (Day 3)</li>
+        <li>3 farm-to-table meals per day</li>
+        <li>Fireside reflections each evening</li>
+        <li>Certificate of completion</li>
+      </ul>
+      <div class="card-cta">
+        <a class="btn-enroll" href="book-course.html?course=3day-aug">Enroll in Aug 14–16 Course</a>
+      </div>
+    </div>
+
+    <div class="course-card">
+      <div class="card-photo" style="background-image:url('images/Permaculture/IMG_3110 Large.jpeg')" role="img" aria-label="Outdoor course session in the kitchen garden"></div>
+      <span class="tag">Weekend Intensive · Labour Day</span>
       <h3>3-Day Permaculture Intensive</h3>
       <div class="theme">Learn · Build · Apply</div>
       <div class="dates">
@@ -285,11 +327,12 @@
         <li>Certificate of completion</li>
       </ul>
       <div class="card-cta">
-        <a class="btn-enroll" href="book-course.html?course=3day">Enroll in 3-Day Intensive</a>
+        <a class="btn-enroll" href="book-course.html?course=3day-sep">Enroll in Sep 4–7 Course</a>
       </div>
     </div>
 
-    <div class="course-card">
+    <div class="course-card is-sold-out">
+      <span class="sold-out-banner">Sold Out</span>
       <div class="card-photo" style="background-image:url('images/Permaculture/IMG_2006 Large.jpeg')" role="img" aria-label="Indoor classroom session in the farmhouse with projector"></div>
       <span class="tag featured">⭐ Full Immersive Experience</span>
       <h3>7-Day Immersive Permaculture Course</h3>
@@ -313,7 +356,7 @@
         <li>Graduation circle + optional FAIL Series integration</li>
       </ul>
       <div class="card-cta">
-        <a class="btn-enroll" href="book-course.html?course=7day">Enroll in 7-Day Immersive</a>
+        <a class="btn-waitlist" href="book-course.html?course=7day&amp;waitlist=1">Join the Waitlist</a>
       </div>
     </div>
   </div>
@@ -732,7 +775,7 @@
 <!-- FOOTER -->
 <footer>
   <div>
-    <img src="images/Logo 2D White Black-bg.jpg" alt="Straight Fin Farms" style="width:140px;height:auto;margin-bottom:14px;display:block;">
+    <img src="images/Logo/Logo 2D White Black-bg.jpg" alt="Straight Fin Farms" style="width:140px;height:auto;margin-bottom:14px;display:block;">
     <h4>Straight Fin Farms</h4>
     <p>A 34-acre regenerative farm and biodiverse learning ground in Dunsford, Ontario. Courses, stays, and community — with balance and nature at the center.</p>
   </div>
