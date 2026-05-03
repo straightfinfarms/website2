@@ -89,6 +89,21 @@
   .course-option { display: block; border: 2px solid #e0ddd6; border-radius: 10px; padding: 18px 20px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; position: relative; }
   .course-option:hover { border-color: #3d8c40; background: #f9f9f6; }
   .course-option.selected { border-color: #3d8c40; background: #f0f7ee; }
+  .course-option.is-sold-out { opacity: 0.7; cursor: not-allowed; }
+  .course-option.is-sold-out:hover { border-color: #e0ddd6; background: transparent; }
+  .course-option .sold-out-pill {
+    position: absolute; top: 30px; left: 32px; z-index: 2;
+    background: #b45309; color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 6px 12px; border-radius: 999px;
+  }
+  .course-option .sold-out-msg {
+    display: none; margin-top: 14px; padding: 12px 14px;
+    background: #fff8e1; border: 1px solid #f1c232; border-radius: 6px;
+    font-size: 13px; color: #7a5d02; line-height: 1.55;
+  }
+  .course-option.is-sold-out.show-msg .sold-out-msg { display: block; }
+  .course-option .sold-out-msg a { color: #5a4400; font-weight: 600; }
   .course-option input { position: absolute; opacity: 0; pointer-events: none; }
   .course-option .opt-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; margin-bottom: 4px; }
   .course-option .opt-dates { font-size: 13px; color: #3d8c40; font-weight: 500; margin-bottom: 6px; }
@@ -221,13 +236,15 @@
         <div class="opt-dates">Fri Sep 4 – Mon Sep 7, 2026 · Labour Day weekend</div>
         <div class="opt-desc">3 full days of instruction · 3 nights accommodation · All meals included · Certificate of completion</div>
       </label>
-      <label class="course-option" data-course="7day" data-tuition="1625">
-        <input type="radio" name="course" value="7day">
+      <label class="course-option is-sold-out" data-course="7day" data-tuition="1625">
+        <input type="radio" name="course" value="7day" disabled>
+        <span class="sold-out-pill">Sold Out</span>
         <div class="opt-thumb" style="background-image:url('images/Permaculture/IMG_2006 Large.jpeg')" role="img" aria-label="Indoor classroom session in the farmhouse with projector"></div>
         <span class="opt-price" id="coursePrice7">$1,625</span>
         <div class="opt-title">7-Day Immersive Course</div>
         <div class="opt-dates">Mon Aug 24 – Sun Aug 30, 2026</div>
         <div class="opt-desc">Full 20-chapter curriculum · 7 nights · All meals included · Capstone build day · Certificate</div>
+        <div class="sold-out-msg">This course is sold out. <a href="permaculture-course.html?course=7day&amp;waitlist=1">Join the waitlist</a> and we'll let you know if a spot opens up or when next year's dates are announced.</div>
       </label>
     </div>
 
@@ -334,7 +351,7 @@
     <div class="form-section">
       <h3>5. Have a promo code?</h3>
       <div class="promo-row">
-        <input type="text" id="promoInput" placeholder="e.g. BALANCE10" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <input type="text" id="promoInput" placeholder="Enter code" autocomplete="off" autocapitalize="characters" spellcheck="false">
         <button type="button" id="promoApplyBtn" onclick="applyPromoCode()">Apply</button>
       </div>
       <div id="promoFeedback" class="promo-feedback"></div>
@@ -426,8 +443,13 @@
   function init() {
     // Bind course radios
     document.querySelectorAll('.course-option').forEach(el => {
-      el.addEventListener('click', () => {
-        document.querySelectorAll('.course-option').forEach(x => x.classList.remove('selected'));
+      el.addEventListener('click', (e) => {
+        if (el.classList.contains('is-sold-out')) {
+          e.preventDefault();
+          el.classList.add('show-msg');
+          return;
+        }
+        document.querySelectorAll('.course-option').forEach(x => { x.classList.remove('selected'); x.classList.remove('show-msg'); });
         el.classList.add('selected');
         el.querySelector('input').checked = true;
         state.course = el.dataset.course;
