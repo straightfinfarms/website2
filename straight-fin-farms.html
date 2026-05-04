@@ -291,6 +291,50 @@
   }
   .btn-green:hover { background: #2e6e31; }
 
+  /* GOOGLE REVIEWS */
+  .reviews-section { padding: 96px 48px; background: #faf8f3; text-align: center; }
+  .reviews-summary {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; margin: 0 auto 40px; max-width: 720px;
+  }
+  .reviews-stars-large { font-size: 26px; color: #f1c232; letter-spacing: 4px; line-height: 1; }
+  .reviews-rating-line {
+    font-family: 'Playfair Display', serif; font-size: 22px; color: #1a1a1a;
+  }
+  .reviews-rating-num { font-weight: 700; }
+  .reviews-meta { font-size: 14px; color: #666; }
+  .reviews-meta a { color: #3d8c40; text-decoration: none; border-bottom: 1px solid #3d8c40; }
+  .reviews-meta a:hover { color: #2e6e31; border-bottom-color: #2e6e31; }
+  .reviews-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px; max-width: 1100px; margin: 0 auto;
+    text-align: left;
+  }
+  .review-card {
+    background: #fff; border-radius: 8px; padding: 28px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .review-header { display: flex; align-items: center; gap: 12px; }
+  .review-photo {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #e0ddd6; flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; color: #888; font-size: 14px;
+  }
+  .review-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .review-author { font-weight: 600; color: #1a1a1a; font-size: 15px; line-height: 1.3; }
+  .review-time { font-size: 12px; color: #888; margin-top: 2px; }
+  .review-stars { color: #f1c232; font-size: 14px; letter-spacing: 2px; line-height: 1; }
+  .review-text {
+    font-size: 14px; line-height: 1.65; color: #444;
+    display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  @media (max-width: 768px) {
+    .reviews-section { padding: 64px 24px; }
+  }
+
   /* CONTACT */
   .contact-section {
     display: grid; grid-template-columns: 1fr 1fr;
@@ -636,6 +680,66 @@
     const next = document.getElementById('farmNext');
     if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -track.clientWidth * 0.85, behavior: 'smooth' }));
     if (next) next.addEventListener('click', () => track.scrollBy({ left: track.clientWidth * 0.85, behavior: 'smooth' }));
+  })();
+</script>
+
+<!-- GOOGLE REVIEWS -->
+<section class="reviews-section" id="reviews" hidden>
+  <h2 class="section-title" style="margin-bottom: 12px;">What Guests Are Saying</h2>
+  <p class="social-sub-title">Verified reviews from Google.</p>
+  <div id="reviewsContent"></div>
+</section>
+
+<script>
+  (function() {
+    const REVIEWS_ENDPOINT = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec?action=reviews';
+    const section = document.getElementById('reviews');
+    const container = document.getElementById('reviewsContent');
+    if (!section || !container) return;
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+    function stars(n) {
+      const full = Math.max(0, Math.min(5, Math.round(n || 0)));
+      return '★'.repeat(full) + '☆'.repeat(5 - full);
+    }
+    function initials(name) {
+      return String(name || '').trim().split(/\s+/).map(p => p[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+    }
+
+    function render(data) {
+      if (!data || data.error || !data.reviews || !data.reviews.length) return;
+      const reviews = data.reviews.slice(0, 4);
+      const googleUrl = data.googleUrl || 'https://www.google.com/maps/place/Straight+Fin+Farms/';
+      const summary = `
+        <div class="reviews-summary">
+          <div class="reviews-stars-large">${stars(data.rating)}</div>
+          <div class="reviews-rating-line"><span class="reviews-rating-num">${(data.rating || 0).toFixed(1)}</span> on Google</div>
+          <div class="reviews-meta">Based on <a href="${escapeHtml(googleUrl)}" target="_blank" rel="noopener noreferrer">${data.totalReviews || 0} reviews</a></div>
+        </div>`;
+      const cards = reviews.map(r => `
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-photo">${r.photo ? `<img src="${escapeHtml(r.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.textContent='${escapeHtml(initials(r.author))}'">` : escapeHtml(initials(r.author))}</div>
+            <div>
+              <div class="review-author">${escapeHtml(r.author || 'Guest')}</div>
+              <div class="review-time">${escapeHtml(r.relativeTime || '')}</div>
+            </div>
+          </div>
+          <div class="review-stars" aria-label="${r.rating} out of 5 stars">${stars(r.rating)}</div>
+          <div class="review-text">${escapeHtml(r.text || '')}</div>
+        </div>`).join('');
+      container.innerHTML = summary + '<div class="reviews-grid">' + cards + '</div>';
+      section.hidden = false;
+    }
+
+    fetch(REVIEWS_ENDPOINT, { credentials: 'omit' })
+      .then(r => r.ok ? r.json() : null)
+      .then(render)
+      .catch(() => { /* leave hidden on failure */ });
   })();
 </script>
 
