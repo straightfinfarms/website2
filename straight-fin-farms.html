@@ -3,6 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTP0NKLDK7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZTP0NKLDK7');
+  // Custom event tracking: booking clicks, outbound links, forms, conversions
+  document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a || !a.getAttribute('href')) return;
+      var href = a.getAttribute('href');
+      var label = (a.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+      var bm = href.match(/(book-direct|book-course|bookings)\.html/);
+      if (bm) {
+        gtag('event', 'booking_click', {
+          booking_type: bm[1],
+          link_text: label,
+          link_url: href,
+          page_path: location.pathname
+        });
+      }
+      try {
+        var u = new URL(a.href, location.href);
+        if (u.host && u.host !== location.host && u.protocol.indexOf('http') === 0) {
+          gtag('event', 'outbound_click', {
+            link_domain: u.host,
+            link_url: u.href,
+            link_text: label,
+            page_path: location.pathname
+          });
+        }
+      } catch (err) {}
+    }, true);
+    document.addEventListener('submit', function (e) {
+      var form = e.target;
+      if (!form || form.tagName !== 'FORM') return;
+      var name = 'unknown';
+      if (form.classList && form.classList.contains('inquiry-form')) name = 'inquiry_form';
+      else if (form.id === 'corporateForm') name = 'corporate_inquiry';
+      else if (form.id === 'waitlistForm') name = 'waitlist';
+      else if (form.id) name = form.id;
+      gtag('event', 'form_submit', {
+        form_name: name,
+        page_path: location.pathname
+      });
+    }, true);
+    if (location.pathname.indexOf('payment-success') !== -1) {
+      gtag('event', 'booking_complete', { page_path: location.pathname });
+    }
+  });
+</script>
+<!-- End Google Analytics -->
 <title>Balance Nature Project at Straight Fin Farms</title>
 <link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
 <link rel="apple-touch-icon" href="images/Logo/favicon-192.png">
