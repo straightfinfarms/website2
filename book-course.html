@@ -412,6 +412,22 @@
       <p class="promo-hint">Optional. Discount applies to tuition (after any shared-booking discount).</p>
     </div>
 
+    <!-- Direct-booking payment method picker (hidden by default — shown when settings.directBookingCourse is true) -->
+    <div id="paymentMethodGroup" style="display:none; margin-top:18px;">
+      <label style="font-weight:500;">Payment method</label>
+      <p style="font-size:12px; color:#888; margin:4px 0 10px;">Pay now to secure your spot instantly. Enrollment is confirmed once Deniz verifies the payment.</p>
+      <div style="display:flex; gap:10px; flex-direction:column;">
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ddd; border-radius:8px; cursor:pointer; background:#fff;">
+          <input type="radio" name="paymentMethod" value="stripe" checked style="margin-top:3px;">
+          <span style="font-size:14px;"><strong>Credit card via Stripe</strong><br><span style="font-size:12px; color:#888;">Visa, Mastercard, AMEX. You'll be redirected to Stripe to enter your card.</span></span>
+        </label>
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ddd; border-radius:8px; cursor:pointer; background:#fff;">
+          <input type="radio" name="paymentMethod" value="etransfer" style="margin-top:3px;">
+          <span style="font-size:14px;"><strong>Interac e-Transfer</strong><br><span style="font-size:12px; color:#888;">Reserve now, send the e-Transfer within 48 hours. Email instructions will follow.</span></span>
+        </label>
+      </div>
+    </div>
+
     <button type="button" class="btn-submit" id="submitBtn" onclick="submitEnrollment()">Request Enrollment</button>
     <div id="msg"></div>
   </div>
@@ -420,9 +436,9 @@
   <div class="form-card" id="successCard" style="display:none; text-align:center">
     <div id="enrollSuccess" style="display:block">
       <div class="check">✓</div>
-      <h2>Enrollment Request Sent</h2>
+      <h2 id="successHeading">Enrollment Request Sent</h2>
       <p id="successDetails"></p>
-      <p style="color:#888; font-size:13px;">Deniz will review your request and send you a confirmation with the payment link within a few hours. Check your inbox.</p>
+      <p id="successCopy" style="color:#888; font-size:13px;">Deniz will review your request and send you a confirmation with the payment link within a few hours. Check your inbox.</p>
     </div>
   </div>
 
@@ -724,6 +740,35 @@
     m.textContent = text;
   }
 
+  // ===== DIRECT-BOOKING MODE =====
+  // Server-side flag (admin Settings tab) controls whether the form takes payment
+  // immediately or just submits an enrollment request for host approval.
+  let directBookingMode = false;
+
+  function applyDirectBookingMode(enabled) {
+    directBookingMode = !!enabled;
+    const btn = document.getElementById('submitBtn');
+    const pmGroup = document.getElementById('paymentMethodGroup');
+    if (directBookingMode) {
+      if (btn) btn.textContent = 'Enroll & Pay Now';
+      if (pmGroup) pmGroup.style.display = 'block';
+    } else {
+      if (btn) btn.textContent = 'Request Enrollment';
+      if (pmGroup) pmGroup.style.display = 'none';
+    }
+  }
+
+  (function fetchBookingSettings() {
+    try {
+      fetch(APPS_SCRIPT_URL + '?action=get_settings', { method: 'GET', cache: 'no-store' })
+        .then(r => r.json())
+        .then(s => applyDirectBookingMode(s && s.directBookingCourse))
+        .catch(err => { console.warn('Settings fetch failed (defaulting to request mode):', err); });
+    } catch (err) {
+      console.warn('Settings fetch error:', err);
+    }
+  })();
+
   function submitEnrollment() {
     if (!state.course) return showMsg('Please choose a course.', 'error');
     if (!state.stay) return showMsg('Please choose an accommodation option.', 'error');
@@ -734,10 +779,14 @@
 
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.textContent = 'Sending…';
+    btn.textContent = directBookingMode ? 'Processing…' : 'Sending…';
 
     const course = COURSES[state.course];
     const stay = STAYS[state.stay];
+
+    const pmRadio = document.querySelector('input[name="paymentMethod"]:checked');
+    const paymentMethod = pmRadio ? pmRadio.value : 'stripe';
+
     const payload = {
       type: 'course',
       course: state.course,
@@ -771,9 +820,12 @@
       dietary: document.getElementById('dietary').value.trim(),
       occasion: 'Permaculture Course · ' + course.name,
       message: document.getElementById('message').value.trim(),
+      // Direct-booking flags (server validates against its own settings before honoring)
+      directBooking: directBookingMode,
+      paymentMethod: directBookingMode ? paymentMethod : undefined,
     };
 
-    const success = () => {
+    const showRequestSuccess = () => {
       document.getElementById('formCard').style.display = 'none';
       document.getElementById('successCard').style.display = 'block';
       document.getElementById('successDetails').innerHTML =
@@ -782,12 +834,58 @@
         'Estimated total: ' + fmt(state._total) + ' CAD';
     };
 
+    const showDirectETransferSuccess = (bookingId) => {
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('successCard').style.display = 'block';
+      const heading = document.getElementById('successHeading');
+      const copy = document.getElementById('successCopy');
+      if (heading) heading.textContent = 'You’re Enrolled!';
+      document.getElementById('successDetails').innerHTML =
+        '<strong>' + course.name + '</strong><br>' + course.dates + '<br>' +
+        (state.isCouple ? '2 adults (sharing accommodation)' : state.adults + ' adult' + (state.adults !== 1 ? 's' : '')) + ' · ' + stay.name + '<br>' +
+        'Total: ' + fmt(state._total) + ' CAD' + (bookingId ? '<br><span style="font-size:12px;color:#888;">Booking ID: ' + bookingId + '</span>' : '');
+      if (copy) copy.innerHTML = 'Check your email at <strong>' + email + '</strong> for your e-Transfer instructions — send the transfer within 48 hours and you’ll receive your final confirmation once Deniz verifies it.';
+    };
+
+    if (directBookingMode) {
+      // Readable POST: omit Content-Type header so the request stays "simple" (no CORS preflight)
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+        .then(r => r.json())
+        .then(result => {
+          if (!result || result.status !== 'ok') {
+            const msg = result && result.message ? result.message : 'Could not complete your enrollment. Please try again or email hello@straightfinfarms.com.';
+            showMsg(msg, 'error');
+            btn.disabled = false;
+            btn.textContent = directBookingMode ? 'Enroll & Pay Now' : 'Request Enrollment';
+            return;
+          }
+          if (result.mode === 'direct-stripe' && result.stripeUrl) {
+            window.location.href = result.stripeUrl;
+          } else if (result.mode === 'direct-etransfer') {
+            showDirectETransferSuccess(result.bookingId);
+          } else {
+            // Fallback: server didn't honor direct mode — show standard success
+            showRequestSuccess();
+          }
+        })
+        .catch(err => {
+          console.error('Direct enrollment submission error:', err);
+          showMsg('Network error. Please try again or email hello@straightfinfarms.com.', 'error');
+          btn.disabled = false;
+          btn.textContent = directBookingMode ? 'Enroll & Pay Now' : 'Request Enrollment';
+        });
+      return;
+    }
+
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    }).then(success).catch(() => success()).finally(() => {
+    }).then(showRequestSuccess).catch(() => showRequestSuccess()).finally(() => {
       btn.disabled = false;
       btn.textContent = 'Request Enrollment';
     });

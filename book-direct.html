@@ -1322,8 +1322,24 @@
           <label>Message (optional)</label>
           <textarea placeholder="Tell us a bit about your trip &mdash; who's coming, anything you'd like us to know..."></textarea>
         </div>
-        <p class="form-note">Deniz will respond with confirmed availability, total pricing, and payment instructions. No charge until you confirm. Your card is saved at booking; a refundable $500 hold (not a charge) is placed 1&ndash;2 days before arrival and released after checkout pending property inspection.</p>
-        <button type="submit" class="btn-submit-inquiry">Send Booking Request</button>
+        <!-- Direct-booking payment method picker (hidden by default — shown when ?action=get_settings says directBookingStay is true) -->
+        <div id="paymentMethodGroup" style="display:none; margin-top:18px;">
+          <label style="font-weight:500;">Payment method</label>
+          <p style="font-size:12px; color:#888; margin:4px 0 10px;">Pay now to secure your dates instantly. The booking is confirmed once Deniz verifies the payment.</p>
+          <div style="display:flex; gap:10px; flex-direction:column;">
+            <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ddd; border-radius:8px; cursor:pointer; background:#fff;">
+              <input type="radio" name="paymentMethod" value="stripe" checked style="margin-top:3px;">
+              <span style="font-size:14px;"><strong>Credit card via Stripe</strong><br><span style="font-size:12px; color:#888;">Visa, Mastercard, AMEX. Secure, instant — you'll be redirected to Stripe to enter your card.</span></span>
+            </label>
+            <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ddd; border-radius:8px; cursor:pointer; background:#fff;">
+              <input type="radio" name="paymentMethod" value="etransfer" style="margin-top:3px;">
+              <span style="font-size:14px;"><strong>Interac e-Transfer</strong><br><span style="font-size:12px; color:#888;">Reserve now, then send the e-Transfer within 48 hours. Email instructions will follow.</span></span>
+            </label>
+          </div>
+        </div>
+
+        <p class="form-note" id="formNote">Deniz will respond with confirmed availability, total pricing, and payment instructions. No charge until you confirm. Your card is saved at booking; a refundable $500 hold (not a charge) is placed 1&ndash;2 days before arrival and released after checkout pending property inspection.</p>
+        <button type="submit" class="btn-submit-inquiry" id="submitBtnInquiry">Send Booking Request</button>
       </form>
     </div>
 
@@ -1828,6 +1844,39 @@
   // REPLACE THIS with your deployed Google Apps Script web app URL
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
 
+  // ===== DIRECT-BOOKING MODE =====
+  // Server-side settings flag (toggle in admin Settings tab) controls whether this
+  // form takes payment immediately or just sends a request for host approval.
+  let directBookingMode = false;
+
+  function applyDirectBookingMode(enabled) {
+    directBookingMode = !!enabled;
+    const btn = document.getElementById('submitBtnInquiry');
+    const note = document.getElementById('formNote');
+    const pmGroup = document.getElementById('paymentMethodGroup');
+    if (directBookingMode) {
+      if (btn) btn.textContent = 'Book Now & Pay';
+      if (pmGroup) pmGroup.style.display = 'block';
+      if (note) note.innerHTML = 'Pay now to secure your dates instantly. Once Deniz verifies the payment, you’ll receive your final confirmation with self check-in details. A refundable $500 hold (not a charge) is placed on your card 1&ndash;2 days before arrival and released after checkout, pending property inspection.';
+    } else {
+      if (btn) btn.textContent = 'Send Booking Request';
+      if (pmGroup) pmGroup.style.display = 'none';
+      // (note text already matches default)
+    }
+  }
+
+  // Fetch booking settings on load and adjust UI
+  (function fetchBookingSettings() {
+    try {
+      fetch(APPS_SCRIPT_URL + '?action=get_settings', { method: 'GET', cache: 'no-store' })
+        .then(r => r.json())
+        .then(s => applyDirectBookingMode(s && s.directBookingStay))
+        .catch(err => { console.warn('Settings fetch failed (defaulting to request mode):', err); });
+    } catch (err) {
+      console.warn('Settings fetch error:', err);
+    }
+  })();
+
   function submitInquiry(e) {
     e.preventDefault();
     // Defensive: dates should already be set via openInquiry, but block submission if somehow missing
@@ -1838,8 +1887,11 @@
     const form = e.target;
     const submitBtn = form.querySelector('.btn-submit-inquiry');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Sending...';
+    submitBtn.textContent = directBookingMode ? 'Processing...' : 'Sending...';
     submitBtn.disabled = true;
+
+    const pmRadio = form.querySelector('input[name="paymentMethod"]:checked');
+    const paymentMethod = pmRadio ? pmRadio.value : 'stripe';
 
     const data = {
       firstName: form.querySelectorAll('input[type="text"]')[0].value,
@@ -1860,24 +1912,77 @@
       message: form.querySelector('textarea').value,
       // Snapshot of the quote the guest saw at request time (all CAD, pre-confirmation)
       quote: lastQuote,
+      // Direct-booking flags (server validates against its own settings before honoring)
+      directBooking: directBookingMode,
+      paymentMethod: directBookingMode ? paymentMethod : undefined,
+      finalTotal: directBookingMode ? lastQuote.grandTotal : undefined,
     };
 
-    const markSuccess = () => {
+    const markRequestSuccess = () => {
       document.getElementById('inquiryForm').style.display = 'none';
       document.getElementById('inquirySuccess').style.display = 'block';
       showBookingCardSuccess(data);
     };
+
+    const showDirectETransferSuccess = (bookingId) => {
+      const successEl = document.getElementById('inquirySuccess');
+      const heading = successEl.querySelector('h3');
+      const paras = successEl.querySelectorAll('p');
+      if (heading) heading.textContent = 'You’re Booked!';
+      if (paras[0]) paras[0].innerHTML = 'Your dates are reserved. Check your email at <strong>' + (data.email || '') + '</strong> for your e-Transfer instructions — send the transfer within 48 hours and you’ll receive your final confirmation once Deniz verifies it landed.';
+      if (paras[1]) paras[1].textContent = 'Booking ID: ' + (bookingId || '—');
+      document.getElementById('inquiryForm').style.display = 'none';
+      successEl.style.display = 'block';
+      showBookingCardSuccess(data);
+    };
+
+    if (directBookingMode) {
+      // Readable POST: omit Content-Type so the request stays "simple" (no CORS preflight)
+      // and Apps Script can return JSON the browser will read (rather than the legacy
+      // no-cors send-and-pray pattern).
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      })
+        .then(r => r.json())
+        .then(result => {
+          if (!result || result.status !== 'ok') {
+            const msg = result && result.message ? result.message : 'Could not complete your booking. Please try again or email hello@straightfinfarms.com.';
+            alert(msg);
+            return;
+          }
+          if (result.mode === 'direct-stripe' && result.stripeUrl) {
+            window.location.href = result.stripeUrl;
+          } else if (result.mode === 'direct-etransfer') {
+            showDirectETransferSuccess(result.bookingId);
+          } else {
+            // Fallback: server didn't honor direct mode (e.g. toggle just flipped off mid-submit) — show standard success
+            markRequestSuccess();
+          }
+        })
+        .catch(err => {
+          console.error('Direct booking submission error:', err);
+          alert('Network error. Please try again or email hello@straightfinfarms.com.');
+        })
+        .finally(() => {
+          submitBtn.textContent = directBookingMode ? 'Book Now & Pay' : originalText;
+          submitBtn.disabled = false;
+        });
+      return;
+    }
+
+    // Legacy request flow — keep no-cors fire-and-forget for backwards compatibility
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    .then(markSuccess)
+    .then(markRequestSuccess)
     .catch(err => {
       console.error('Booking submission error:', err);
       // Still show success — no-cors mode won't return status, but the request goes through
-      markSuccess();
+      markRequestSuccess();
     })
     .finally(() => {
       submitBtn.textContent = originalText;
