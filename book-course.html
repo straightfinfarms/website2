@@ -182,6 +182,11 @@
   .stay-counter .stay-btn:not(:disabled):hover { border-color: #3d8c40; color: #3d8c40; }
   .stay-counter .stay-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .stay-counter .stay-count { min-width: 32px; text-align: center; font-weight: 600; font-size: 14px; }
+  /* Free-option highlights */
+  .stay-option.stay-free { background: #f9faf6; border-color: #d6e3c9; }
+  .stay-option.stay-free.selected { border-color: #3d8c40; background: #f0f7ee; }
+  .free-badge { display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #2e6e31; background: #e6f4ea; padding: 2px 7px; border-radius: 999px; vertical-align: middle; }
+  .stay-price.stay-price-free { color: #2e6e31; font-weight: 700; }
 
   /* GUESTS */
   .guest-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
@@ -294,45 +299,31 @@
 
     <!-- ACCOMMODATION -->
     <div class="form-section">
-      <h3>2. Accommodation</h3>
-      <label class="stay-option" data-stay="commuter" data-cost="0">
-        <input type="radio" name="stay" value="commuter">
-        <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Permaculture/IMG_4908 Large.jpeg')" role="img" aria-label="Farmhouse driveway"></div>
-          <div><div class="name">No accommodation (commuter)</div><div class="sub">Stay elsewhere; come for sessions and meals</div></div>
-        </div>
-        <div class="price">Free</div>
-      </label>
-      <label class="stay-option" data-stay="byo" data-cost="0">
-        <input type="radio" name="stay" value="byo">
-        <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Community/IMG_4810 Large.jpeg')" role="img" aria-label="Personal tents pitched in the camping area at sunset"></div>
-          <div><div class="name">Bring your own tent</div><div class="sub">Camping area · washroom &amp; shower access</div></div>
-        </div>
-        <div class="price">Free</div>
-      </label>
+      <h3>2. Accommodation <span style="font-weight:400; font-size:13px; color:#666;">— pick one per guest. Free options (commuter / BYO tent) count too.</span></h3>
       <!-- Running tally — populated by renderStayCounters() -->
       <div id="staySelectionStatus" style="margin-bottom:12px; padding:10px 14px; background:#f5f3ee; border:1px solid #e0ddd6; border-radius:8px; font-size:13px; color:#555;">
         Choose your course first to see accommodation options.
       </div>
 
       <!-- Quantity-based stay rows. With multiple adults, sum of counts must equal adults
-           (or 1 if couple sharing). Each non-dorm row maxes at 1; dorm goes up to 3. -->
+           (or 1 if couple sharing). Free options (commuter / BYO tent) ALSO count and cost
+           nothing — pick them if you don't need a paid room. Each non-dorm row maxes at 1;
+           dorm goes up to 3. -->
       <div class="stay-options-list">
-        <div class="stay-option" data-stay="commuter">
+        <div class="stay-option stay-free" data-stay="commuter">
           <div class="stay-option-label">
             <div class="stay-thumb" style="background-image:url('images/Permaculture/IMG_4908 Large.jpeg')" role="img" aria-label="Farmhouse driveway"></div>
-            <div><div class="name">No accommodation (commuter)</div><div class="sub">Stay elsewhere; come for sessions and meals</div></div>
+            <div><div class="name">No accommodation (commuter) <span class="free-badge">FREE</span></div><div class="sub">Stay elsewhere; come for sessions and meals only</div></div>
           </div>
-          <div class="stay-price">Free</div>
+          <div class="stay-price stay-price-free">$0</div>
           <div class="stay-counter" data-stay-counter="commuter"></div>
         </div>
-        <div class="stay-option" data-stay="byo">
+        <div class="stay-option stay-free" data-stay="byo">
           <div class="stay-option-label">
             <div class="stay-thumb" style="background-image:url('images/Community/IMG_4810 Large.jpeg')" role="img" aria-label="Personal tents pitched in the camping area at sunset"></div>
-            <div><div class="name">Bring your own tent</div><div class="sub">Camping area · washroom &amp; shower access</div></div>
+            <div><div class="name">Bring your own tent <span class="free-badge">FREE</span></div><div class="sub">Camping area · washroom &amp; shower access · no charge</div></div>
           </div>
-          <div class="stay-price">Free</div>
+          <div class="stay-price stay-price-free">$0</div>
           <div class="stay-counter" data-stay-counter="byo"></div>
         </div>
         <div class="stay-option" data-stay="bell">
