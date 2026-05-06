@@ -164,18 +164,24 @@
   .course-option .opt-desc { font-size: 13px; color: #666; line-height: 1.55; }
   .course-option .opt-price { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 16px; color: #1a1a1a; background: rgba(255,255,255,0.95); padding: 6px 12px; border-radius: 999px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); position: absolute; top: 30px; right: 32px; }
 
-  /* ACCOMMODATION RADIO */
-  .stay-option { border: 1.5px solid #e0ddd6; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .stay-option:hover { border-color: #3d8c40; }
+  /* ACCOMMODATION ROWS (multi-quantity) */
+  .stay-option { border: 1.5px solid #e0ddd6; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .stay-option.selected { border-color: #3d8c40; background: #f0f7ee; }
   .stay-option input { display: none; }
   .stay-option-label { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
   .stay-option .ico { font-size: 22px; }
   .stay-option .name { font-weight: 600; font-size: 14px; }
   .stay-option .sub { font-size: 12px; color: #666; }
-  .stay-option .price { font-weight: 700; font-size: 15px; white-space: nowrap; }
+  .stay-option .price, .stay-option .stay-price { font-weight: 700; font-size: 15px; white-space: nowrap; }
   .stay-option.disabled { opacity: 0.4; cursor: not-allowed; }
-  .stay-option.disabled:hover { border-color: #e0ddd6; }
+  .stay-option.is-sold-out { opacity: 0.55; }
+  .stay-option .avail-pill { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  /* +/- counter group */
+  .stay-counter { display: flex; align-items: center; gap: 4px; min-width: 96px; justify-content: flex-end; }
+  .stay-counter .stay-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ccc; background: #fff; font-size: 18px; font-weight: 600; cursor: pointer; line-height: 1; padding: 0; color: #1a1a1a; }
+  .stay-counter .stay-btn:not(:disabled):hover { border-color: #3d8c40; color: #3d8c40; }
+  .stay-counter .stay-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .stay-counter .stay-count { min-width: 32px; text-align: center; font-weight: 600; font-size: 14px; }
 
   /* GUESTS */
   .guest-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
@@ -305,57 +311,75 @@
         </div>
         <div class="price">Free</div>
       </label>
-      <label class="stay-option" data-stay="bell">
-        <input type="radio" name="stay" value="bell">
-        <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Tent/IMG_4979 Large.jpeg')" role="img" aria-label="Canvas bell tent in the field"></div>
-          <div><div class="name">Bell Tent Glamping</div><div class="sub" id="bellSub">Luxury canvas tent · sleeps 2</div></div>
-        </div>
-        <div class="price" id="bellPrice">$225</div>
-        <div class="avail-pill" id="bellAvail" style="display:none"></div>
-      </label>
-      <label class="stay-option" data-stay="bunkie">
-        <input type="radio" name="stay" value="bunkie">
-        <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Bunkie/bunkie Large.jpeg')" role="img" aria-label="The bunkie cabin — barn-roof rustic cabin in the woods"></div>
-          <div><div class="name">Bunkie Cabin</div><div class="sub" id="bunkieSub">Private rustic cabin in the woods</div></div>
-        </div>
-        <div class="price" id="bunkiePrice">$500</div>
-        <div class="avail-pill" id="bunkieAvail" style="display:none"></div>
-      </label>
-      <label class="stay-option" data-stay="dorm">
-        <input type="radio" name="stay" value="dorm">
-        <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Room/King Room Large.jpeg')" role="img" aria-label="The King Room dorm — three beds shared"></div>
-          <div><div class="name">King Room Dorm</div><div class="sub" id="dormSub">$175 per bed · 3 beds total (King / Queen / Double), shared room</div></div>
-        </div>
-        <div class="price" id="dormPrice">$175<span style="font-size:11px;color:#888;">/bed</span></div>
-        <div class="avail-pill" id="dormAvail" style="display:none"></div>
-      </label>
-      <label class="stay-option" data-stay="shared">
-        <input type="radio" name="stay" value="shared">
-        <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Room/Mushroom Room Large.jpeg')" role="img" aria-label="The Mushroom Room — private bedroom with shared bathroom"></div>
-          <div><div class="name">Mushroom Room</div><div class="sub" id="sharedSub">Private bedroom · shared bathroom</div></div>
-        </div>
-        <div class="price" id="sharedPrice">$275</div>
-        <div class="avail-pill" id="sharedAvail" style="display:none"></div>
-      </label>
-      <label class="stay-option" data-stay="ensuite">
-        <input type="radio" name="stay" value="ensuite">
-        <div class="stay-option-label">
-          <div class="stay-thumb" style="background-image:url('images/Room/Pond Room.png')" role="img" aria-label="The Pond View Room — private ensuite"></div>
-          <div><div class="name">Pond View Room (Ensuite)</div><div class="sub" id="ensuiteSub">Private ensuite bathroom · pond views</div></div>
-        </div>
-        <div class="price" id="ensuitePrice">$375</div>
-        <div class="avail-pill" id="ensuiteAvail" style="display:none"></div>
-      </label>
+      <!-- Running tally — populated by renderStayCounters() -->
+      <div id="staySelectionStatus" style="margin-bottom:12px; padding:10px 14px; background:#f5f3ee; border:1px solid #e0ddd6; border-radius:8px; font-size:13px; color:#555;">
+        Choose your course first to see accommodation options.
+      </div>
 
-      <!-- Dorm bed-count selector (only shown when stay=dorm AND adults>1) -->
-      <div id="dormBedSelector" style="display:none; margin-top:14px; padding:14px 16px; background:#f0f7ee; border:1px solid #cfe6d0; border-radius:8px;">
-        <div style="font-size:14px; font-weight:500; margin-bottom:8px;">How many dorm beds do you need?</div>
-        <div style="font-size:12px; color:#666; margin-bottom:10px;">The dorm has 3 separate beds (King, Queen, Double). Choose 1 if you'll all share, or one bed per person if not.</div>
-        <div id="dormBedOptions" style="display:flex; gap:8px; flex-wrap:wrap;"><!-- radios injected by JS --></div>
+      <!-- Quantity-based stay rows. With multiple adults, sum of counts must equal adults
+           (or 1 if couple sharing). Each non-dorm row maxes at 1; dorm goes up to 3. -->
+      <div class="stay-options-list">
+        <div class="stay-option" data-stay="commuter">
+          <div class="stay-option-label">
+            <div class="stay-thumb" style="background-image:url('images/Permaculture/IMG_4908 Large.jpeg')" role="img" aria-label="Farmhouse driveway"></div>
+            <div><div class="name">No accommodation (commuter)</div><div class="sub">Stay elsewhere; come for sessions and meals</div></div>
+          </div>
+          <div class="stay-price">Free</div>
+          <div class="stay-counter" data-stay-counter="commuter"></div>
+        </div>
+        <div class="stay-option" data-stay="byo">
+          <div class="stay-option-label">
+            <div class="stay-thumb" style="background-image:url('images/Community/IMG_4810 Large.jpeg')" role="img" aria-label="Personal tents pitched in the camping area at sunset"></div>
+            <div><div class="name">Bring your own tent</div><div class="sub">Camping area · washroom &amp; shower access</div></div>
+          </div>
+          <div class="stay-price">Free</div>
+          <div class="stay-counter" data-stay-counter="byo"></div>
+        </div>
+        <div class="stay-option" data-stay="bell">
+          <div class="stay-option-label">
+            <div class="stay-thumb" style="background-image:url('images/Tent/IMG_4979 Large.jpeg')" role="img" aria-label="Canvas bell tent in the field"></div>
+            <div><div class="name">Bell Tent Glamping</div><div class="sub">Luxury canvas tent · sleeps 2</div></div>
+          </div>
+          <div class="stay-price">$225</div>
+          <div class="avail-pill" id="bellAvail" style="display:none"></div>
+          <div class="stay-counter" data-stay-counter="bell"></div>
+        </div>
+        <div class="stay-option" data-stay="bunkie">
+          <div class="stay-option-label">
+            <div class="stay-thumb" style="background-image:url('images/Bunkie/bunkie Large.jpeg')" role="img" aria-label="The bunkie cabin — barn-roof rustic cabin in the woods"></div>
+            <div><div class="name">Bunkie Cabin</div><div class="sub">Private rustic cabin in the woods</div></div>
+          </div>
+          <div class="stay-price">$500</div>
+          <div class="avail-pill" id="bunkieAvail" style="display:none"></div>
+          <div class="stay-counter" data-stay-counter="bunkie"></div>
+        </div>
+        <div class="stay-option" data-stay="dorm">
+          <div class="stay-option-label">
+            <div class="stay-thumb" style="background-image:url('images/Room/King Room Large.jpeg')" role="img" aria-label="The King Room dorm — three beds shared"></div>
+            <div><div class="name">King Room Dorm</div><div class="sub">$175 per bed · 3 beds (King / Queen / Double), shared room</div></div>
+          </div>
+          <div class="stay-price">$175<span style="font-size:11px;color:#888;">/bed</span></div>
+          <div class="avail-pill" id="dormAvail" style="display:none"></div>
+          <div class="stay-counter" data-stay-counter="dorm"></div>
+        </div>
+        <div class="stay-option" data-stay="shared">
+          <div class="stay-option-label">
+            <div class="stay-thumb" style="background-image:url('images/Room/Mushroom Room Large.jpeg')" role="img" aria-label="The Mushroom Room — private bedroom with shared bathroom"></div>
+            <div><div class="name">Mushroom Room</div><div class="sub">Private bedroom · shared bathroom</div></div>
+          </div>
+          <div class="stay-price">$275</div>
+          <div class="avail-pill" id="sharedAvail" style="display:none"></div>
+          <div class="stay-counter" data-stay-counter="shared"></div>
+        </div>
+        <div class="stay-option" data-stay="ensuite">
+          <div class="stay-option-label">
+            <div class="stay-thumb" style="background-image:url('images/Room/Pond Room.png')" role="img" aria-label="The Pond View Room — private ensuite"></div>
+            <div><div class="name">Pond View Room (Ensuite)</div><div class="sub">Private ensuite bathroom · pond views</div></div>
+          </div>
+          <div class="stay-price">$375</div>
+          <div class="avail-pill" id="ensuiteAvail" style="display:none"></div>
+          <div class="stay-counter" data-stay-counter="ensuite"></div>
+        </div>
       </div>
     </div>
 
@@ -480,14 +504,68 @@
 
   const state = {
     course: null,        // course key from COURSES (e.g. '3day-aug', '3day-sep', '7day')
-    stay: null,          // 'commuter' | 'byo' | 'bell' | 'bunkie' | 'dorm' | 'shared' | 'ensuite'
-    stayBeds: 1,         // # of dorm beds claimed (only meaningful when stay = 'dorm')
+    stays: {},           // { stayKey: count } — multi-accommodation. e.g. {bell:1, dorm:2}
+                         // Sum of counts must equal getRequiredStaySum() (= adults, or 1 if couple).
+                         // Each stay is capped at its inventory remaining.
     adults: 1,
     isCouple: false,
     promoCode: null,     // e.g. 'BALANCE10'
     promoPercent: 0,     // % off tuition (after couples discount)
     promoLabel: null,    // human-readable label, e.g. 'Instagram 10% off'
   };
+
+  // ===== STAY-SELECTION HELPERS =====
+  function getRequiredStaySum() {
+    return (state.isCouple && state.adults === 2) ? 1 : state.adults;
+  }
+  function getCurrentStaySum() {
+    return Object.keys(state.stays).reduce((acc, k) => acc + (state.stays[k] || 0), 0);
+  }
+  function getPrimaryStay() {
+    // Returns the first stay key with count > 0 (used for legacy summary display)
+    const k = Object.keys(state.stays).find(k => state.stays[k] > 0);
+    return k || null;
+  }
+  function getRemainingForStay(stayKey) {
+    if (!stayKey || !STAYS[stayKey]) return 0;
+    const cap = STAYS[stayKey].capacity;
+    if (cap >= 999) return 999;  // unlimited (commuter / byo)
+    const avail = (state.course && availabilityCache[state.course]) || {};
+    const info = avail[stayKey] || { booked: 0 };
+    return Math.max(0, cap - (info.booked || 0));
+  }
+  function setStayCount(stayKey, newCount) {
+    newCount = Math.max(0, Math.floor(newCount || 0));
+    const remaining = getRemainingForStay(stayKey);
+    if (newCount > remaining) newCount = remaining;
+    // Don't let total exceed required — clamp to (required - other stays)
+    const required = getRequiredStaySum();
+    let other = 0;
+    Object.keys(state.stays).forEach(k => { if (k !== stayKey) other += (state.stays[k] || 0); });
+    if (newCount + other > required) newCount = Math.max(0, required - other);
+    if (newCount <= 0) delete state.stays[stayKey];
+    else state.stays[stayKey] = newCount;
+    renderStayCounters();
+    recalc();
+  }
+  function adjustStaysForRequiredSum() {
+    // Trim selections from the bottom if total > required (e.g. adults dropped, couples toggled).
+    // Order to trim: priciest first (refund-friendly), but fall back to whatever's set.
+    let total = getCurrentStaySum();
+    const required = getRequiredStaySum();
+    if (total <= required) return;
+    // Trim in reverse-priority order: dorm (cheap, multi-bed) is trimmed first to free a bed,
+    // then non-dorm rooms.
+    const trimOrder = ['dorm', 'commuter', 'byo', 'bell', 'shared', 'bunkie', 'ensuite'];
+    for (const key of trimOrder) {
+      if (total <= required) break;
+      while (total > required && (state.stays[key] || 0) > 0) {
+        state.stays[key] -= 1;
+        if (state.stays[key] <= 0) delete state.stays[key];
+        total -= 1;
+      }
+    }
+  }
 
   // Course catalog — data-driven so adding a new course = one entry here.
   // Required: name, dates (display), tuition, nights, checkin (YYYY-MM-DD), checkout (YYYY-MM-DD), image
@@ -598,27 +676,15 @@
       updateStayPrices();
       recalc();
     });
-    // Bind stay radios
-    document.querySelectorAll('.stay-option').forEach(el => {
-      el.addEventListener('click', () => {
-        if (el.classList.contains('disabled') || el.classList.contains('is-sold-out')) return;
-        document.querySelectorAll('.stay-option').forEach(x => x.classList.remove('selected'));
-        el.classList.add('selected');
-        const radio = el.querySelector('input');
-        if (radio && !radio.disabled) radio.checked = true;
-        state.stay = el.dataset.stay;
-        // Default dorm to all available beds for this party size
-        if (state.stay === 'dorm') {
-          const avail = (state.course && availabilityCache[state.course]) || {};
-          const dormInfo = avail.dorm || { booked: 0, capacity: STAYS.dorm.capacity };
-          const remaining = Math.max(0, (dormInfo.capacity || STAYS.dorm.capacity) - (dormInfo.booked || 0));
-          state.stayBeds = Math.min(state.adults || 1, remaining);
-        } else {
-          state.stayBeds = 1;
-        }
-        renderDormBedSelector();
-        recalc();
-      });
+    // Bind +/- counter buttons via event delegation (counters are rendered after course pick)
+    document.querySelector('.stay-options-list').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-stay-action]');
+      if (!btn) return;
+      const stayKey = btn.dataset.stayKey;
+      const action = btn.dataset.stayAction;
+      const current = state.stays[stayKey] || 0;
+      if (action === 'plus') setStayCount(stayKey, current + 1);
+      else if (action === 'minus') setStayCount(stayKey, current - 1);
     });
     // Couples checkbox
     document.getElementById('couplesCheck').addEventListener('change', e => {
@@ -627,6 +693,9 @@
         state.adults = 2;
         document.getElementById('adultsCount').textContent = state.adults;
       }
+      // Couple sharing drops required accommodation count to 1 — trim if needed
+      adjustStaysForRequiredSum();
+      renderStayCounters();
       recalc();
     });
     // Pre-select from URL — supports both new keys ('3day-aug') and legacy ('3day' → first matching prefix)
@@ -718,14 +787,10 @@
     document.getElementById(field + 'Count').textContent = state[field];
     document.getElementById(field + 'Minus').disabled = state[field] <= min;
     document.getElementById(field + 'Plus').disabled = state[field] >= 8;
-    // If dorm is selected, refresh the bed selector — adults change affects the max bed count
-    if (field === 'adults' && state.stay === 'dorm') {
-      const avail = (state.course && availabilityCache[state.course]) || {};
-      const dormInfo = avail.dorm || { booked: 0, capacity: STAYS.dorm.capacity };
-      const remaining = Math.max(0, (dormInfo.capacity || STAYS.dorm.capacity) - (dormInfo.booked || 0));
-      const maxAllowed = Math.min(state.adults || 1, remaining);
-      if (state.stayBeds > maxAllowed) state.stayBeds = maxAllowed;
-      renderDormBedSelector();
+    // Trim accommodation selections if adults went down or couple-sharing toggled
+    if (field === 'adults') {
+      adjustStaysForRequiredSum();
+      renderStayCounters();
     }
     recalc();
   }
@@ -754,97 +819,108 @@
   }
 
   function applyAvailabilityToUI() {
-    const stays = ['bell', 'bunkie', 'dorm', 'shared', 'ensuite'];
-    const avail = (state.course && availabilityCache[state.course]) || {};
-    stays.forEach(key => {
-      const optionEl = document.querySelector('.stay-option[data-stay="' + key + '"]');
-      const pillEl = document.getElementById(key + 'Avail');
-      if (!optionEl || !pillEl) return;
-      const info = avail[key] || { booked: 0, capacity: STAYS[key].capacity };
-      const remaining = Math.max(0, (info.capacity || STAYS[key].capacity) - (info.booked || 0));
-      const isDorm = key === 'dorm';
-      // Reset class
-      optionEl.classList.remove('is-sold-out');
-      const radio = optionEl.querySelector('input[type="radio"]');
-      if (radio) radio.disabled = false;
+    renderStayCounters();
+  }
 
-      if (remaining <= 0) {
-        // Sold out
-        optionEl.classList.add('is-sold-out');
-        if (radio) radio.disabled = true;
-        pillEl.style.display = 'inline-block';
-        pillEl.textContent = 'Sold out';
-        pillEl.style.background = '#f5e6e6';
-        pillEl.style.color = '#a04040';
-        // If this was the selected stay, deselect it
-        if (state.stay === key) { state.stay = null; optionEl.classList.remove('selected'); }
-      } else if (isDorm && remaining < STAYS.dorm.capacity) {
-        // Partially booked dorm
-        pillEl.style.display = 'inline-block';
-        pillEl.textContent = remaining + ' of ' + STAYS.dorm.capacity + ' beds left';
-        pillEl.style.background = '#fff3cd';
-        pillEl.style.color = '#856404';
-      } else if (isDorm) {
-        // All dorm beds available
-        pillEl.style.display = 'inline-block';
-        pillEl.textContent = '3 beds available';
-        pillEl.style.background = '#e6f4ea';
-        pillEl.style.color = '#2e6e31';
+  // Renders the +/- counter and sold-out / availability pills for every stay row,
+  // and the running tally at the top of the section.
+  function renderStayCounters() {
+    const allStayKeys = ['commuter', 'byo', 'bell', 'bunkie', 'dorm', 'shared', 'ensuite'];
+    const avail = (state.course && availabilityCache[state.course]) || {};
+    const required = getRequiredStaySum();
+    const current = getCurrentStaySum();
+    const courseSelected = !!state.course;
+
+    // Tally header
+    const status = document.getElementById('staySelectionStatus');
+    if (status) {
+      if (!courseSelected) {
+        status.innerHTML = 'Choose your course first to see accommodation options.';
+        status.style.background = '#f5f3ee';
+        status.style.borderColor = '#e0ddd6';
+        status.style.color = '#555';
+      } else if (current === required) {
+        status.innerHTML = '<strong>✓</strong> All ' + required + ' guest' + (required > 1 ? 's' : '') + ' housed.';
+        status.style.background = '#e6f4ea';
+        status.style.borderColor = '#3d8c40';
+        status.style.color = '#2e6e31';
+      } else if (current < required) {
+        status.innerHTML = '<strong>' + current + ' of ' + required + '</strong> guest' + (required > 1 ? 's' : '') + ' selected. ' +
+          'Add ' + (required - current) + ' more accommodation' + ((required - current) > 1 ? 's' : '') + (state.isCouple ? ' (sharing as a couple — 1 needed total).' : '.');
+        status.style.background = '#fff3cd';
+        status.style.borderColor = '#ffc107';
+        status.style.color = '#856404';
       } else {
-        // Non-dorm available — hide the pill (price tells the story)
-        pillEl.style.display = 'none';
+        status.innerHTML = '<strong>' + current + ' of ' + required + '</strong> selected — too many. Decrement one.';
+        status.style.background = '#f5e6e6';
+        status.style.borderColor = '#a04040';
+        status.style.color = '#a04040';
+      }
+    }
+
+    // Per-row counters
+    allStayKeys.forEach(key => {
+      const optionEl = document.querySelector('.stay-option[data-stay="' + key + '"]');
+      if (!optionEl) return;
+      const counterEl = optionEl.querySelector('.stay-counter');
+      const pillEl = document.getElementById(key + 'Avail');
+      const stayMeta = STAYS[key];
+      const cap = stayMeta.capacity;
+      const isUnlimited = cap >= 999;
+      const info = avail[key] || { booked: 0, capacity: cap };
+      const remaining = isUnlimited ? required : Math.max(0, cap - (info.booked || 0));
+      const count = state.stays[key] || 0;
+      const room = required - current;            // how many more selections are allowed in total
+      const maxForThisStay = Math.min(remaining, count + room);
+      const plusDisabled = !courseSelected || count >= maxForThisStay;
+      const minusDisabled = count <= 0;
+
+      // Sold-out / availability pill (skip for unlimited stays — commuter / byo)
+      if (pillEl) {
+        if (!courseSelected) {
+          pillEl.style.display = 'none';
+        } else if (remaining <= 0) {
+          pillEl.style.display = 'inline-block';
+          pillEl.textContent = 'Sold out';
+          pillEl.style.background = '#f5e6e6';
+          pillEl.style.color = '#a04040';
+        } else if (key === 'dorm' && remaining < cap) {
+          pillEl.style.display = 'inline-block';
+          pillEl.textContent = remaining + ' of ' + cap + ' beds left';
+          pillEl.style.background = '#fff3cd';
+          pillEl.style.color = '#856404';
+        } else if (key === 'dorm') {
+          pillEl.style.display = 'inline-block';
+          pillEl.textContent = cap + ' beds available';
+          pillEl.style.background = '#e6f4ea';
+          pillEl.style.color = '#2e6e31';
+        } else {
+          pillEl.style.display = 'none';
+        }
+      }
+
+      // Sold-out class on the row
+      optionEl.classList.toggle('is-sold-out', remaining <= 0 && !isUnlimited);
+      optionEl.classList.toggle('selected', count > 0);
+
+      // Render counter buttons
+      if (counterEl) {
+        if (!courseSelected) {
+          counterEl.innerHTML = '<span style="color:#aaa; font-size:13px;">—</span>';
+        } else {
+          const label = (key === 'dorm' && count > 0) ? (count + ' bed' + (count > 1 ? 's' : '')) : count;
+          counterEl.innerHTML =
+            '<button type="button" class="stay-btn" data-stay-action="minus" data-stay-key="' + key + '" ' + (minusDisabled ? 'disabled' : '') + '>−</button>' +
+            '<span class="stay-count">' + label + '</span>' +
+            '<button type="button" class="stay-btn" data-stay-action="plus" data-stay-key="' + key + '" ' + (plusDisabled ? 'disabled' : '') + '>+</button>';
+        }
       }
     });
-    renderDormBedSelector();
   }
-
-  function renderDormBedSelector() {
-    const wrap = document.getElementById('dormBedSelector');
-    const opts = document.getElementById('dormBedOptions');
-    if (!wrap || !opts) return;
-    if (state.stay !== 'dorm') {
-      wrap.style.display = 'none';
-      return;
-    }
-    const avail = (state.course && availabilityCache[state.course]) || {};
-    const dormInfo = avail.dorm || { booked: 0, capacity: STAYS.dorm.capacity };
-    const remaining = Math.max(0, (dormInfo.capacity || STAYS.dorm.capacity) - (dormInfo.booked || 0));
-    const maxAllowed = Math.min(state.adults || 1, remaining);
-    if (maxAllowed < 1) {
-      wrap.style.display = 'none';
-      return;
-    }
-    // Always show the selector when dorm is picked, even for adults=1, so the user sees the bed count clearly
-    wrap.style.display = 'block';
-    // Default state.stayBeds to maxAllowed if it's invalid
-    if (!state.stayBeds || state.stayBeds > maxAllowed) state.stayBeds = maxAllowed;
-    if (state.stayBeds < 1) state.stayBeds = 1;
-    let html = '';
-    for (let n = 1; n <= maxAllowed; n++) {
-      const checked = (n === state.stayBeds) ? ' checked' : '';
-      const subtotal = n * STAYS.dorm.cost;
-      html += '<label style="flex:1; min-width:120px; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; cursor:pointer; text-align:center;" class="dorm-bed-option' + (n === state.stayBeds ? ' selected' : '') + '">' +
-        '<input type="radio" name="dormBeds" value="' + n + '"' + checked + ' style="margin-right:6px;">' +
-        '<span style="font-weight:500;">' + n + ' bed' + (n > 1 ? 's' : '') + '</span>' +
-        '<div style="font-size:12px; color:#666; margin-top:2px;">$' + subtotal + '</div>' +
-        '</label>';
-    }
-    opts.innerHTML = html;
-  }
-
-  // Bind dorm bed-count selector via delegation
-  document.addEventListener('change', function (e) {
-    if (e.target && e.target.name === 'dormBeds') {
-      state.stayBeds = parseInt(e.target.value, 10) || 1;
-      renderDormBedSelector();
-      recalc();
-    }
-  });
 
   function recalc() {
     const s = state;
     const course = COURSES[s.course];
-    const stay = STAYS[s.stay];
 
     // Course & Dates
     document.getElementById('sumCourse').textContent = course ? course.name : '—';
@@ -855,8 +931,17 @@
     if (s.isCouple) pText = '2 adults (sharing)';
     document.getElementById('sumParticipants').textContent = pText;
 
-    // Accommodation label
-    document.getElementById('sumStay').textContent = stay ? stay.name : '—';
+    // Accommodation label — list each selected stay (e.g. "1× Mushroom Room, 2× Dorm beds")
+    const stayParts = [];
+    Object.keys(s.stays).forEach(k => {
+      const cnt = s.stays[k] || 0;
+      if (cnt <= 0) return;
+      const meta = STAYS[k];
+      if (!meta) return;
+      const isDorm = k === 'dorm';
+      stayParts.push(cnt + '× ' + meta.name + (isDorm ? ' (' + cnt + ' bed' + (cnt > 1 ? 's' : '') + ')' : ''));
+    });
+    document.getElementById('sumStay').textContent = stayParts.length ? stayParts.join(', ') : '—';
 
     // Pricing (pre-HST)
     const tuitionPerPerson = course ? course.tuition : 0;
@@ -874,11 +959,16 @@
     }
     const tuitionAfterAll = tuitionAfterCouples - promoDiscount;
 
-    // Flat per-course pricing — one charge per accommodation unit, regardless of duration.
-    // Dorm is per-bed: charge cost × bedsRequested. Other rooms charge cost once (couples
-    // sharing don't double-pay; adults > 1 in a private room still book that ONE room).
-    const beds = (stay && stay.perBed) ? Math.max(1, state.stayBeds || 1) : 1;
-    const stayCost = stay ? (stay.cost * beds) : 0;
+    // Flat per-course pricing — sum cost × count for each selected stay.
+    // Non-dorm rooms: capacity 1 each so count is 1 if picked, cost = stay.cost.
+    // Dorm: count is # of beds, cost = stay.cost × count.
+    let stayCost = 0;
+    Object.keys(s.stays).forEach(k => {
+      const cnt = s.stays[k] || 0;
+      const meta = STAYS[k];
+      if (!meta || cnt <= 0) return;
+      stayCost += meta.cost * cnt;
+    });
 
     const subtotal = tuitionAfterAll + stayCost;
     const hst = Math.round(subtotal * HST_RATE * 100) / 100;
@@ -898,7 +988,7 @@
     } else {
       document.getElementById('promoRow').style.display = 'none';
     }
-    document.getElementById('sumStayCost').textContent = stay ? fmt(stayCost) : '—';
+    document.getElementById('sumStayCost').textContent = stayCost > 0 ? fmt(stayCost) : '—';
     document.getElementById('sumHst').textContent = course ? fmt(hst) : '—';
     document.getElementById('sumTotal').textContent = course ? fmt(total) : '—';
 
@@ -951,7 +1041,11 @@
 
   function submitEnrollment() {
     if (!state.course) return showMsg('Please choose a course.', 'error');
-    if (!state.stay) return showMsg('Please choose an accommodation option.', 'error');
+    const requiredSum = getRequiredStaySum();
+    const currentSum = getCurrentStaySum();
+    if (currentSum === 0) return showMsg('Please choose at least one accommodation option.', 'error');
+    if (currentSum < requiredSum) return showMsg('Please select accommodation for all ' + requiredSum + ' guests (' + currentSum + ' chosen so far).', 'error');
+    if (currentSum > requiredSum) return showMsg('Too many accommodations selected (' + currentSum + ' for ' + requiredSum + ' guests).', 'error');
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -962,7 +1056,16 @@
     btn.textContent = directBookingMode ? 'Processing…' : 'Sending…';
 
     const course = COURSES[state.course];
-    const stay = STAYS[state.stay];
+    // Build a flat list of stays for the backend + a primary stay for legacy display.
+    const primaryKey = getPrimaryStay();
+    const primaryStay = primaryKey ? STAYS[primaryKey] : null;
+    const staysList = Object.keys(state.stays).filter(k => state.stays[k] > 0).map(k => ({
+      key: k,
+      name: STAYS[k] ? STAYS[k].name : k,
+      count: state.stays[k],
+      cost: STAYS[k] ? STAYS[k].cost : 0,
+    }));
+    const staysSummary = staysList.map(s => s.count + '× ' + s.name).join(' + ');
 
     const pmRadio = document.querySelector('input[name="paymentMethod"]:checked');
     const paymentMethod = pmRadio ? pmRadio.value : 'stripe';
@@ -974,9 +1077,11 @@
       courseDates: course.dates,
       checkin: course.checkin,
       checkout: course.checkout,
-      stay: state.stay,
-      stayName: stay.name,
-      stayBeds: (stay && stay.perBed) ? Math.max(1, state.stayBeds || 1) : 1,
+      stay: primaryKey,                                       // legacy primary stay key
+      stayName: staysSummary || (primaryStay ? primaryStay.name : ''),
+      stayBeds: state.stays.dorm || 0,                        // legacy dorm-bed count (0 if no dorm)
+      stays: state.stays,                                     // multi-accommodation map (NEW)
+      staysList: staysList,                                   // pre-formatted list for emails / sheet
       nights: course.nights,
       adults: state.adults,
       children: 0,
