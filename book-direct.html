@@ -1145,10 +1145,21 @@
       <button class="btn-reserve" onclick="openInquiry()" id="reserveBtn">Request to Book</button>
       <p class="no-charge-note">You won't be charged yet</p>
 
+      <!-- Weekly stay discount banner (shown when threshold + percent come in from get_pricing) -->
+      <div id="weeklyDiscountBanner" style="display:none; margin: 10px 0 4px; padding: 10px 14px; background: #f0f7ee; border: 1px solid #cfe6d0; border-radius: 8px; font-size: 13px; color: #2b4a1f; line-height: 1.5;">
+        <strong>💚 Stay <span id="wdBannerThreshold">7</span>+ nights, save <span id="wdBannerPercent">15</span>%.</strong>
+        <span style="color:#555;">Discount applies automatically.</span>
+      </div>
+
       <div class="price-breakdown" id="priceBreakdown" style="display: none;">
+        <div id="nightlyRowsContainer"><!-- per-night rows injected by updatePricing when matrix is loaded --></div>
         <div class="breakdown-row">
           <span class="label" id="nightsLabel">$650 x 2 nights</span>
           <span id="nightsTotal">$1,300</span>
+        </div>
+        <div class="breakdown-row" id="weeklyDiscountRow" style="display: none; color: #2e6e31;">
+          <span class="label" id="weeklyDiscountLabel">Weekly stay discount</span>
+          <span id="weeklyDiscountTotal">−$0</span>
         </div>
         <div class="breakdown-row" id="extraGuestRow" style="display: none;">
           <span class="label" id="extraGuestLabel">Extra guests</span>
@@ -1712,6 +1723,50 @@
   }
 
   // ===== PRICING =====
+  // ===== SERVER PRICING MATRIX (fetched from admin Pricing tab) =====
+  // Falls back to flat NIGHTLY_RATE if the fetch hasn't returned yet.
+  let pricingConfig = null;
+
+  function fetchPricingConfig() {
+    try {
+      fetch(APPS_SCRIPT_URL + '?action=get_pricing', { method: 'GET', cache: 'no-store' })
+        .then(r => r.json())
+        .then(d => {
+          if (d && d.pricing) {
+            pricingConfig = d.pricing;
+            // Update the weekly-discount banner with live numbers
+            const wd = pricingConfig.weeklyDiscount || { thresholdNights: 7, percentOff: 15 };
+            const banner = document.getElementById('weeklyDiscountBanner');
+            const tEl = document.getElementById('wdBannerThreshold');
+            const pEl = document.getElementById('wdBannerPercent');
+            if (tEl) tEl.textContent = wd.thresholdNights;
+            if (pEl) pEl.textContent = wd.percentOff;
+            if (banner) banner.style.display = (wd.percentOff > 0) ? 'block' : 'none';
+            // Re-render the price breakdown if dates already chosen
+            if (checkinDate && checkoutDate) updatePricing();
+          }
+        })
+        .catch(err => console.warn('Pricing config fetch failed (using fallback):', err));
+    } catch (err) {
+      console.warn('Pricing fetch error:', err);
+    }
+  }
+
+  // Look up the per-night rate for a date string (YYYY-MM-DD), using overrides first then matrix.
+  function nightlyRateForDate(dateStr) {
+    if (!pricingConfig) return { rate: NIGHTLY_RATE, source: 'fallback', label: '' };
+    const ov = (pricingConfig.overrides || []).find(o => o.date === dateStr);
+    if (ov) return { rate: ov.price, source: 'override', label: ov.label || 'Special date' };
+    const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return { rate: NIGHTLY_RATE, source: 'fallback', label: '' };
+    const month = parseInt(m[2], 10) - 1;
+    const dt = new Date(parseInt(m[1], 10), month, parseInt(m[3], 10));
+    const dow = dt.getDay();
+    const row = (pricingConfig.baseRates || {})[String(month)] || [];
+    const rate = (typeof row[dow] === 'number' && row[dow] > 0) ? row[dow] : NIGHTLY_RATE;
+    return { rate: rate, source: 'matrix', label: '' };
+  }
+
   function updatePricing() {
     if (!checkinDate || !checkoutDate) {
       document.getElementById('priceBreakdown').style.display = 'none';
@@ -1720,8 +1775,28 @@
     const nights = Math.max(1, Math.round((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)));
     if (nights < 1 || isNaN(nights)) return;
     document.getElementById('priceBreakdown').style.display = 'block';
-    const subtotal = NIGHTLY_RATE * nights;
-    const cleaningFee = (adults + children) >= BASE_GUESTS ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
+
+    // Compute per-night rates from the server matrix (or NIGHTLY_RATE fallback)
+    const days = [];
+    let nightlySubtotal = 0;
+    const startTs = checkinDate.getTime();
+    for (let i = 0; i < nights; i++) {
+      const d = new Date(startTs + i * 24 * 60 * 60 * 1000);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const dateStr = yyyy + '-' + mm + '-' + dd;
+      const r = nightlyRateForDate(dateStr);
+      days.push({ date: dateStr, rate: r.rate, source: r.source, label: r.label, dt: d });
+      nightlySubtotal += r.rate;
+    }
+
+    // Weekly discount
+    const wd = (pricingConfig && pricingConfig.weeklyDiscount) || { thresholdNights: 7, percentOff: 15 };
+    const weeklyDiscountApplies = (nights >= wd.thresholdNights && wd.percentOff > 0);
+    const weeklyDiscount = weeklyDiscountApplies ? Math.round(nightlySubtotal * (wd.percentOff / 100) * 100) / 100 : 0;
+    const subtotal = nightlySubtotal - weeklyDiscount;
+
     const extraGuests = Math.max(0, adults - ADULT_FEE_THRESHOLD);
     const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
     const petCost = pets * PET_FEE;
@@ -1729,8 +1804,36 @@
     const bunkieCost = addBunkie ? BUNKIE_FEE * nights : 0;
     const total = subtotal + cleaningFee + extraGuestCost + petCost + bellTentCost + bunkieCost;
 
-    document.getElementById('nightsLabel').textContent = '$' + NIGHTLY_RATE + ' x ' + nights + ' night' + (nights > 1 ? 's' : '');
-    document.getElementById('nightsTotal').textContent = '$' + subtotal.toLocaleString();
+    // Determine if rates vary across the stay (override hit or matrix returned non-uniform values)
+    const allSameRate = days.every(d => d.rate === days[0].rate);
+    const nightlyRowsContainer = document.getElementById('nightlyRowsContainer');
+    if (!allSameRate && nightlyRowsContainer) {
+      // Show per-night detail when rates vary
+      nightlyRowsContainer.innerHTML = days.map(d => {
+        const dt = d.dt;
+        const label = dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        const tag = (d.source === 'override' && d.label) ? ' · ' + d.label : '';
+        return '<div class="breakdown-row" style="font-size:13px;color:#666;"><span class="label">' + label + tag + '</span><span>$' + d.rate.toLocaleString() + '</span></div>';
+      }).join('');
+      document.getElementById('nightsLabel').textContent = nights + ' night subtotal';
+      document.getElementById('nightsTotal').textContent = '$' + nightlySubtotal.toLocaleString();
+    } else {
+      if (nightlyRowsContainer) nightlyRowsContainer.innerHTML = '';
+      const baseRate = days.length ? days[0].rate : NIGHTLY_RATE;
+      document.getElementById('nightsLabel').textContent = '$' + baseRate + ' x ' + nights + ' night' + (nights > 1 ? 's' : '');
+      document.getElementById('nightsTotal').textContent = '$' + nightlySubtotal.toLocaleString();
+    }
+
+    // Weekly discount row
+    const weeklyRow = document.getElementById('weeklyDiscountRow');
+    if (weeklyDiscountApplies) {
+      weeklyRow.style.display = '';
+      document.getElementById('weeklyDiscountLabel').textContent = 'Weekly stay discount (−' + wd.percentOff + '% on ' + nights + '+ nights)';
+      document.getElementById('weeklyDiscountTotal').textContent = '−$' + weeklyDiscount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    } else {
+      weeklyRow.style.display = 'none';
+    }
+
     document.getElementById('cleaningLabel').textContent = 'Cleaning fee';
     document.getElementById('cleaningTotal').textContent = '$' + cleaningFee;
 
@@ -1781,11 +1884,16 @@
     document.getElementById('hstAmount').textContent = '$' + hst.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     document.getElementById('totalPrice').textContent = '$' + grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    // Cache for submission
+    // Cache for submission — preserves the per-night detail + weekly discount the guest saw
     lastQuote = {
       nights: nights,
-      nightlyRate: NIGHTLY_RATE,
-      subtotal: subtotal,
+      nightlyRate: days.length ? days[0].rate : NIGHTLY_RATE,
+      nightlyDays: days.map(d => ({ date: d.date, rate: d.rate, source: d.source, label: d.label })),
+      nightlySubtotal: nightlySubtotal,
+      weeklyDiscountPercent: wd.percentOff,
+      weeklyDiscountApplied: weeklyDiscountApplies,
+      weeklyDiscount: weeklyDiscount,
+      subtotal: subtotal,             // accommodation after weekly discount
       cleaningFee: cleaningFee,
       extraGuestCost: extraGuestCost,
       petCost: petCost,
@@ -1927,6 +2035,9 @@
       console.warn('Settings fetch error:', err);
     }
   })();
+
+  // Fetch pricing matrix (per-month/day base rates, date overrides, weekly-discount config)
+  fetchPricingConfig();
 
   // Toggle the optional upsell textareas (chef / permaculture experience) — only shown
   // when the corresponding checkbox is ticked. Inquiry-only flow; host coordinates by reply.
