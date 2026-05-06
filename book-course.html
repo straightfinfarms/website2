@@ -281,25 +281,9 @@
 
     <!-- COURSE -->
     <div class="form-section">
-      <h3>1. Choose your course</h3>
-      <label class="course-option" data-course="3day" data-tuition="725">
-        <input type="radio" name="course" value="3day">
-        <div class="opt-thumb" style="background-image:url('images/Permaculture/IMG_1949 Large.jpeg')" role="img" aria-label="Outdoor course session under canopies on the lawn"></div>
-        <span class="opt-price" id="coursePrice3">$725</span>
-        <div class="opt-title">3-Day Permaculture Intensive</div>
-        <div class="opt-dates">Fri Sep 4 – Mon Sep 7, 2026 · Labour Day weekend</div>
-        <div class="opt-desc">3 full days of instruction · 3 nights accommodation · All meals included · Certificate of completion</div>
-      </label>
-      <label class="course-option is-sold-out" data-course="7day" data-tuition="1625">
-        <input type="radio" name="course" value="7day" disabled>
-        <span class="sold-out-pill">Sold Out</span>
-        <div class="opt-thumb" style="background-image:url('images/Permaculture/IMG_2006 Large.jpeg')" role="img" aria-label="Indoor classroom session in the farmhouse with projector"></div>
-        <span class="opt-price" id="coursePrice7">$1,625</span>
-        <div class="opt-title">7-Day Immersive Course</div>
-        <div class="opt-dates">Mon Aug 24 – Sun Aug 30, 2026</div>
-        <div class="opt-desc">Full 20-chapter curriculum · 7 nights · All meals included · Capstone build day · Certificate</div>
-        <div class="sold-out-msg">This course is sold out. <a href="permaculture-course.html?course=7day&amp;waitlist=1">Join the waitlist</a> and we'll let you know if a spot opens up or when next year's dates are announced.</div>
-      </label>
+      <h3>1. Choose your course &amp; date</h3>
+      <p style="font-size:13px; color:#666; margin:-6px 0 14px;">Multiple dates available. Pick the one that works for you — the 7-day immersive returns next year.</p>
+      <div id="courseOptions"><!-- Rendered from COURSES dict in JS so adding a new course = one-line edit --></div>
     </div>
 
     <!-- ACCOMMODATION -->
@@ -321,46 +305,58 @@
         </div>
         <div class="price">Free</div>
       </label>
-      <label class="stay-option" data-stay="bell" data-cost3="225" data-cost7="525">
+      <label class="stay-option" data-stay="bell">
         <input type="radio" name="stay" value="bell">
         <div class="stay-option-label">
           <div class="stay-thumb" style="background-image:url('images/Tent/IMG_4979 Large.jpeg')" role="img" aria-label="Canvas bell tent in the field"></div>
-          <div><div class="name">Bell Tent Glamping</div><div class="sub" id="bellSub">$225 for 3 nights · $525 for 7 nights</div></div>
+          <div><div class="name">Bell Tent Glamping</div><div class="sub" id="bellSub">Luxury canvas tent · sleeps 2</div></div>
         </div>
-        <div class="price" id="bellPrice">–</div>
+        <div class="price" id="bellPrice">$225</div>
+        <div class="avail-pill" id="bellAvail" style="display:none"></div>
       </label>
-      <label class="stay-option" data-stay="bunkie" data-cost3="275" data-cost7="635">
+      <label class="stay-option" data-stay="bunkie">
         <input type="radio" name="stay" value="bunkie">
         <div class="stay-option-label">
           <div class="stay-thumb" style="background-image:url('images/Bunkie/bunkie Large.jpeg')" role="img" aria-label="The bunkie cabin — barn-roof rustic cabin in the woods"></div>
-          <div><div class="name">Bunkie Cabin</div><div class="sub" id="bunkieSub">$275 / $635 · Private rustic cabin</div></div>
+          <div><div class="name">Bunkie Cabin</div><div class="sub" id="bunkieSub">Private rustic cabin in the woods</div></div>
         </div>
-        <div class="price" id="bunkiePrice">–</div>
+        <div class="price" id="bunkiePrice">$500</div>
+        <div class="avail-pill" id="bunkieAvail" style="display:none"></div>
       </label>
-      <label class="stay-option" data-stay="dorm" data-cost3="250" data-cost7="575">
+      <label class="stay-option" data-stay="dorm">
         <input type="radio" name="stay" value="dorm">
         <div class="stay-option-label">
           <div class="stay-thumb" style="background-image:url('images/Room/King Room Large.jpeg')" role="img" aria-label="The King Room dorm — three beds shared"></div>
-          <div><div class="name">King Room Dorm Bed</div><div class="sub" id="dormSub">$250 / $575 · 3 beds (King/Queen/Double), shared room</div></div>
+          <div><div class="name">King Room Dorm</div><div class="sub" id="dormSub">$175 per bed · 3 beds total (King / Queen / Double), shared room</div></div>
         </div>
-        <div class="price" id="dormPrice">–</div>
+        <div class="price" id="dormPrice">$175<span style="font-size:11px;color:#888;">/bed</span></div>
+        <div class="avail-pill" id="dormAvail" style="display:none"></div>
       </label>
-      <label class="stay-option" data-stay="shared" data-cost3="400" data-cost7="925">
+      <label class="stay-option" data-stay="shared">
         <input type="radio" name="stay" value="shared">
         <div class="stay-option-label">
           <div class="stay-thumb" style="background-image:url('images/Room/Mushroom Room Large.jpeg')" role="img" aria-label="The Mushroom Room — private bedroom with shared bathroom"></div>
-          <div><div class="name">Private Farmhouse Room (shared bath)</div><div class="sub" id="sharedSub">$400 / $925 · Mushroom or Beekeepers Room</div></div>
+          <div><div class="name">Mushroom Room</div><div class="sub" id="sharedSub">Private bedroom · shared bathroom</div></div>
         </div>
-        <div class="price" id="sharedPrice">–</div>
+        <div class="price" id="sharedPrice">$275</div>
+        <div class="avail-pill" id="sharedAvail" style="display:none"></div>
       </label>
-      <label class="stay-option" data-stay="ensuite" data-cost3="500" data-cost7="1150">
+      <label class="stay-option" data-stay="ensuite">
         <input type="radio" name="stay" value="ensuite">
         <div class="stay-option-label">
           <div class="stay-thumb" style="background-image:url('images/Room/Pond Room.png')" role="img" aria-label="The Pond View Room — private ensuite"></div>
-          <div><div class="name">Pond View Room (Ensuite)</div><div class="sub" id="ensuiteSub">$500 / $1,150 · Private ensuite bathroom, pond views</div></div>
+          <div><div class="name">Pond View Room (Ensuite)</div><div class="sub" id="ensuiteSub">Private ensuite bathroom · pond views</div></div>
         </div>
-        <div class="price" id="ensuitePrice">–</div>
+        <div class="price" id="ensuitePrice">$375</div>
+        <div class="avail-pill" id="ensuiteAvail" style="display:none"></div>
       </label>
+
+      <!-- Dorm bed-count selector (only shown when stay=dorm AND adults>1) -->
+      <div id="dormBedSelector" style="display:none; margin-top:14px; padding:14px 16px; background:#f0f7ee; border:1px solid #cfe6d0; border-radius:8px;">
+        <div style="font-size:14px; font-weight:500; margin-bottom:8px;">How many dorm beds do you need?</div>
+        <div style="font-size:12px; color:#666; margin-bottom:10px;">The dorm has 3 separate beds (King, Queen, Double). Choose 1 if you'll all share, or one bed per person if not.</div>
+        <div id="dormBedOptions" style="display:flex; gap:8px; flex-wrap:wrap;"><!-- radios injected by JS --></div>
+      </div>
     </div>
 
     <!-- PARTICIPANTS -->
@@ -483,8 +479,9 @@
   const HST_RATE = 0.13;
 
   const state = {
-    course: null,        // '3day' | '7day'
+    course: null,        // course key from COURSES (e.g. '3day-aug', '3day-sep', '7day')
     stay: null,          // 'commuter' | 'byo' | 'bell' | 'bunkie' | 'dorm' | 'shared' | 'ensuite'
+    stayBeds: 1,         // # of dorm beds claimed (only meaningful when stay = 'dorm')
     adults: 1,
     isCouple: false,
     promoCode: null,     // e.g. 'BALANCE10'
@@ -492,18 +489,85 @@
     promoLabel: null,    // human-readable label, e.g. 'Instagram 10% off'
   };
 
+  // Course catalog — data-driven so adding a new course = one entry here.
+  // Required: name, dates (display), tuition, nights, checkin (YYYY-MM-DD), checkout (YYYY-MM-DD), image
+  // Optional: tagline, description, soldOut, waitlistMsg
   const COURSES = {
-    '3day': { name: '3-Day Intensive', dates: 'Sep 4–7, 2026', tuition: 725, nights: 3 },
-    '7day': { name: '7-Day Immersive', dates: 'Aug 24–30, 2026', tuition: 1625, nights: 7 },
+    '3day-aug': {
+      name: '3-Day Intensive',
+      dates: 'Aug 14–16, 2026',
+      tagline: 'Mid-summer weekend',
+      tuition: 725,
+      nights: 3,
+      checkin: '2026-08-14',
+      checkout: '2026-08-16',
+      image: 'images/Permaculture/IMG_1949 Large.jpeg',
+      imageAlt: 'Outdoor course session under canopies on the lawn',
+      description: '3 full days of instruction · 2 nights accommodation · All meals included · Certificate of completion',
+    },
+    '3day-sep': {
+      name: '3-Day Intensive',
+      dates: 'Sep 4–7, 2026',
+      tagline: 'Labour Day long weekend',
+      tuition: 725,
+      nights: 3,
+      checkin: '2026-09-04',
+      checkout: '2026-09-07',
+      image: 'images/Permaculture/IMG_1949 Large.jpeg',
+      imageAlt: 'Outdoor course session under canopies on the lawn',
+      description: '3 full days of instruction · 3 nights accommodation · All meals included · Certificate of completion',
+    },
+    '7day': {
+      name: '7-Day Immersive',
+      dates: 'Aug 24–30, 2026',
+      tagline: 'Full immersion',
+      tuition: 1625,
+      nights: 7,
+      checkin: '2026-08-24',
+      checkout: '2026-08-30',
+      image: 'images/Permaculture/IMG_2006 Large.jpeg',
+      imageAlt: 'Indoor classroom session in the farmhouse with projector',
+      description: 'Full 20-chapter curriculum · 7 nights · All meals included · Capstone build day · Certificate',
+      soldOut: true,
+      waitlistMsg: 'This course is sold out. <a href="permaculture-course.html?course=7day&amp;waitlist=1">Join the waitlist</a> and we\'ll let you know if a spot opens up or when next year\'s dates are announced.',
+    },
   };
+
+  function renderCourseOptions() {
+    const wrap = document.getElementById('courseOptions');
+    if (!wrap) return;
+    wrap.innerHTML = Object.keys(COURSES).map(key => {
+      const c = COURSES[key];
+      const escAttr = (s) => String(s).replace(/"/g, '&quot;');
+      const priceFmt = '$' + Number(c.tuition).toLocaleString();
+      const datesLabel = c.dates + (c.tagline ? ' · ' + c.tagline : '');
+      const soldOutPill = c.soldOut ? '<span class="sold-out-pill">Sold Out</span>' : '';
+      const soldOutClass = c.soldOut ? ' is-sold-out' : '';
+      const radioAttrs = c.soldOut ? 'disabled' : '';
+      const waitlist = c.soldOut && c.waitlistMsg ? '<div class="sold-out-msg">' + c.waitlistMsg + '</div>' : '';
+      return '<label class="course-option' + soldOutClass + '" data-course="' + escAttr(key) + '" data-tuition="' + c.tuition + '">' +
+        '<input type="radio" name="course" value="' + escAttr(key) + '" ' + radioAttrs + '>' +
+        soldOutPill +
+        '<div class="opt-thumb" style="background-image:url(\'' + escAttr(c.image) + '\')" role="img" aria-label="' + escAttr(c.imageAlt || '') + '"></div>' +
+        '<span class="opt-price">' + priceFmt + '</span>' +
+        '<div class="opt-title">' + c.name + '</div>' +
+        '<div class="opt-dates">' + datesLabel + '</div>' +
+        '<div class="opt-desc">' + c.description + '</div>' +
+        waitlist +
+      '</label>';
+    }).join('');
+  }
+  // Flat per-course pricing (one number per stay, regardless of course duration).
+  // capacity = how many bookings can claim this stay before it's sold out.
+  // perBed = true means cost is multiplied by the number of beds the guest takes.
   const STAYS = {
-    commuter: { name: 'No accommodation', cost3: 0, cost7: 0 },
-    byo: { name: 'Bring your own tent', cost3: 0, cost7: 0 },
-    bell: { name: 'Bell Tent Glamping', cost3: 225, cost7: 525 },
-    bunkie: { name: 'Bunkie Cabin', cost3: 275, cost7: 635 },
-    dorm: { name: 'King Room Dorm Bed', cost3: 250, cost7: 575 },
-    shared: { name: 'Private Farmhouse Room (shared bath)', cost3: 400, cost7: 925 },
-    ensuite: { name: 'Pond View Room (Ensuite)', cost3: 500, cost7: 1150 },
+    commuter: { name: 'No accommodation (commuter)',                cost: 0,    capacity: 999 },
+    byo:      { name: 'Bring your own tent',                         cost: 0,    capacity: 999 },
+    bell:     { name: 'Bell Tent Glamping',                          cost: 225,  capacity: 1 },
+    bunkie:   { name: 'Bunkie Cabin',                                cost: 500,  capacity: 1 },
+    dorm:     { name: 'King Room Dorm',                              cost: 175,  capacity: 3, perBed: true },
+    shared:   { name: 'Mushroom Room',                               cost: 275,  capacity: 1 },
+    ensuite:  { name: 'Pond View Room (Ensuite)',                    cost: 375,  capacity: 1 },
   };
 
   // Read URL query ?course=3day or 7day for auto-select
@@ -511,30 +575,48 @@
   const preSelect = urlParams.get('course');
 
   function init() {
-    // Bind course radios
-    document.querySelectorAll('.course-option').forEach(el => {
-      el.addEventListener('click', (e) => {
-        if (el.classList.contains('is-sold-out')) {
-          e.preventDefault();
-          el.classList.add('show-msg');
-          return;
-        }
-        document.querySelectorAll('.course-option').forEach(x => { x.classList.remove('selected'); x.classList.remove('show-msg'); });
-        el.classList.add('selected');
-        el.querySelector('input').checked = true;
-        state.course = el.dataset.course;
-        updateStayPrices();
-        recalc();
-      });
+    // Render course options BEFORE binding click handlers (since they're built from COURSES dict)
+    renderCourseOptions();
+
+    // Bind course radios via event delegation so newly-rendered options work
+    document.getElementById('courseOptions').addEventListener('click', (e) => {
+      const el = e.target.closest('.course-option');
+      if (!el) return;
+      if (el.classList.contains('is-sold-out')) {
+        e.preventDefault();
+        el.classList.add('show-msg');
+        return;
+      }
+      document.querySelectorAll('.course-option').forEach(x => { x.classList.remove('selected'); x.classList.remove('show-msg'); });
+      el.classList.add('selected');
+      const radio = el.querySelector('input');
+      if (radio) radio.checked = true;
+      state.course = el.dataset.course;
+      // Pull live inventory for this course occurrence (server fetches confirmed bookings,
+      // so the UI can mark sold-out rooms / show remaining dorm beds).
+      fetchCourseAvailability(state.course);
+      updateStayPrices();
+      recalc();
     });
     // Bind stay radios
     document.querySelectorAll('.stay-option').forEach(el => {
       el.addEventListener('click', () => {
-        if (el.classList.contains('disabled')) return;
+        if (el.classList.contains('disabled') || el.classList.contains('is-sold-out')) return;
         document.querySelectorAll('.stay-option').forEach(x => x.classList.remove('selected'));
         el.classList.add('selected');
-        el.querySelector('input').checked = true;
+        const radio = el.querySelector('input');
+        if (radio && !radio.disabled) radio.checked = true;
         state.stay = el.dataset.stay;
+        // Default dorm to all available beds for this party size
+        if (state.stay === 'dorm') {
+          const avail = (state.course && availabilityCache[state.course]) || {};
+          const dormInfo = avail.dorm || { booked: 0, capacity: STAYS.dorm.capacity };
+          const remaining = Math.max(0, (dormInfo.capacity || STAYS.dorm.capacity) - (dormInfo.booked || 0));
+          state.stayBeds = Math.min(state.adults || 1, remaining);
+        } else {
+          state.stayBeds = 1;
+        }
+        renderDormBedSelector();
         recalc();
       });
     });
@@ -547,9 +629,15 @@
       }
       recalc();
     });
-    // Pre-select from URL
-    if (preSelect && COURSES[preSelect]) {
-      const el = document.querySelector(`.course-option[data-course="${preSelect}"]`);
+    // Pre-select from URL — supports both new keys ('3day-aug') and legacy ('3day' → first matching prefix)
+    let preselectKey = preSelect;
+    if (preselectKey && !COURSES[preselectKey]) {
+      // Legacy '3day' or '7day' shortcut — find the first non-sold-out matching course
+      const candidates = Object.keys(COURSES).filter(k => k.startsWith(preselectKey) && !COURSES[k].soldOut);
+      preselectKey = candidates[0] || null;
+    }
+    if (preselectKey && COURSES[preselectKey]) {
+      const el = document.querySelector('.course-option[data-course="' + preselectKey + '"]');
       if (el) el.click();
     }
     // Pre-fill promo code from URL ?promo=BALANCE10
@@ -630,37 +718,128 @@
     document.getElementById(field + 'Count').textContent = state[field];
     document.getElementById(field + 'Minus').disabled = state[field] <= min;
     document.getElementById(field + 'Plus').disabled = state[field] >= 8;
+    // If dorm is selected, refresh the bed selector — adults change affects the max bed count
+    if (field === 'adults' && state.stay === 'dorm') {
+      const avail = (state.course && availabilityCache[state.course]) || {};
+      const dormInfo = avail.dorm || { booked: 0, capacity: STAYS.dorm.capacity };
+      const remaining = Math.max(0, (dormInfo.capacity || STAYS.dorm.capacity) - (dormInfo.booked || 0));
+      const maxAllowed = Math.min(state.adults || 1, remaining);
+      if (state.stayBeds > maxAllowed) state.stayBeds = maxAllowed;
+      renderDormBedSelector();
+    }
     recalc();
   }
 
   function updateStayPrices() {
     // If no course selected, show range
-    if (!state.course) {
-      document.getElementById('bellPrice').textContent = '–';
-      document.getElementById('bunkiePrice').textContent = '–';
-      document.getElementById('dormPrice').textContent = '–';
-      document.getElementById('sharedPrice').textContent = '–';
-      document.getElementById('ensuitePrice').textContent = '–';
-      document.getElementById('bellSub').textContent = '$225 for 3 nights · $525 for 7 nights';
-      document.getElementById('bunkieSub').textContent = '$275 / $635 · Private rustic cabin';
-      document.getElementById('dormSub').textContent = '$250 / $575 · 3 beds (King/Queen/Double), shared room';
-      document.getElementById('sharedSub').textContent = '$400 / $925 · Mushroom or Beekeepers Room';
-      document.getElementById('ensuiteSub').textContent = '$500 / $1,150 · Private ensuite bathroom, pond views';
+    // Prices are flat per-course (set in HTML), so this function now only updates the
+    // sub-text descriptions and applies live availability when known.
+    applyAvailabilityToUI();
+  }
+
+  // ===== AVAILABILITY (server-side inventory tracking) =====
+  // Cache the latest availability fetch keyed by course key. null = not yet fetched.
+  const availabilityCache = {};
+
+  function fetchCourseAvailability(courseKey) {
+    if (!courseKey) return;
+    fetch(APPS_SCRIPT_URL + '?action=course_availability&course=' + encodeURIComponent(courseKey), { method: 'GET', cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => {
+        availabilityCache[courseKey] = d && d.stays ? d.stays : {};
+        // If this is still the active course, re-render the UI
+        if (state.course === courseKey) applyAvailabilityToUI();
+      })
+      .catch(err => { console.warn('Course availability fetch failed:', err); });
+  }
+
+  function applyAvailabilityToUI() {
+    const stays = ['bell', 'bunkie', 'dorm', 'shared', 'ensuite'];
+    const avail = (state.course && availabilityCache[state.course]) || {};
+    stays.forEach(key => {
+      const optionEl = document.querySelector('.stay-option[data-stay="' + key + '"]');
+      const pillEl = document.getElementById(key + 'Avail');
+      if (!optionEl || !pillEl) return;
+      const info = avail[key] || { booked: 0, capacity: STAYS[key].capacity };
+      const remaining = Math.max(0, (info.capacity || STAYS[key].capacity) - (info.booked || 0));
+      const isDorm = key === 'dorm';
+      // Reset class
+      optionEl.classList.remove('is-sold-out');
+      const radio = optionEl.querySelector('input[type="radio"]');
+      if (radio) radio.disabled = false;
+
+      if (remaining <= 0) {
+        // Sold out
+        optionEl.classList.add('is-sold-out');
+        if (radio) radio.disabled = true;
+        pillEl.style.display = 'inline-block';
+        pillEl.textContent = 'Sold out';
+        pillEl.style.background = '#f5e6e6';
+        pillEl.style.color = '#a04040';
+        // If this was the selected stay, deselect it
+        if (state.stay === key) { state.stay = null; optionEl.classList.remove('selected'); }
+      } else if (isDorm && remaining < STAYS.dorm.capacity) {
+        // Partially booked dorm
+        pillEl.style.display = 'inline-block';
+        pillEl.textContent = remaining + ' of ' + STAYS.dorm.capacity + ' beds left';
+        pillEl.style.background = '#fff3cd';
+        pillEl.style.color = '#856404';
+      } else if (isDorm) {
+        // All dorm beds available
+        pillEl.style.display = 'inline-block';
+        pillEl.textContent = '3 beds available';
+        pillEl.style.background = '#e6f4ea';
+        pillEl.style.color = '#2e6e31';
+      } else {
+        // Non-dorm available — hide the pill (price tells the story)
+        pillEl.style.display = 'none';
+      }
+    });
+    renderDormBedSelector();
+  }
+
+  function renderDormBedSelector() {
+    const wrap = document.getElementById('dormBedSelector');
+    const opts = document.getElementById('dormBedOptions');
+    if (!wrap || !opts) return;
+    if (state.stay !== 'dorm') {
+      wrap.style.display = 'none';
       return;
     }
-    const nights = COURSES[state.course].nights;
-    const suffix = nights + ' night' + (nights > 1 ? 's' : '');
-    document.getElementById('bellPrice').textContent = '$' + STAYS.bell['cost' + nights].toLocaleString() + '/person';
-    document.getElementById('bunkiePrice').textContent = '$' + STAYS.bunkie['cost' + nights].toLocaleString() + '/person';
-    document.getElementById('dormPrice').textContent = '$' + STAYS.dorm['cost' + nights].toLocaleString() + '/person';
-    document.getElementById('sharedPrice').textContent = '$' + STAYS.shared['cost' + nights].toLocaleString() + '/person';
-    document.getElementById('ensuitePrice').textContent = '$' + STAYS.ensuite['cost' + nights].toLocaleString() + '/person';
-    document.getElementById('bellSub').textContent = suffix + ' · luxury canvas tent';
-    document.getElementById('bunkieSub').textContent = suffix + ' · rustic private cabin';
-    document.getElementById('dormSub').textContent = suffix + ' · 3 beds, shared room (King/Queen/Double)';
-    document.getElementById('sharedSub').textContent = suffix + ' · private bedroom, shared bathroom';
-    document.getElementById('ensuiteSub').textContent = suffix + ' · private ensuite bathroom, pond views';
+    const avail = (state.course && availabilityCache[state.course]) || {};
+    const dormInfo = avail.dorm || { booked: 0, capacity: STAYS.dorm.capacity };
+    const remaining = Math.max(0, (dormInfo.capacity || STAYS.dorm.capacity) - (dormInfo.booked || 0));
+    const maxAllowed = Math.min(state.adults || 1, remaining);
+    if (maxAllowed < 1) {
+      wrap.style.display = 'none';
+      return;
+    }
+    // Always show the selector when dorm is picked, even for adults=1, so the user sees the bed count clearly
+    wrap.style.display = 'block';
+    // Default state.stayBeds to maxAllowed if it's invalid
+    if (!state.stayBeds || state.stayBeds > maxAllowed) state.stayBeds = maxAllowed;
+    if (state.stayBeds < 1) state.stayBeds = 1;
+    let html = '';
+    for (let n = 1; n <= maxAllowed; n++) {
+      const checked = (n === state.stayBeds) ? ' checked' : '';
+      const subtotal = n * STAYS.dorm.cost;
+      html += '<label style="flex:1; min-width:120px; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; cursor:pointer; text-align:center;" class="dorm-bed-option' + (n === state.stayBeds ? ' selected' : '') + '">' +
+        '<input type="radio" name="dormBeds" value="' + n + '"' + checked + ' style="margin-right:6px;">' +
+        '<span style="font-weight:500;">' + n + ' bed' + (n > 1 ? 's' : '') + '</span>' +
+        '<div style="font-size:12px; color:#666; margin-top:2px;">$' + subtotal + '</div>' +
+        '</label>';
+    }
+    opts.innerHTML = html;
   }
+
+  // Bind dorm bed-count selector via delegation
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.name === 'dormBeds') {
+      state.stayBeds = parseInt(e.target.value, 10) || 1;
+      renderDormBedSelector();
+      recalc();
+    }
+  });
 
   function recalc() {
     const s = state;
@@ -695,10 +874,11 @@
     }
     const tuitionAfterAll = tuitionAfterCouples - promoDiscount;
 
-    const nights = course ? course.nights : 3;
-    const stayCostPerPerson = stay ? (stay['cost' + nights] || 0) : 0;
-    // If booking as a pair sharing accommodation, only charge for one unit (one room/tent)
-    const stayCost = (s.isCouple && s.adults === 2) ? stayCostPerPerson : stayCostPerPerson * s.adults;
+    // Flat per-course pricing — one charge per accommodation unit, regardless of duration.
+    // Dorm is per-bed: charge cost × bedsRequested. Other rooms charge cost once (couples
+    // sharing don't double-pay; adults > 1 in a private room still book that ONE room).
+    const beds = (stay && stay.perBed) ? Math.max(1, state.stayBeds || 1) : 1;
+    const stayCost = stay ? (stay.cost * beds) : 0;
 
     const subtotal = tuitionAfterAll + stayCost;
     const hst = Math.round(subtotal * HST_RATE * 100) / 100;
@@ -792,10 +972,11 @@
       course: state.course,
       courseName: course.name,
       courseDates: course.dates,
-      checkin: state.course === '3day' ? '2026-09-04' : '2026-08-24',
-      checkout: state.course === '3day' ? '2026-09-07' : '2026-08-30',
+      checkin: course.checkin,
+      checkout: course.checkout,
       stay: state.stay,
       stayName: stay.name,
+      stayBeds: (stay && stay.perBed) ? Math.max(1, state.stayBeds || 1) : 1,
       nights: course.nights,
       adults: state.adults,
       children: 0,
