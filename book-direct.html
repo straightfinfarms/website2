@@ -665,6 +665,33 @@
   .inquiry-form .form-note {
     font-size: 13px; color: #888; text-align: center; line-height: 1.5;
   }
+  /* Optional upsells (chef / permaculture experience) */
+  .upsell-section {
+    background: #f9faf6; border: 1px solid #d6e3c9; border-radius: 10px;
+    padding: 16px 18px; margin: 4px 0 6px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .upsell-header {
+    font-weight: 600; font-size: 14px; color: #2b4a1f;
+    padding-bottom: 8px; border-bottom: 1px solid #e0e8d6; margin-bottom: 4px;
+  }
+  .upsell-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    cursor: pointer; padding: 6px 0;
+  }
+  .upsell-row input[type="checkbox"] {
+    margin-top: 4px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;
+  }
+  .upsell-row .upsell-info { flex-grow: 1; line-height: 1.4; }
+  .upsell-row .upsell-info strong { font-size: 14px; color: #1a1a1a; }
+  .upsell-row .upsell-sub { font-size: 12px; color: #666; }
+  .upsell-details {
+    width: 100%; min-height: 60px; padding: 10px 12px;
+    border: 1px solid #d6e3c9; border-radius: 8px; font-family: inherit;
+    font-size: 13px; resize: vertical; background: #fff; color: #1a1a1a;
+    margin-top: -4px; margin-bottom: 4px;
+  }
+  .upsell-details:focus { outline: none; border-color: #3d8c40; }
 
   /* SUCCESS STATE */
   .inquiry-success { display: none; text-align: center; padding: 40px 20px; }
@@ -1322,6 +1349,30 @@
           <label>Message (optional)</label>
           <textarea placeholder="Tell us a bit about your trip &mdash; who's coming, anything you'd like us to know..."></textarea>
         </div>
+
+        <!-- Optional upsells — inquiry-only, host coordinates by reply with availability + price. -->
+        <div class="upsell-section">
+          <div class="upsell-header">Want to add an experience? <span style="font-weight:400;color:#666;font-size:12px;">Optional &middot; subject to availability &middot; we'll confirm details + pricing in our reply.</span></div>
+
+          <label class="upsell-row">
+            <input type="checkbox" id="upsellChef">
+            <span class="upsell-info">
+              <strong>Add a private chef</strong><br>
+              <span class="upsell-sub">Farm-to-table meals prepared on-site for some or all of your stay.</span>
+            </span>
+          </label>
+          <textarea id="upsellChefDetails" class="upsell-details" placeholder="How many meals, dietary preferences, allergies, what occasion? (e.g. dinner Friday + Saturday for 8 guests, vegetarian + 1 nut allergy)" style="display:none"></textarea>
+
+          <label class="upsell-row">
+            <input type="checkbox" id="upsellCourse">
+            <span class="upsell-info">
+              <strong>Add a permaculture experience</strong><br>
+              <span class="upsell-sub">A hands-on workshop during your stay &mdash; soil, food forest, beekeeping, design, etc.</span>
+            </span>
+          </label>
+          <textarea id="upsellCourseDetails" class="upsell-details" placeholder="What are you hoping to learn or experience? Group size, duration, any specific topics?" style="display:none"></textarea>
+        </div>
+
         <!-- Direct-booking payment method picker (hidden by default — shown when ?action=get_settings says directBookingStay is true) -->
         <div id="paymentMethodGroup" style="display:none; margin-top:18px;">
           <label style="font-weight:500;">Payment method</label>
@@ -1877,6 +1928,21 @@
     }
   })();
 
+  // Toggle the optional upsell textareas (chef / permaculture experience) — only shown
+  // when the corresponding checkbox is ticked. Inquiry-only flow; host coordinates by reply.
+  function bindUpsellToggle(checkboxId, detailsId) {
+    const cb = document.getElementById(checkboxId);
+    const ta = document.getElementById(detailsId);
+    if (!cb || !ta) return;
+    cb.addEventListener('change', () => {
+      ta.style.display = cb.checked ? 'block' : 'none';
+      if (cb.checked) ta.focus();
+      else ta.value = '';
+    });
+  }
+  bindUpsellToggle('upsellChef', 'upsellChefDetails');
+  bindUpsellToggle('upsellCourse', 'upsellCourseDetails');
+
   function submitInquiry(e) {
     e.preventDefault();
     // Defensive: dates should already be set via openInquiry, but block submission if somehow missing
@@ -1912,6 +1978,11 @@
       message: form.querySelector('textarea').value,
       // Snapshot of the quote the guest saw at request time (all CAD, pre-confirmation)
       quote: lastQuote,
+      // Optional upsells — inquiry-only; host follows up with availability + pricing
+      upsellChef: document.getElementById('upsellChef')?.checked || false,
+      upsellChefDetails: document.getElementById('upsellChefDetails')?.value || '',
+      upsellCourse: document.getElementById('upsellCourse')?.checked || false,
+      upsellCourseDetails: document.getElementById('upsellCourseDetails')?.value || '',
       // Direct-booking flags (server validates against its own settings before honoring)
       directBooking: directBookingMode,
       paymentMethod: directBookingMode ? paymentMethod : undefined,
