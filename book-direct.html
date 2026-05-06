@@ -1797,6 +1797,7 @@
     const weeklyDiscount = weeklyDiscountApplies ? Math.round(nightlySubtotal * (wd.percentOff / 100) * 100) / 100 : 0;
     const subtotal = nightlySubtotal - weeklyDiscount;
 
+    const cleaningFee = (adults + children) >= BASE_GUESTS ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
     const extraGuests = Math.max(0, adults - ADULT_FEE_THRESHOLD);
     const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
     const petCost = pets * PET_FEE;
