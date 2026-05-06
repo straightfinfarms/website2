@@ -689,9 +689,16 @@
     // Couples checkbox
     document.getElementById('couplesCheck').addEventListener('change', e => {
       state.isCouple = e.target.checked;
-      if (state.isCouple && state.adults < 2) {
+      if (state.isCouple) {
+        // Couple/friend sharing is exactly 2 adults — force the count and lock the +/- buttons
         state.adults = 2;
         document.getElementById('adultsCount').textContent = state.adults;
+        document.getElementById('adultsMinus').disabled = true;
+        document.getElementById('adultsPlus').disabled = true;
+      } else {
+        // Re-enable the +/- buttons within the normal 1..8 bounds
+        document.getElementById('adultsMinus').disabled = state.adults <= 1;
+        document.getElementById('adultsPlus').disabled = state.adults >= 8;
       }
       // Couple sharing drops required accommodation count to 1 — trim if needed
       adjustStaysForRequiredSum();
@@ -778,16 +785,22 @@
 
   function changeCount(field, delta) {
     const min = field === 'adults' ? 1 : 0;
-    state[field] = Math.max(min, Math.min(8, state[field] + delta));
-    if (state.isCouple && state.adults > 2) {
-      // Couple discount only applies to 2 adults
-      state.isCouple = false;
-      document.getElementById('couplesCheck').checked = false;
+    // When the couple-sharing checkbox is on, the adult count is locked to exactly 2 —
+    // ignore any +/- attempt that would move us off 2. The user has to uncheck couple
+    // sharing first to add a 3rd person.
+    if (field === 'adults' && state.isCouple) {
+      // Snap back to 2 if somehow off, but otherwise the +/- buttons are disabled below.
+      state.adults = 2;
+      document.getElementById(field + 'Count').textContent = state[field];
+      document.getElementById(field + 'Minus').disabled = true;
+      document.getElementById(field + 'Plus').disabled = true;
+      return;
     }
+    state[field] = Math.max(min, Math.min(8, state[field] + delta));
     document.getElementById(field + 'Count').textContent = state[field];
     document.getElementById(field + 'Minus').disabled = state[field] <= min;
-    document.getElementById(field + 'Plus').disabled = state[field] >= 8;
-    // Trim accommodation selections if adults went down or couple-sharing toggled
+    document.getElementById(field + 'Plus').disabled = state[field] >= 8 || (field === 'adults' && state.isCouple);
+    // Trim accommodation selections if adults went down
     if (field === 'adults') {
       adjustStaysForRequiredSum();
       renderStayCounters();
