@@ -1261,8 +1261,11 @@
   <div class="lightbox-counter" id="lightboxCounter">1 / 26</div>
 </div>
 
-<!-- CALENDAR SYNC SECTION -->
-<section style="max-width:1200px; margin:0 auto; padding:0 48px 80px;">
+<!-- CALENDAR SYNC SECTION — hidden from public view (host-only reference). The two-way
+     sync (auto-pushing direct bookings to Airbnb) is queued as a separate task. The
+     iCal feed at <SCRIPT_URL>?action=bookings_ics is still live and importable; just
+     not advertised on the public page. To bring this back, remove the style="display:none". -->
+<section style="display:none;" data-internal-only="true">
   <div style="background:#f9f9f6; border:1px solid #e0ddd6; border-radius:12px; padding:32px; display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
     <div style="flex:1; min-width:280px;">
       <h3 style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin-bottom:8px;">Calendar Sync</h3>
