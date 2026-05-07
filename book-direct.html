@@ -1810,6 +1810,17 @@
 
     // Determine if rates vary across the stay (override hit or matrix returned non-uniform values)
     const allSameRate = days.every(d => d.rate === days[0].rate);
+
+    // Update the booking-card header price. Shows "$X CAD / night" when uniform,
+    // or "Avg $X CAD / night" when rates vary across the stay.
+    const headerRateEl = document.getElementById('nightlyRate');
+    const headerLabelEl = document.querySelector('.price-row .per-night');
+    if (headerRateEl && days.length) {
+      const avgRate = Math.round(nightlySubtotal / nights);
+      const displayRate = allSameRate ? days[0].rate : avgRate;
+      headerRateEl.textContent = '$' + displayRate.toLocaleString();
+      if (headerLabelEl) headerLabelEl.textContent = allSameRate ? 'CAD / night' : 'CAD / night avg';
+    }
     const nightlyRowsContainer = document.getElementById('nightlyRowsContainer');
     if (!allSameRate && nightlyRowsContainer) {
       // Show per-night detail when rates vary
