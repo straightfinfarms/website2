@@ -1017,9 +1017,11 @@
       </div>
       <div id="bookingCardContent">
       <div class="price-row">
-        <span class="price" id="nightlyRate">$650</span>
-        <span class="per-night">CAD / night</span>
+        <span class="price" id="nightlyRate">From $650</span>
+        <span class="per-night" id="nightlyRateLabel">CAD / night</span>
       </div>
+      <!-- Hint that prices vary; populated when guest picks dates -->
+      <div id="nightlyRateHint" style="font-size:12px;color:#888;margin:-2px 0 8px;line-height:1.4">Rates vary by date &middot; weekends &amp; holidays priced higher</div>
       <div class="rating-row">
         <span class="star">&#9733; 5.0</span> &middot; <a href="https://airbnb.ca/h/straightfinfarms" target="_blank" style="color:#555; text-decoration:underline;">Airbnb Reviews</a>
       </div>
@@ -1745,6 +1747,9 @@
             if (tEl) tEl.textContent = wd.thresholdNights;
             if (pEl) pEl.textContent = wd.percentOff;
             if (banner) banner.style.display = (wd.percentOff > 0) ? 'block' : 'none';
+            // Update the price-row header — when no dates picked, show "From $X" using the
+            // lowest matrix cell (so guests see a realistic floor rather than a stale $650).
+            updateHeaderRate();
             // Re-render the price breakdown if dates already chosen
             if (checkinDate && checkoutDate) updatePricing();
           }
@@ -1752,6 +1757,41 @@
         .catch(err => console.warn('Pricing config fetch failed (using fallback):', err));
     } catch (err) {
       console.warn('Pricing fetch error:', err);
+    }
+  }
+
+  // Header price display ("$X / night"). Defaults to "From <lowest rate>" when no dates
+  // are picked, switches to the average rate for the selected stay when dates are chosen.
+  function updateHeaderRate(stayDays) {
+    const priceEl = document.getElementById('nightlyRate');
+    const labelEl = document.getElementById('nightlyRateLabel');
+    const hintEl = document.getElementById('nightlyRateHint');
+    if (!priceEl) return;
+    if (stayDays && stayDays.length > 0) {
+      // Average across the selected stay
+      const sum = stayDays.reduce((a, d) => a + d.rate, 0);
+      const avg = Math.round(sum / stayDays.length);
+      const allSame = stayDays.every(d => d.rate === stayDays[0].rate);
+      priceEl.textContent = '$' + avg.toLocaleString();
+      if (labelEl) labelEl.textContent = allSame ? 'CAD / night' : 'CAD / night avg';
+      if (hintEl) hintEl.style.display = allSame ? 'none' : 'block';
+      if (hintEl && !allSame) hintEl.textContent = stayDays.length + '-night avg · individual rates shown in breakdown';
+    } else if (pricingConfig) {
+      // Lowest rate across the whole matrix (excluding zero/empty cells) — fallback floor
+      let lowest = NIGHTLY_RATE;
+      try {
+        const all = [];
+        Object.keys(pricingConfig.baseRates || {}).forEach(m => {
+          (pricingConfig.baseRates[m] || []).forEach(r => { if (r > 0) all.push(r); });
+        });
+        if (all.length > 0) lowest = Math.min.apply(null, all);
+      } catch (err) {}
+      priceEl.textContent = 'From $' + lowest.toLocaleString();
+      if (labelEl) labelEl.textContent = 'CAD / night';
+      if (hintEl) {
+        hintEl.style.display = 'block';
+        hintEl.textContent = 'Rates vary by date · weekends & holidays priced higher';
+      }
     }
   }
 
@@ -1773,6 +1813,8 @@
   function updatePricing() {
     if (!checkinDate || !checkoutDate) {
       document.getElementById('priceBreakdown').style.display = 'none';
+      // Reset header to "From $X" when dates are cleared
+      updateHeaderRate();
       return;
     }
     const nights = Math.max(1, Math.round((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)));
@@ -1811,16 +1853,9 @@
     // Determine if rates vary across the stay (override hit or matrix returned non-uniform values)
     const allSameRate = days.every(d => d.rate === days[0].rate);
 
-    // Update the booking-card header price. Shows "$X CAD / night" when uniform,
-    // or "Avg $X CAD / night" when rates vary across the stay.
-    const headerRateEl = document.getElementById('nightlyRate');
-    const headerLabelEl = document.querySelector('.price-row .per-night');
-    if (headerRateEl && days.length) {
-      const avgRate = Math.round(nightlySubtotal / nights);
-      const displayRate = allSameRate ? days[0].rate : avgRate;
-      headerRateEl.textContent = '$' + displayRate.toLocaleString();
-      if (headerLabelEl) headerLabelEl.textContent = allSameRate ? 'CAD / night' : 'CAD / night avg';
-    }
+    // Update the booking-card header price (avg for the stay) + the descriptive hint line.
+    updateHeaderRate(days);
+
     const nightlyRowsContainer = document.getElementById('nightlyRowsContainer');
     if (!allSameRate && nightlyRowsContainer) {
       // Show per-night detail when rates vary
