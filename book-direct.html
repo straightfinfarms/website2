@@ -1389,19 +1389,13 @@
           <textarea id="upsellCourseDetails" class="upsell-details" placeholder="What are you hoping to learn or experience? Group size, duration, any specific topics?" style="display:none"></textarea>
         </div>
 
-        <!-- Direct-booking payment method picker (hidden by default — shown when ?action=get_settings says directBookingStay is true) -->
+        <!-- Direct-booking payment notice (hidden by default — shown when ?action=get_settings says directBookingStay is true).
+             Always credit card via Stripe; e-transfer option removed per Deniz, but backend still supports it via paymentMethod param if ever re-enabled. -->
         <div id="paymentMethodGroup" style="display:none; margin-top:18px;">
-          <label style="font-weight:500;">Payment method</label>
-          <p style="font-size:12px; color:#888; margin:4px 0 10px;">Pay now to secure your dates instantly. The booking is confirmed once Deniz verifies the payment.</p>
-          <div style="display:flex; gap:10px; flex-direction:column;">
-            <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ddd; border-radius:8px; cursor:pointer; background:#fff;">
-              <input type="radio" name="paymentMethod" value="stripe" checked style="margin-top:3px;">
-              <span style="font-size:14px;"><strong>Credit card via Stripe</strong><br><span style="font-size:12px; color:#888;">Visa, Mastercard, AMEX. Secure, instant — you'll be redirected to Stripe to enter your card.</span></span>
-            </label>
-            <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ddd; border-radius:8px; cursor:pointer; background:#fff;">
-              <input type="radio" name="paymentMethod" value="etransfer" style="margin-top:3px;">
-              <span style="font-size:14px;"><strong>Interac e-Transfer</strong><br><span style="font-size:12px; color:#888;">Reserve now, then send the e-Transfer within 48 hours. Email instructions will follow.</span></span>
-            </label>
+          <label style="font-weight:500;">Payment</label>
+          <p style="font-size:12px; color:#888; margin:4px 0 10px;">Pay now to secure your dates instantly. Once payment is verified, you'll get your confirmation and check-in details.</p>
+          <div style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ddd; border-radius:8px; background:#fff;">
+            <span style="font-size:14px;"><strong>Credit card via Stripe</strong><br><span style="font-size:12px; color:#888;">Visa, Mastercard, AMEX. Secure, instant — you'll be redirected to Stripe to enter your card.</span></span>
           </div>
         </div>
 
