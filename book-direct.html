@@ -1139,7 +1139,7 @@
               <span class="toggle-slider"></span>
             </label>
           </div>
-          <div style="font-size:12px; color:#888; margin-top:6px;">Bell Tent +$50/night each &middot; Bunkie +$100/night</div>
+          <div id="addonsPriceHint" style="font-size:12px; color:#888; margin-top:6px;">Bell Tent +$50/night each &middot; Bunkie +$100/night</div>
         </div>
       </div>
 
@@ -1448,11 +1448,30 @@
   const CLEANING_FEE_SHORT = 340;  // 2-night stay
   const CLEANING_FEE_LONG = 440;   // 3+ night stay
   const BASE_GUESTS = 8;           // cleaning fee tier threshold (adults + children)
+  // Fallback defaults — overridden at runtime by extrasConfig fetched from the admin Pricing tab.
   const ADULT_FEE_THRESHOLD = 10;  // extra-adult surcharge only kicks in above this many adults
   const EXTRA_GUEST_FEE = 50;      // per additional adult per night above ADULT_FEE_THRESHOLD
   const PET_FEE = 50;              // per pet per stay
   const BELL_TENT_FEE = 50;        // per night, optional add-on
   const BUNKIE_FEE = 100;          // per night, optional add-on (Forest Bunkie)
+  // Server-driven extras config — populated by fetchPricingConfig()
+  // Shape mirrors EXTRAS_DEFAULT in the Apps Script backend.
+  let extrasConfig = {
+    adult:  { enabled: true, threshold: ADULT_FEE_THRESHOLD, price: EXTRA_GUEST_FEE, perNight: true,  label: 'Extra adults' },
+    pet:    { enabled: true, threshold: 0,                    price: PET_FEE,        perNight: false, label: 'Pet fee' },
+    bunkie: { enabled: true, threshold: 0,                    price: BUNKIE_FEE,     perNight: true,  label: 'Forest Bunkie' },
+    tent:   { enabled: true, threshold: 0,                    price: BELL_TENT_FEE,  perNight: true,  label: 'Bell Tent' },
+  };
+  function _computeExtra(line, qty, nights) {
+    if (!line || !line.enabled) return { billable: 0, cost: 0 };
+    const q = Math.max(0, parseInt(qty, 10) || 0);
+    const threshold = Math.max(0, parseInt(line.threshold, 10) || 0);
+    const billable = Math.max(0, q - threshold);
+    if (billable === 0) return { billable: 0, cost: 0 };
+    const price = Math.max(0, Number(line.price) || 0);
+    const cost = line.perNight ? (billable * price * Math.max(1, nights || 0)) : (billable * price);
+    return { billable: billable, cost: cost };
+  }
   const AIRBNB_ICAL = 'https://www.airbnb.ca/calendar/ical/1616735096393630004.ics?t=484c63ee55484b46b22f9877233147f1';
   // CORS proxies (try in order — own Apps Script proxy first, then fallbacks)
   const CORS_PROXIES = [
@@ -1733,6 +1752,28 @@
         .then(d => {
           if (d && d.pricing) {
             pricingConfig = d.pricing;
+            // Hydrate the admin-editable extras config (adult surcharge, pets, bunkie, bell tent).
+            // Falls back to the hardcoded defaults defined above if the server returns nothing.
+            if (d.extras && typeof d.extras === 'object') {
+              ['adult', 'pet', 'bunkie', 'tent'].forEach(function (k) {
+                if (d.extras[k] && typeof d.extras[k] === 'object') {
+                  extrasConfig[k] = Object.assign({}, extrasConfig[k], d.extras[k]);
+                }
+              });
+              // Refresh the add-ons price hint with the live numbers
+              const hintEl = document.getElementById('addonsPriceHint');
+              if (hintEl) {
+                const tent = extrasConfig.tent || {};
+                const bun  = extrasConfig.bunkie || {};
+                const tentStr = (tent.enabled !== false)
+                  ? 'Bell Tent +$' + Number(tent.price || 0) + (tent.perNight ? '/night' : '') + ' each'
+                  : '';
+                const bunStr = (bun.enabled !== false)
+                  ? 'Bunkie +$' + Number(bun.price || 0) + (bun.perNight ? '/night' : '')
+                  : '';
+                hintEl.textContent = [tentStr, bunStr].filter(Boolean).join(' · ');
+              }
+            }
             // Update the weekly-discount banner with live numbers
             const wd = pricingConfig.weeklyDiscount || { thresholdNights: 7, percentOff: 15 };
             const banner = document.getElementById('weeklyDiscountBanner');
@@ -1837,11 +1878,16 @@
     const subtotal = nightlySubtotal - weeklyDiscount;
 
     const cleaningFee = (adults + children) >= BASE_GUESTS ? CLEANING_FEE_LONG : CLEANING_FEE_SHORT;
-    const extraGuests = Math.max(0, adults - ADULT_FEE_THRESHOLD);
-    const extraGuestCost = extraGuests * EXTRA_GUEST_FEE * nights;
-    const petCost = pets * PET_FEE;
-    const bellTentCost = bellTents * BELL_TENT_FEE * nights;
-    const bunkieCost = addBunkie ? BUNKIE_FEE * nights : 0;
+    // Admin-editable extras (threshold + price + per-night|per-stay). See extrasConfig above.
+    const adultExtra  = _computeExtra(extrasConfig.adult,  adults,                nights);
+    const petExtra    = _computeExtra(extrasConfig.pet,    pets,                  nights);
+    const bunkieExtra = _computeExtra(extrasConfig.bunkie, addBunkie ? 1 : 0,     nights);
+    const tentExtra   = _computeExtra(extrasConfig.tent,   bellTents,             nights);
+    const extraGuests = adultExtra.billable;
+    const extraGuestCost = adultExtra.cost;
+    const petCost = petExtra.cost;
+    const bellTentCost = tentExtra.cost;
+    const bunkieCost = bunkieExtra.cost;
     const total = subtotal + cleaningFee + extraGuestCost + petCost + bellTentCost + bunkieCost;
 
     // Determine if rates vary across the stay (override hit or matrix returned non-uniform values)
@@ -1881,11 +1927,20 @@
     document.getElementById('cleaningLabel').textContent = 'Cleaning fee';
     document.getElementById('cleaningTotal').textContent = '$' + cleaningFee;
 
+    // Helper: format the per-line description (per-night vs per-stay), e.g.
+    //   "2 extra adults x 3 nights x $50"  /  "1 pet x $50"
+    function _extraDesc(line, qty, billable, nights, noun) {
+      const unit = '$' + Number(line.price || 0).toLocaleString();
+      const n = billable > 1 ? noun + 's' : noun;
+      if (line.perNight) return billable + ' ' + n + ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x ' + unit;
+      return billable + ' ' + n + ' x ' + unit;
+    }
+
     // Extra guests
     const extraRow = document.getElementById('extraGuestRow');
     if (extraGuests > 0) {
       extraRow.style.display = '';
-      document.getElementById('extraGuestLabel').textContent = extraGuests + ' extra adult' + (extraGuests > 1 ? 's' : '') + ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + EXTRA_GUEST_FEE;
+      document.getElementById('extraGuestLabel').textContent = _extraDesc(extrasConfig.adult, adults, extraGuests, nights, 'extra adult');
       document.getElementById('extraGuestTotal').textContent = '$' + extraGuestCost.toLocaleString();
     } else {
       extraRow.style.display = 'none';
@@ -1893,19 +1948,19 @@
 
     // Pets
     const petRow = document.getElementById('petRow');
-    if (pets > 0) {
+    if (pets > 0 && petExtra.cost > 0) {
       petRow.style.display = '';
-      document.getElementById('petLabel').textContent = pets + ' pet' + (pets > 1 ? 's' : '') + ' x $' + PET_FEE;
-      document.getElementById('petTotal').textContent = '$' + petCost;
+      document.getElementById('petLabel').textContent = _extraDesc(extrasConfig.pet, pets, petExtra.billable, nights, 'pet');
+      document.getElementById('petTotal').textContent = '$' + petCost.toLocaleString();
     } else {
       petRow.style.display = 'none';
     }
 
     // Bell Tent add-on
     const bellTentRow = document.getElementById('bellTentRow');
-    if (bellTents > 0) {
+    if (bellTents > 0 && tentExtra.cost > 0) {
       bellTentRow.style.display = '';
-      document.getElementById('bellTentLabel').textContent = bellTents + ' Bell Tent' + (bellTents > 1 ? 's' : '') + ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + BELL_TENT_FEE;
+      document.getElementById('bellTentLabel').textContent = _extraDesc(extrasConfig.tent, bellTents, tentExtra.billable, nights, 'Bell Tent');
       document.getElementById('bellTentTotal').textContent = '$' + bellTentCost.toLocaleString();
     } else {
       bellTentRow.style.display = 'none';
@@ -1913,9 +1968,11 @@
 
     // Bunkie add-on
     const bunkieRow = document.getElementById('bunkieRow');
-    if (addBunkie) {
+    if (addBunkie && bunkieExtra.cost > 0) {
       bunkieRow.style.display = '';
-      document.getElementById('bunkieLabel').textContent = 'Forest Bunkie x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x $' + BUNKIE_FEE;
+      const bunkieUnit = '$' + Number(extrasConfig.bunkie.price || 0).toLocaleString();
+      document.getElementById('bunkieLabel').textContent = (extrasConfig.bunkie.label || 'Forest Bunkie')
+        + (extrasConfig.bunkie.perNight ? ' x ' + nights + ' night' + (nights > 1 ? 's' : '') + ' x ' + bunkieUnit : ' x ' + bunkieUnit);
       document.getElementById('bunkieTotal').textContent = '$' + bunkieCost.toLocaleString();
     } else {
       bunkieRow.style.display = 'none';
