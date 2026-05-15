@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Editor — Straight Fin Farms</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root {
+    --bg: #f7f4ec;
+    --panel: #ffffff;
+    --border: #e2ddd0;
+    --text: #2b2b2b;
+    --muted: #777;
+    --accent: #3d8c40;
+    --accent-dark: #2e6c31;
+    --danger: #c0392b;
+    --warn: #b8860b;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+  button { font: inherit; cursor: pointer; }
+  input, textarea { font: inherit; }
+  a { color: var(--accent); }
+
+  /* ---------- LOGIN OVERLAY ---------- */
+  #loginOverlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
+  #loginOverlay.hidden { display: none; }
+  .login-card { background: var(--panel); padding: 36px 32px; border-radius: 14px; box-shadow: var(--shadow); max-width: 460px; width: 100%; border: 1px solid var(--border); }
+  .login-card h1 { font-size: 22px; margin: 0 0 6px; font-family: 'Playfair Display', Georgia, serif; }
+  .login-card p { color: var(--muted); margin: 0 0 22px; font-size: 13px; line-height: 1.55; }
+  .login-card label { display: block; font-size: 12px; font-weight: 600; color: #555; margin: 14px 0 6px; }
+  .login-card input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fcfbf8; }
+  .login-card input:focus { outline: none; border-color: var(--accent); }
+  .login-card .help { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .login-card button.primary { width: 100%; margin-top: 22px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .login-card button.primary:hover { background: var(--accent-dark); }
+  .login-card .err { color: var(--danger); font-size: 12px; margin-top: 10px; min-height: 16px; }
+  .login-toggle { font-size: 12px; color: var(--muted); margin-top: 16px; text-align: center; }
+  .login-toggle a { cursor: pointer; }
+
+  /* ---------- LAYOUT ---------- */
+  .topbar { background: var(--panel); border-bottom: 1px solid var(--border); padding: 10px 22px; display: flex; align-items: center; gap: 18px; height: 56px; }
+  .brand { font-family: 'Playfair Display', Georgia, serif; font-size: 16px; font-weight: 700; }
+  .tabs { display: flex; gap: 4px; margin-left: 18px; }
+  .tab { padding: 7px 14px; border-radius: 7px; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 500; }
+  .tab.active { background: #efeae0; color: var(--text); }
+  .tab.disabled { opacity: 0.45; cursor: not-allowed; }
+  .topbar .spacer { flex: 1; }
+  .topbar .status { font-size: 12px; color: var(--muted); margin-right: 14px; }
+  .topbar .status.dirty { color: var(--warn); font-weight: 600; }
+  .topbar .status.error { color: var(--danger); font-weight: 600; }
+  .topbar .status.ok { color: var(--accent); }
+  .topbar button.save { padding: 8px 18px; background: var(--accent); color: white; border: none; border-radius: 7px; font-weight: 600; font-size: 13px; }
+  .topbar button.save:disabled { background: #bdbdbd; cursor: not-allowed; }
+  .topbar button.save:hover:not(:disabled) { background: var(--accent-dark); }
+  .topbar button.logout { padding: 7px 10px; background: transparent; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; color: var(--muted); margin-left: 6px; }
+
+  .layout { display: grid; grid-template-columns: 240px 1fr 320px; height: calc(100vh - 56px); overflow: hidden; }
+
+  /* Sidebar */
+  .sidebar { background: var(--panel); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px 0; }
+  .sidebar h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 0 18px; margin: 14px 0 6px; }
+  .sidebar .section-item { padding: 8px 18px; cursor: pointer; font-size: 13px; border-left: 3px solid transparent; }
+  .sidebar .section-item:hover { background: #faf8f3; }
+  .sidebar .section-item.active { background: #f0ebde; border-left-color: var(--accent); font-weight: 600; }
+  .sidebar .section-item .count { float: right; color: var(--muted); font-size: 11px; }
+  .sidebar .section-item .page-hint { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* Editor */
+  .editor { overflow-y: auto; padding: 24px 28px 80px; }
+  .editor .section-title { margin: 0 0 4px; font-size: 22px; font-family: 'Playfair Display', Georgia, serif; }
+  .editor .section-sub { color: var(--muted); margin: 0 0 18px; font-size: 12px; }
+  .editor .empty { color: var(--muted); padding: 40px 0; text-align: center; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+  .tile { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; position: relative; cursor: grab; transition: transform 0.12s, box-shadow 0.12s; }
+  .tile:active { cursor: grabbing; }
+  .tile.dragging { opacity: 0.4; }
+  .tile.drag-over { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(61,140,64,0.18); }
+  .tile img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  .tile .meta { padding: 8px 10px; font-size: 11px; color: var(--muted); }
+  .tile .meta input { width: 100%; border: none; background: transparent; color: var(--text); font-size: 12px; padding: 0; }
+  .tile .meta input:focus { outline: none; color: var(--text); background: #fcfbf8; }
+  .tile .path { display: block; font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .pos { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.55); color: white; font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: 600; }
+  .tile .remove { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; background: rgba(0,0,0,0.55); color: white; border: none; border-radius: 50%; font-size: 14px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+  .tile .remove:hover { background: var(--danger); }
+  .drop-end { border: 2px dashed transparent; min-height: 140px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: transparent; font-size: 12px; }
+  .drop-end.drag-over { border-color: var(--accent); color: var(--accent); }
+
+  /* Library */
+  .library { background: var(--panel); border-left: 1px solid var(--border); overflow-y: auto; padding: 14px 12px 80px; }
+  .library h3 { font-size: 13px; margin: 0 0 8px; }
+  .library .search { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; background: #fcfbf8; margin-bottom: 10px; font-size: 12px; }
+  .library .folder-filter { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .library .folder-filter button { padding: 3px 8px; border: 1px solid var(--border); background: #fcfbf8; border-radius: 14px; font-size: 11px; color: var(--muted); }
+  .library .folder-filter button.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .lib-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .lib-tile { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; cursor: grab; background: #f0ede5; position: relative; }
+  .lib-tile:hover { border-color: var(--accent); }
+  .lib-tile img { width: 100%; height: 80px; object-fit: cover; display: block; }
+  .lib-tile .name { font-size: 9px; padding: 3px 5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #fafaf6; }
+  .lib-tile.in-section { opacity: 0.45; }
+  .lib-tile.in-section::after { content: '✓'; position: absolute; top: 3px; right: 3px; background: var(--accent); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+
+  /* Modal / toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 10px 18px; border-radius: 8px; font-size: 13px; z-index: 500; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast.ok { background: var(--accent); }
+  .toast.err { background: var(--danger); }
+
+  /* Coming soon panel */
+  .coming-soon { padding: 60px 40px; text-align: center; color: var(--muted); }
+  .coming-soon h2 { color: var(--text); margin: 0 0 10px; font-family: 'Playfair Display', Georgia, serif; }
+
+  /* Save indicator dots */
+  .dirty-dot { display: inline-block; width: 7px; height: 7px; background: var(--warn); border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <h1>Content Editor</h1>
+    <p id="loginIntro">Drag-and-drop manager for photos and content on straightfinfarms.com. Sign in with your admin password.</p>
+
+    <div id="setupFields" style="display:none;">
+      <label>Set an admin password</label>
+      <input type="password" id="setupPassword" placeholder="Choose a password" autocomplete="new-password">
+      <div class="help">You'll use this every visit. Stored only in this browser.</div>
+      <label style="margin-top:18px;">GitHub Personal Access Token</label>
+      <input type="password" id="setupToken" placeholder="ghp_… or github_pat_…" autocomplete="off">
+      <div class="help">A token with <strong>Contents: write</strong> permission on <code>straightfinfarms/website2</code>. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">Create one →</a></div>
+    </div>
+
+    <div id="loginFields">
+      <label>Admin password</label>
+      <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password">
+    </div>
+
+    <button class="primary" id="loginBtn">Unlock</button>
+    <div class="err" id="loginErr"></div>
+    <div class="login-toggle">
+      <a id="resetSetupLink">Reset / re-enter token</a>
+    </div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar" id="topbar" style="display:none;">
+  <span class="brand">Straight Fin Farms — Editor</span>
+  <div class="tabs">
+    <div class="tab active" data-tab="photos">Photos</div>
+    <div class="tab disabled" data-tab="description" title="Coming soon">Description</div>
+  </div>
+  <span class="spacer"></span>
+  <span class="status" id="status">Loading…</span>
+  <button class="save" id="saveBtn" disabled>Save</button>
+  <button class="logout" id="logoutBtn" title="Log out and clear stored token">Log out</button>
+</div>
+
+<!-- PHOTOS TAB -->
+<div class="layout" id="photosTab" style="display:none;">
+  <aside class="sidebar" id="sidebar">
+    <h3>Sections</h3>
+    <div id="sectionList"></div>
+  </aside>
+  <main class="editor" id="editor">
+    <div class="empty">Loading sections…</div>
+  </main>
+  <aside class="library" id="library">
+    <h3>Image Library</h3>
+    <input class="search" id="librarySearch" placeholder="Search…">
+    <div class="folder-filter" id="folderFilter"></div>
+    <div class="lib-grid" id="libraryGrid"></div>
+  </aside>
+</div>
+
+<!-- DESCRIPTION TAB -->
+<div id="descriptionTab" style="display:none;">
+  <div class="coming-soon">
+    <h2>Description editor — coming soon</h2>
+    <p>Will let you edit page headings and body copy with the same workflow.<br>For now, ping Claude to update text.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const REPO_OWNER = 'straightfinfarms';
+const REPO_NAME = 'website2';
+const BRANCH = 'main';
+const HTML_FILES = ['straight-fin-farms.html','book-direct.html','book-course.html','bookings.html','tiny-house.html','balance-nature.html','biodiverse-farm.html','permaculture-course.html'];
+const SECTION_REGEX = /<!--\s*PHOTOS:start\s+id="([^"]+)"\s+type="([^"]+)"(?:\s+label="([^"]*)")?\s*-->([\s\S]*?)<!--\s*PHOTOS:end\s+id="\1"\s*-->/g;
+const TILE_REGEX = /<div class="photo-tile"[^>]*><img\s+src="([^"]+)"\s+alt="([^"]*)"[^>]*><\/div>/g;
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  token: localStorage.getItem('sff_pat') || '',
+  passwordHash: localStorage.getItem('sff_pwhash') || '',
+  files: {},          // path -> { content, sha }
+  sections: [],       // {id, page, type, label, items: [{src, alt}], originalHtml, file}
+  current: null,      // current section id
+  library: [],        // [{path, name, folder}]
+  dirty: new Set(),   // section ids that have been edited
+};
+
+// ============================================================
+// UTILS
+// ============================================================
+async function sha256(s) {
+  const buf = new TextEncoder().encode(s);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function escAttr(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(msg, kind='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + kind;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>{ t.className = 'toast ' + kind; }, 3000);
+}
+function setStatus(text, kind='') {
+  const s = document.getElementById('status');
+  s.textContent = text;
+  s.className = 'status ' + kind;
+}
+
+// ============================================================
+// GITHUB API
+// ============================================================
+async function gh(path, opts={}) {
+  const url = 'https://api.github.com' + path;
+  const res = await fetch(url, {
+    ...opts,
+    headers: {
+      'Authorization': 'Bearer ' + state.token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(opts.headers||{}),
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`GitHub ${res.status}: ${text.slice(0,200)}`);
+  }
+  return res.json();
+}
+async function ghGetFile(path) {
+  const data = await gh(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(path)}?ref=${BRANCH}`);
+  const content = atob(data.content.replace(/\s/g,''));
+  // Use decodeURIComponent + escape to handle UTF-8 properly
+  const utf8 = decodeURIComponent(Array.from(content).map(c => '%' + c.charCodeAt(0).toString(16).padStart(2,'0')).join(''));
+  return { content: utf8, sha: data.sha };
+}
+async function ghPutFile(path, newContent, sha, message) {
+  // Encode UTF-8 → base64
+  const b64 = btoa(unescape(encodeURIComponent(newContent)));
+  return gh(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(path)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ message, content: b64, sha, branch: BRANCH }),
+  });
+}
+async function ghTree() {
+  return gh(`/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${BRANCH}?recursive=1`);
+}
+
+// ============================================================
+// PARSING
+// ============================================================
+function parseSections(file, content) {
+  const sections = [];
+  let m;
+  SECTION_REGEX.lastIndex = 0;
+  while ((m = SECTION_REGEX.exec(content)) !== null) {
+    const [full, id, type, label, inner] = m;
+    const items = [];
+    let tm;
+    TILE_REGEX.lastIndex = 0;
+    while ((tm = TILE_REGEX.exec(inner)) !== null) {
+      items.push({ src: tm[1], alt: tm[2] });
+    }
+    sections.push({ id, type, label: label || id, items, file });
+  }
+  return sections;
+}
+
+function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function buildSectionHtml(section) {
+  const lines = [
+    `<!-- PHOTOS:start id="${section.id}" type="${section.type}" label="${escAttr(section.label)}" -->`,
+    ...section.items.map((it, i) =>
+      `      <div class="photo-tile" data-i="${i}"><img src="${escAttr(it.src)}" alt="${escAttr(it.alt)}" loading="lazy"></div>`
+    ),
+    `      <!-- PHOTOS:end id="${section.id}" -->`,
+  ];
+  return lines.join('\n');
+}
+
+function replaceInFile(content, sectionId, newBlock) {
+  const id = escRe(sectionId);
+  const re = new RegExp(`<!--\\s*PHOTOS:start\\s+id="${id}"[\\s\\S]*?<!--\\s*PHOTOS:end\\s+id="${id}"\\s*-->`);
+  return content.replace(re, newBlock);
+}
+
+// ============================================================
+// LOAD ALL SECTIONS
+// ============================================================
+async function loadAll() {
+  setStatus('Loading repository…');
+  // 1) tree (for library)
+  const tree = await ghTree();
+  state.library = tree.tree
+    .filter(n => n.type === 'blob' && /^images\/.+\.(jpe?g|png|webp)$/i.test(n.path) && !/\/Enhanced\//.test(n.path))
+    .map(n => ({ path: n.path, name: n.path.split('/').pop(), folder: n.path.split('/').slice(0,-1).join('/') }))
+    .sort((a,b) => a.path.localeCompare(b.path));
+  // 2) HTML files with sections
+  state.sections = [];
+  state.files = {};
+  for (const f of HTML_FILES) {
+    try {
+      const fd = await ghGetFile(f);
+      state.files[f] = fd;
+      const secs = parseSections(f, fd.content);
+      // Tag with page key (filename without .html)
+      secs.forEach(s => { s.page = f.replace(/\.html$/,''); });
+      state.sections.push(...secs);
+    } catch (e) {
+      console.warn('Could not load', f, e);
+    }
+  }
+  renderSidebar();
+  renderLibraryFilters();
+  renderLibrary();
+  if (state.sections.length) {
+    selectSection(state.sections[0].id);
+  } else {
+    document.getElementById('editor').innerHTML = '<div class="empty">No editable sections found yet.<br><br>To make a section editable, wrap its photos with:<br><code>&lt;!-- PHOTOS:start id="page.section" type="gallery" label="Display name" --&gt;</code><br>…tiles…<br><code>&lt;!-- PHOTOS:end id="page.section" --&gt;</code></div>';
+  }
+  setStatus('Ready', 'ok');
+}
+
+// ============================================================
+// SIDEBAR / SECTION SELECTION
+// ============================================================
+function renderSidebar() {
+  const sl = document.getElementById('sectionList');
+  sl.innerHTML = '';
+  // Group by page
+  const byPage = {};
+  state.sections.forEach(s => { (byPage[s.page] = byPage[s.page] || []).push(s); });
+  Object.keys(byPage).sort().forEach(page => {
+    const header = document.createElement('h3');
+    header.textContent = page;
+    sl.appendChild(header);
+    byPage[page].forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'section-item' + (s.id === state.current ? ' active' : '');
+      el.dataset.id = s.id;
+      el.innerHTML = `${state.dirty.has(s.id) ? '<span class="dirty-dot"></span>' : ''}${escAttr(s.label)}<span class="count">${s.items.length}</span>`;
+      el.onclick = () => selectSection(s.id);
+      sl.appendChild(el);
+    });
+  });
+}
+
+function selectSection(id) {
+  state.current = id;
+  renderSidebar();
+  renderEditor();
+  renderLibrary();
+}
+
+function getCurrent() { return state.sections.find(s => s.id === state.current); }
+
+function markDirty(id) {
+  state.dirty.add(id);
+  document.getElementById('saveBtn').disabled = false;
+  setStatus(state.dirty.size + ' unsaved change' + (state.dirty.size===1?'':'s'), 'dirty');
+  renderSidebar();
+}
+
+// ============================================================
+// EDITOR (drag-drop tiles)
+// ============================================================
+function renderEditor() {
+  const e = document.getElementById('editor');
+  const sec = getCurrent();
+  if (!sec) { e.innerHTML = '<div class="empty">Pick a section.</div>'; return; }
+  e.innerHTML = `
+    <h2 class="section-title">${escAttr(sec.label)}</h2>
+    <p class="section-sub">${escAttr(sec.page)}.html · ${sec.items.length} photo${sec.items.length===1?'':'s'} · Drag to reorder, drag from library to add, × to remove</p>
+    <div class="grid" id="editorGrid"></div>
+  `;
+  const grid = document.getElementById('editorGrid');
+  sec.items.forEach((it, i) => grid.appendChild(makeTile(it, i)));
+  const dropEnd = document.createElement('div');
+  dropEnd.className = 'drop-end';
+  dropEnd.dataset.drop = 'end';
+  dropEnd.textContent = 'Drop here to add';
+  grid.appendChild(dropEnd);
+  wireDropZones();
+}
+
+function makeTile(item, idx) {
+  const t = document.createElement('div');
+  t.className = 'tile';
+  t.draggable = true;
+  t.dataset.idx = idx;
+  t.innerHTML = `
+    <span class="pos">${idx+1}</span>
+    <button class="remove" title="Remove">×</button>
+    <img src="${escAttr(item.src)}" alt="" loading="lazy">
+    <div class="meta">
+      <input type="text" value="${escAttr(item.alt)}" placeholder="Alt text…" data-idx="${idx}">
+      <span class="path">${escAttr(item.src.replace(/^images\//,''))}</span>
+    </div>
+  `;
+  // remove
+  t.querySelector('.remove').onclick = (e) => { e.stopPropagation(); removeAt(idx); };
+  // alt edit
+  t.querySelector('input').oninput = (e) => {
+    getCurrent().items[parseInt(e.target.dataset.idx)].alt = e.target.value;
+    markDirty(state.current);
+  };
+  // drag
+  t.ondragstart = (e) => {
+    t.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', JSON.stringify({ kind: 'reorder', idx }));
+  };
+  t.ondragend = () => t.classList.remove('dragging');
+  t.ondragover = (e) => { e.preventDefault(); t.classList.add('drag-over'); };
+  t.ondragleave = () => t.classList.remove('drag-over');
+  t.ondrop = (e) => {
+    e.preventDefault();
+    t.classList.remove('drag-over');
+    handleDrop(e, idx);
+  };
+  return t;
+}
+
+function wireDropZones() {
+  const end = document.querySelector('.drop-end');
+  if (!end) return;
+  end.ondragover = (e) => { e.preventDefault(); end.classList.add('drag-over'); };
+  end.ondragleave = () => end.classList.remove('drag-over');
+  end.ondrop = (e) => {
+    e.preventDefault();
+    end.classList.remove('drag-over');
+    handleDrop(e, getCurrent().items.length);
+  };
+}
+
+function handleDrop(e, targetIdx) {
+  const data = e.dataTransfer.getData('text/plain');
+  if (!data) return;
+  const parsed = JSON.parse(data);
+  const sec = getCurrent();
+  if (parsed.kind === 'reorder') {
+    const fromIdx = parsed.idx;
+    if (fromIdx === targetIdx) return;
+    const [item] = sec.items.splice(fromIdx, 1);
+    const insertAt = fromIdx < targetIdx ? targetIdx - 1 : targetIdx;
+    sec.items.splice(insertAt, 0, item);
+    markDirty(sec.id);
+    renderEditor();
+  } else if (parsed.kind === 'library') {
+    // duplicate-check
+    if (sec.items.some(it => it.src === parsed.path)) {
+      toast('Already in this section', 'err');
+      return;
+    }
+    sec.items.splice(targetIdx, 0, { src: parsed.path, alt: '' });
+    markDirty(sec.id);
+    renderEditor();
+    renderLibrary();
+  }
+}
+
+function removeAt(idx) {
+  const sec = getCurrent();
+  sec.items.splice(idx, 1);
+  markDirty(sec.id);
+  renderEditor();
+  renderLibrary();
+}
+
+// ============================================================
+// LIBRARY
+// ============================================================
+let libraryFilter = { folder: '', search: '' };
+function renderLibraryFilters() {
+  const folders = Array.from(new Set(state.library.map(l => l.folder))).sort();
+  const ff = document.getElementById('folderFilter');
+  ff.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.textContent = 'All';
+  allBtn.className = libraryFilter.folder === '' ? 'active' : '';
+  allBtn.onclick = () => { libraryFilter.folder = ''; renderLibraryFilters(); renderLibrary(); };
+  ff.appendChild(allBtn);
+  folders.forEach(f => {
+    const b = document.createElement('button');
+    b.textContent = f.replace('images/','');
+    b.className = libraryFilter.folder === f ? 'active' : '';
+    b.onclick = () => { libraryFilter.folder = f; renderLibraryFilters(); renderLibrary(); };
+    ff.appendChild(b);
+  });
+  document.getElementById('librarySearch').oninput = (e) => {
+    libraryFilter.search = e.target.value.toLowerCase();
+    renderLibrary();
+  };
+}
+
+function renderLibrary() {
+  const grid = document.getElementById('libraryGrid');
+  grid.innerHTML = '';
+  const sec = getCurrent();
+  const inSection = new Set((sec?.items || []).map(it => it.src));
+  const filtered = state.library.filter(l => {
+    if (libraryFilter.folder && l.folder !== libraryFilter.folder) return false;
+    if (libraryFilter.search && !l.path.toLowerCase().includes(libraryFilter.search)) return false;
+    return true;
+  });
+  filtered.slice(0, 400).forEach(l => {
+    const t = document.createElement('div');
+    t.className = 'lib-tile' + (inSection.has(l.path) ? ' in-section' : '');
+    t.draggable = true;
+    t.title = l.path;
+    t.innerHTML = `<img src="${escAttr(l.path)}" alt="" loading="lazy"><div class="name">${escAttr(l.name)}</div>`;
+    t.ondragstart = (e) => {
+      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.setData('text/plain', JSON.stringify({ kind: 'library', path: l.path }));
+    };
+    t.onclick = () => {
+      if (inSection.has(l.path)) { toast('Already in this section', 'err'); return; }
+      if (!sec) return;
+      sec.items.push({ src: l.path, alt: '' });
+      markDirty(sec.id);
+      renderEditor();
+      renderLibrary();
+    };
+    grid.appendChild(t);
+  });
+}
+
+// ============================================================
+// SAVE (commit all dirty sections back via GitHub API)
+// ============================================================
+async function save() {
+  if (!state.dirty.size) return;
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  setStatus('Saving…');
+  // Group dirty sections by file
+  const byFile = {};
+  state.sections.forEach(s => {
+    if (state.dirty.has(s.id)) {
+      (byFile[s.file] = byFile[s.file] || []).push(s);
+    }
+  });
+  try {
+    for (const [file, secs] of Object.entries(byFile)) {
+      // fetch latest content + sha (in case the file changed since load)
+      const fresh = await ghGetFile(file);
+      let newContent = fresh.content;
+      secs.forEach(s => {
+        const html = buildSectionHtml(s);
+        newContent = replaceInFile(newContent, s.id, html);
+      });
+      const msg = `Update photos: ${secs.map(s => s.label).join(', ')}`;
+      await ghPutFile(file, newContent, fresh.sha, msg);
+      state.files[file] = { content: newContent, sha: '?' };
+    }
+    state.dirty.clear();
+    setStatus('Saved · live in ~1 min', 'ok');
+    toast('Pushed to GitHub. Pages will rebuild in ~1 min.', 'ok');
+    renderSidebar();
+  } catch (e) {
+    console.error(e);
+    setStatus('Save failed', 'error');
+    toast('Save failed: ' + e.message, 'err');
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function showApp() {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('photosTab').style.display = 'grid';
+  loadAll().catch(e => { setStatus('Error: ' + e.message, 'error'); toast(e.message, 'err'); });
+}
+
+async function tryLogin() {
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  if (!state.token || !state.passwordHash) {
+    // Setup mode
+    const pw = document.getElementById('setupPassword').value.trim();
+    const tk = document.getElementById('setupToken').value.trim();
+    if (!pw || pw.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
+    if (!tk.startsWith('ghp_') && !tk.startsWith('github_pat_')) { err.textContent = 'That doesn’t look like a GitHub token.'; return; }
+    state.passwordHash = await sha256(pw);
+    state.token = tk;
+    localStorage.setItem('sff_pwhash', state.passwordHash);
+    localStorage.setItem('sff_pat', state.token);
+    showApp();
+  } else {
+    const pw = document.getElementById('loginPassword').value;
+    const h = await sha256(pw);
+    if (h === state.passwordHash) {
+      showApp();
+    } else {
+      err.textContent = 'Incorrect password.';
+    }
+  }
+}
+
+function showLoginForm() {
+  const hasSetup = !!(state.token && state.passwordHash);
+  document.getElementById('setupFields').style.display = hasSetup ? 'none' : 'block';
+  document.getElementById('loginFields').style.display = hasSetup ? 'block' : 'none';
+  document.getElementById('loginIntro').textContent = hasSetup
+    ? 'Sign in with your admin password.'
+    : 'First-time setup — pick a password and paste a GitHub token.';
+}
+
+document.getElementById('loginBtn').onclick = tryLogin;
+document.getElementById('resetSetupLink').onclick = () => {
+  if (!confirm('Clear the stored token and password? You\'ll need to re-enter them.')) return;
+  localStorage.removeItem('sff_pat');
+  localStorage.removeItem('sff_pwhash');
+  state.token = '';
+  state.passwordHash = '';
+  showLoginForm();
+};
+document.getElementById('logoutBtn').onclick = () => {
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('topbar').style.display = 'none';
+  document.getElementById('photosTab').style.display = 'none';
+  document.getElementById('loginPassword').value = '';
+  showLoginForm();
+};
+document.getElementById('saveBtn').onclick = save;
+
+// Enter key on login
+document.getElementById('loginOverlay').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') tryLogin();
+});
+
+// Tab switching (Description is disabled)
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    if (t.classList.contains('disabled')) return;
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const tab = t.dataset.tab;
+    document.getElementById('photosTab').style.display = tab === 'photos' ? 'grid' : 'none';
+    document.getElementById('descriptionTab').style.display = tab === 'description' ? 'block' : 'none';
+  };
+});
+
+showLoginForm();
+</script>
+</body>
+</html>
