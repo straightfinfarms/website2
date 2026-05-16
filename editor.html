@@ -97,6 +97,9 @@
   .library .folder-filter { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
   .library .folder-filter button { padding: 3px 8px; border: 1px solid var(--border); background: #fcfbf8; border-radius: 14px; font-size: 11px; color: var(--muted); }
   .library .folder-filter button.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .upload-btn { padding: 5px 10px; background: var(--accent); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .upload-btn:hover { background: var(--accent-dark); }
+  .upload-btn:disabled { background: #bdbdbd; cursor: not-allowed; }
   .lib-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .lib-tile { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; cursor: grab; background: #f0ede5; position: relative; }
   .lib-tile:hover { border-color: var(--accent); }
@@ -172,10 +175,14 @@
     <div class="empty">Loading sections…</div>
   </main>
   <aside class="library" id="library">
-    <h3>Image Library</h3>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+      <h3 style="margin:0;">Image Library</h3>
+      <button class="upload-btn" id="uploadBtn" title="Upload a new image from your computer">+ Upload</button>
+    </div>
     <input class="search" id="librarySearch" placeholder="Search…">
     <div class="folder-filter" id="folderFilter"></div>
     <div class="lib-grid" id="libraryGrid"></div>
+    <input type="file" id="uploadInput" accept="image/*" multiple style="display:none;">
   </aside>
 </div>
 
@@ -197,8 +204,13 @@ const REPO_OWNER = 'straightfinfarms';
 const REPO_NAME = 'website2';
 const BRANCH = 'main';
 const HTML_FILES = ['straight-fin-farms.html','book-direct.html','book-course.html','bookings.html','tiny-house.html','balance-nature.html','biodiverse-farm.html','permaculture-course.html'];
-const SECTION_REGEX = /<!--\s*PHOTOS:start\s+id="([^"]+)"\s+type="([^"]+)"(?:\s+label="([^"]*)")?\s*-->([\s\S]*?)<!--\s*PHOTOS:end\s+id="\1"\s*-->/g;
-const TILE_REGEX = /<div class="photo-tile"[^>]*><img\s+src="([^"]+)"\s+alt="([^"]*)"[^>]*><\/div>/g;
+// Marker can be:
+//   <!-- PHOTOS:start id="page.section" type="img-list|bg-list" label="…" wrapper="optional-class-name" -->
+// We auto-detect type from content if "type" omitted.
+const SECTION_REGEX = /<!--\s*PHOTOS:start\s+id="([^"]+)"((?:\s+\w+="[^"]*")*)\s*-->([\s\S]*?)<!--\s*PHOTOS:end\s+id="\1"\s*-->/g;
+const ATTR_REGEX = /(\w+)="([^"]*)"/g;
+const IMG_REGEX = /<img\s+[^>]*?src="([^"]+)"[^>]*?alt="([^"]*)"[^>]*?>/g;
+const BG_REGEX = /background-image\s*:\s*url\(\s*['"]?([^'")\s]+)['"]?\s*\)/g;
 
 // ============================================================
 // STATE
@@ -270,6 +282,33 @@ async function ghPutFile(path, newContent, sha, message) {
     body: JSON.stringify({ message, content: b64, sha, branch: BRANCH }),
   });
 }
+async function ghPutBinary(path, base64Content, message) {
+  // Upload a new binary file (or overwrite existing). For new files, omit sha.
+  // Check if file exists first to get sha
+  let sha = undefined;
+  try {
+    const existing = await gh(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(path)}?ref=${BRANCH}`);
+    sha = existing.sha;
+  } catch (e) { /* doesn't exist → new file */ }
+  const body = { message, content: base64Content, branch: BRANCH };
+  if (sha) body.sha = sha;
+  return gh(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${encodeURIComponent(path)}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+}
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error('read failed'));
+    r.onload = () => {
+      const result = r.result; // data:image/jpeg;base64,XXXX
+      const i = result.indexOf(',');
+      resolve(result.slice(i + 1));
+    };
+    r.readAsDataURL(file);
+  });
+}
 async function ghTree() {
   return gh(`/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${BRANCH}?recursive=1`);
 }
@@ -277,31 +316,96 @@ async function ghTree() {
 // ============================================================
 // PARSING
 // ============================================================
+function parseAttrs(s) {
+  const attrs = {};
+  if (!s) return attrs;
+  ATTR_REGEX.lastIndex = 0;
+  let m;
+  while ((m = ATTR_REGEX.exec(s)) !== null) attrs[m[1]] = m[2];
+  return attrs;
+}
+
 function parseSections(file, content) {
   const sections = [];
-  let m;
   SECTION_REGEX.lastIndex = 0;
+  let m;
   while ((m = SECTION_REGEX.exec(content)) !== null) {
-    const [full, id, type, label, inner] = m;
-    const items = [];
-    let tm;
-    TILE_REGEX.lastIndex = 0;
-    while ((tm = TILE_REGEX.exec(inner)) !== null) {
-      items.push({ src: tm[1], alt: tm[2] });
+    const [, id, attrsRaw, inner] = m;
+    const a = parseAttrs(attrsRaw);
+    // Collect items from <img> tags
+    const imgs = [];
+    IMG_REGEX.lastIndex = 0;
+    let im;
+    while ((im = IMG_REGEX.exec(inner)) !== null) imgs.push({ src: im[1], alt: im[2] });
+    // Collect items from inline background-image URLs (each div in the list usually has one)
+    const bgs = [];
+    BG_REGEX.lastIndex = 0;
+    let bm;
+    while ((bm = BG_REGEX.exec(inner)) !== null) bgs.push({ src: bm[1], alt: '' });
+    // Decide type: explicit > content
+    let type = a.type;
+    if (!type) {
+      if (imgs.length && !bgs.length) type = 'img-list';
+      else if (bgs.length && !imgs.length) type = 'bg-list';
+      else if (imgs.length >= bgs.length) type = 'img-list';
+      else type = 'bg-list';
     }
-    sections.push({ id, type, label: label || id, items, file });
+    // Normalize legacy type names
+    if (type === 'gallery') type = 'img-list';
+    const items = (type === 'bg-list') ? bgs : imgs;
+    // Auto-detect wrapper class from inner HTML if not explicitly set
+    let wrapper = a.wrapper || '';
+    if (!wrapper) {
+      if (type === 'bg-list') {
+        const wm = inner.match(/<div\s+class="([^"]+)"[^>]*style="[^"]*background-image/);
+        if (wm) wrapper = wm[1].split(/\s+/)[0];
+      } else {
+        const wm = inner.match(/<div\s+class="([^"]+)"[^>]*>\s*<img/);
+        if (wm) wrapper = wm[1].split(/\s+/)[0];
+      }
+    }
+    sections.push({
+      id,
+      type,
+      wrapper,
+      label: a.label || id,
+      items,
+      file,
+    });
   }
   return sections;
 }
 
 function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
+function buildItemHtml(section, it, i) {
+  const src = escAttr(it.src);
+  const alt = escAttr(it.alt || '');
+  const w = section.wrapper;
+  if (section.type === 'bg-list') {
+    if (w === 'photo-tile') {
+      return `<div class="photo-tile" data-i="${i}" style="background-image:url('${src}')" role="img" aria-label="${alt}"></div>`;
+    }
+    const cls = w || 'photo-tile';
+    return `<div class="${cls}" style="background-image:url('${src}')" role="img" aria-label="${alt}"></div>`;
+  }
+  // img-list (default)
+  if (w === 'photo-tile') {
+    return `<div class="photo-tile" data-i="${i}"><img src="${src}" alt="${alt}" loading="lazy"></div>`;
+  }
+  if (w) {
+    return `<div class="${w}"><img src="${src}" alt="${alt}" loading="lazy"></div>`;
+  }
+  return `<img src="${src}" alt="${alt}" loading="lazy">`;
+}
+
 function buildSectionHtml(section) {
+  const attrs = [`id="${section.id}"`, `type="${section.type}"`];
+  if (section.wrapper) attrs.push(`wrapper="${section.wrapper}"`);
+  attrs.push(`label="${escAttr(section.label)}"`);
   const lines = [
-    `<!-- PHOTOS:start id="${section.id}" type="${section.type}" label="${escAttr(section.label)}" -->`,
-    ...section.items.map((it, i) =>
-      `      <div class="photo-tile" data-i="${i}"><img src="${escAttr(it.src)}" alt="${escAttr(it.alt)}" loading="lazy"></div>`
-    ),
+    `<!-- PHOTOS:start ${attrs.join(' ')} -->`,
+    ...section.items.map((it, i) => '      ' + buildItemHtml(section, it, i)),
     `      <!-- PHOTOS:end id="${section.id}" -->`,
   ];
   return lines.join('\n');
@@ -655,6 +759,60 @@ document.getElementById('logoutBtn').onclick = () => {
   showLoginForm();
 };
 document.getElementById('saveBtn').onclick = save;
+
+// ============================================================
+// UPLOAD NEW IMAGES TO THE REPO
+// ============================================================
+async function handleUpload(files) {
+  if (!files || !files.length) return;
+  // Pick folder
+  const folders = Array.from(new Set(state.library.map(l => l.folder))).sort();
+  const folderChoices = folders.concat(['images/Uploads (new)']).map((f, i) => `${i+1}. ${f}`).join('\n');
+  const ans = prompt(
+    `Upload ${files.length} file${files.length===1?'':'s'} to which folder?\nEnter a number, or type a custom path like "images/Aerial":\n\n${folderChoices}`,
+    'images/Uploads'
+  );
+  if (!ans) return;
+  let folder;
+  const n = parseInt(ans, 10);
+  if (!isNaN(n) && n >= 1 && n <= folders.length) folder = folders[n-1];
+  else if (!isNaN(n) && n === folders.length + 1) folder = 'images/Uploads';
+  else folder = ans.replace(/^\/+|\/+$/g, '');
+  if (!folder.startsWith('images/')) folder = 'images/' + folder;
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  let added = 0, failed = 0;
+  for (const file of files) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._\- ]/g, '_');
+    const path = `${folder}/${safeName}`;
+    setStatus(`Uploading ${file.name}…`);
+    try {
+      const b64 = await fileToBase64(file);
+      await ghPutBinary(path, b64, `Upload ${safeName}`);
+      // add to library state
+      if (!state.library.some(l => l.path === path)) {
+        state.library.push({ path, name: safeName, folder });
+      }
+      added++;
+    } catch (e) {
+      console.error('upload failed', file.name, e);
+      failed++;
+    }
+  }
+  btn.disabled = false;
+  state.library.sort((a,b) => a.path.localeCompare(b.path));
+  renderLibraryFilters();
+  renderLibrary();
+  setStatus(`Uploaded ${added}${failed ? ', '+failed+' failed' : ''}`, failed ? 'error' : 'ok');
+  toast(`${added} uploaded${failed ? ', '+failed+' failed' : ''}`, failed ? 'err' : 'ok');
+}
+
+document.getElementById('uploadBtn').onclick = () => document.getElementById('uploadInput').click();
+document.getElementById('uploadInput').onchange = (e) => {
+  handleUpload(Array.from(e.target.files));
+  e.target.value = ''; // reset so same file can be uploaded again
+};
 
 // Enter key on login
 document.getElementById('loginOverlay').addEventListener('keydown', (e) => {
