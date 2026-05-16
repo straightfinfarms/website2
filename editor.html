@@ -325,6 +325,78 @@ function parseAttrs(s) {
   return attrs;
 }
 
+// Detect the image src and alt in an element, preserving its full HTML as template
+function extractSrcAlt(el) {
+  let src = '', alt = '';
+  if (el.tagName === 'IMG') {
+    src = el.getAttribute('src') || '';
+    alt = el.getAttribute('alt') || '';
+    return { src, alt };
+  }
+  // Try inline background-image on the element itself
+  const style = el.getAttribute('style') || '';
+  const bgm = style.match(/background(?:-image)?\s*:\s*[^;]*url\s*\(\s*['"]?([^'")\s]+)['"]?\s*\)/i);
+  if (bgm) {
+    src = bgm[1];
+    alt = el.getAttribute('aria-label') || el.getAttribute('alt') || '';
+    return { src, alt };
+  }
+  // Search for descendant img
+  const img = el.querySelector('img');
+  if (img) {
+    src = img.getAttribute('src') || '';
+    alt = img.getAttribute('alt') || '';
+    return { src, alt };
+  }
+  // Search for descendant with background-image
+  const styled = el.querySelectorAll('[style]');
+  for (const x of styled) {
+    const m = (x.getAttribute('style') || '').match(/background(?:-image)?\s*:\s*[^;]*url\s*\(\s*['"]?([^'")\s]+)['"]?\s*\)/i);
+    if (m) {
+      src = m[1];
+      alt = x.getAttribute('aria-label') || x.getAttribute('alt') || '';
+      return { src, alt };
+    }
+  }
+  return { src: '', alt: '' };
+}
+
+// Apply edited src/alt back into an item's stored HTML, preserving everything else
+function applyItemEdit(itemHtml, newSrc, newAlt) {
+  const doc = new DOMParser().parseFromString(`<div id="r">${itemHtml}</div>`, 'text/html');
+  const root = doc.getElementById('r').firstElementChild;
+  if (!root) return itemHtml;
+  const srcEnc = encodeURI(decodeURI(newSrc));
+  const replaceUrlInStyle = (style) => style.replace(/(background(?:-image)?\s*:\s*[^;]*url\s*\(\s*)['"]?[^'")\s]+['"]?(\s*\))/i, `$1'${srcEnc}'$2`);
+  if (root.tagName === 'IMG') {
+    root.setAttribute('src', newSrc);
+    root.setAttribute('alt', newAlt);
+  } else {
+    const style = root.getAttribute('style') || '';
+    if (/background(?:-image)?\s*:\s*[^;]*url\s*\(/i.test(style)) {
+      root.setAttribute('style', replaceUrlInStyle(style));
+      if (root.hasAttribute('aria-label')) root.setAttribute('aria-label', newAlt);
+    } else {
+      const img = root.querySelector('img');
+      if (img) {
+        img.setAttribute('src', newSrc);
+        img.setAttribute('alt', newAlt);
+      } else {
+        const styled = root.querySelectorAll('[style]');
+        for (const x of styled) {
+          const st = x.getAttribute('style') || '';
+          if (/background(?:-image)?\s*:\s*[^;]*url\s*\(/i.test(st)) {
+            x.setAttribute('style', replaceUrlInStyle(st));
+            if (x.hasAttribute('aria-label')) x.setAttribute('aria-label', newAlt);
+            break;
+          }
+        }
+      }
+    }
+  }
+  return root.outerHTML;
+}
+
 function parseSections(file, content) {
   const sections = [];
   SECTION_REGEX.lastIndex = 0;
@@ -332,42 +404,22 @@ function parseSections(file, content) {
   while ((m = SECTION_REGEX.exec(content)) !== null) {
     const [, id, attrsRaw, inner] = m;
     const a = parseAttrs(attrsRaw);
-    // Collect items from <img> tags
-    const imgs = [];
-    IMG_REGEX.lastIndex = 0;
-    let im;
-    while ((im = IMG_REGEX.exec(inner)) !== null) imgs.push({ src: im[1], alt: im[2] });
-    // Collect items from inline background-image URLs (each div in the list usually has one)
-    const bgs = [];
-    BG_REGEX.lastIndex = 0;
-    let bm;
-    while ((bm = BG_REGEX.exec(inner)) !== null) bgs.push({ src: bm[1], alt: '' });
-    // Decide type: explicit > content
+    // DOM-parse the inner region; each direct child is an item
+    const doc = new DOMParser().parseFromString(`<div id="r">${inner}</div>`, 'text/html');
+    const root = doc.getElementById('r');
+    const items = [];
+    for (const el of Array.from(root.children)) {
+      const { src, alt } = extractSrcAlt(el);
+      // Decode the src for editor display; keep raw form in original html template
+      let display = src;
+      try { display = decodeURI(src); } catch (e) {}
+      items.push({ src: display, alt, html: el.outerHTML });
+    }
     let type = a.type;
-    if (!type) {
-      if (imgs.length && !bgs.length) type = 'img-list';
-      else if (bgs.length && !imgs.length) type = 'bg-list';
-      else if (imgs.length >= bgs.length) type = 'img-list';
-      else type = 'bg-list';
-    }
-    // Normalize legacy type names
-    if (type === 'gallery') type = 'img-list';
-    const items = (type === 'bg-list') ? bgs : imgs;
-    // Auto-detect wrapper class from inner HTML if not explicitly set
-    let wrapper = a.wrapper || '';
-    if (!wrapper) {
-      if (type === 'bg-list') {
-        const wm = inner.match(/<div\s+class="([^"]+)"[^>]*style="[^"]*background-image/);
-        if (wm) wrapper = wm[1].split(/\s+/)[0];
-      } else {
-        const wm = inner.match(/<div\s+class="([^"]+)"[^>]*>\s*<img/);
-        if (wm) wrapper = wm[1].split(/\s+/)[0];
-      }
-    }
+    if (!type) type = items.length === 1 ? 'single' : 'multi';
     sections.push({
       id,
       type,
-      wrapper,
       label: a.label || id,
       items,
       file,
@@ -378,37 +430,23 @@ function parseSections(file, content) {
 
 function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-function buildItemHtml(section, it, i) {
-  const src = escAttr(it.src);
-  const alt = escAttr(it.alt || '');
-  const w = section.wrapper;
-  if (section.type === 'bg-list') {
-    if (w === 'photo-tile') {
-      return `<div class="photo-tile" data-i="${i}" style="background-image:url('${src}')" role="img" aria-label="${alt}"></div>`;
-    }
-    const cls = w || 'photo-tile';
-    return `<div class="${cls}" style="background-image:url('${src}')" role="img" aria-label="${alt}"></div>`;
-  }
-  // img-list (default)
-  if (w === 'photo-tile') {
-    return `<div class="photo-tile" data-i="${i}"><img src="${src}" alt="${alt}" loading="lazy"></div>`;
-  }
-  if (w) {
-    return `<div class="${w}"><img src="${src}" alt="${alt}" loading="lazy"></div>`;
-  }
-  return `<img src="${src}" alt="${alt}" loading="lazy">`;
+function buildSectionHtml(section) {
+  const attrs = [`id="${section.id}"`, `type="${section.type}"`, `label="${escAttr(section.label)}"`];
+  const indent = '      ';
+  const lines = [`<!-- PHOTOS:start ${attrs.join(' ')} -->`];
+  section.items.forEach(it => {
+    const html = applyItemEdit(it.html, it.src, it.alt || '');
+    lines.push(indent + html);
+  });
+  lines.push(indent + `<!-- PHOTOS:end id="${section.id}" -->`);
+  return lines.join('\n');
 }
 
-function buildSectionHtml(section) {
-  const attrs = [`id="${section.id}"`, `type="${section.type}"`];
-  if (section.wrapper) attrs.push(`wrapper="${section.wrapper}"`);
-  attrs.push(`label="${escAttr(section.label)}"`);
-  const lines = [
-    `<!-- PHOTOS:start ${attrs.join(' ')} -->`,
-    ...section.items.map((it, i) => '      ' + buildItemHtml(section, it, i)),
-    `      <!-- PHOTOS:end id="${section.id}" -->`,
-  ];
-  return lines.join('\n');
+// When adding a new item (from library) to a section, copy the structure of an existing item
+function makeItemFromTemplate(section, src, alt) {
+  const template = section.items[0]?.html || `<img src="" alt="" loading="lazy">`;
+  const newHtml = applyItemEdit(template, src, alt || '');
+  return { src, alt: alt || '', html: newHtml };
 }
 
 function replaceInFile(content, sectionId, newBlock) {
@@ -425,7 +463,7 @@ async function loadAll() {
   // 1) tree (for library)
   const tree = await ghTree();
   state.library = tree.tree
-    .filter(n => n.type === 'blob' && /^images\/.+\.(jpe?g|png|webp)$/i.test(n.path) && !/\/Enhanced\//.test(n.path))
+    .filter(n => n.type === 'blob' && /^images\/.+\.(jpe?g|png|webp)$/i.test(n.path))
     .map(n => ({ path: n.path, name: n.path.split('/').pop(), folder: n.path.split('/').slice(0,-1).join('/') }))
     .sort((a,b) => a.path.localeCompare(b.path));
   // 2) HTML files with sections
@@ -501,37 +539,45 @@ function renderEditor() {
   const e = document.getElementById('editor');
   const sec = getCurrent();
   if (!sec) { e.innerHTML = '<div class="empty">Pick a section.</div>'; return; }
+  const isSingle = sec.type === 'single';
+  const sub = isSingle
+    ? `${escAttr(sec.page)}.html · single photo · click a library image to swap it`
+    : `${escAttr(sec.page)}.html · ${sec.items.length} photo${sec.items.length===1?'':'s'} · Drag to reorder, drag from library to add, × to remove`;
   e.innerHTML = `
     <h2 class="section-title">${escAttr(sec.label)}</h2>
-    <p class="section-sub">${escAttr(sec.page)}.html · ${sec.items.length} photo${sec.items.length===1?'':'s'} · Drag to reorder, drag from library to add, × to remove</p>
+    <p class="section-sub">${sub}</p>
     <div class="grid" id="editorGrid"></div>
   `;
   const grid = document.getElementById('editorGrid');
-  sec.items.forEach((it, i) => grid.appendChild(makeTile(it, i)));
-  const dropEnd = document.createElement('div');
-  dropEnd.className = 'drop-end';
-  dropEnd.dataset.drop = 'end';
-  dropEnd.textContent = 'Drop here to add';
-  grid.appendChild(dropEnd);
-  wireDropZones();
+  sec.items.forEach((it, i) => grid.appendChild(makeTile(it, i, isSingle)));
+  if (!isSingle) {
+    const dropEnd = document.createElement('div');
+    dropEnd.className = 'drop-end';
+    dropEnd.dataset.drop = 'end';
+    dropEnd.textContent = 'Drop here to add';
+    grid.appendChild(dropEnd);
+    wireDropZones();
+  }
 }
 
-function makeTile(item, idx) {
+function makeTile(item, idx, isSingle = false) {
   const t = document.createElement('div');
   t.className = 'tile';
-  t.draggable = true;
+  t.draggable = !isSingle;
   t.dataset.idx = idx;
   t.innerHTML = `
-    <span class="pos">${idx+1}</span>
-    <button class="remove" title="Remove">×</button>
+    ${isSingle ? '' : `<span class="pos">${idx+1}</span>`}
+    ${isSingle ? '' : '<button class="remove" title="Remove">×</button>'}
     <img src="${escAttr(item.src)}" alt="" loading="lazy">
     <div class="meta">
       <input type="text" value="${escAttr(item.alt)}" placeholder="Alt text…" data-idx="${idx}">
       <span class="path">${escAttr(item.src.replace(/^images\//,''))}</span>
     </div>
   `;
-  // remove
-  t.querySelector('.remove').onclick = (e) => { e.stopPropagation(); removeAt(idx); };
+  // remove (skip for single)
+  if (!isSingle) {
+    t.querySelector('.remove').onclick = (e) => { e.stopPropagation(); removeAt(idx); };
+  }
   // alt edit
   t.querySelector('input').oninput = (e) => {
     getCurrent().items[parseInt(e.target.dataset.idx)].alt = e.target.value;
@@ -580,12 +626,23 @@ function handleDrop(e, targetIdx) {
     markDirty(sec.id);
     renderEditor();
   } else if (parsed.kind === 'library') {
-    // duplicate-check
+    if (sec.type === 'single') {
+      // Replace the single item's image
+      if (sec.items.length) {
+        sec.items[0] = { ...sec.items[0], src: parsed.path, html: applyItemEdit(sec.items[0].html, parsed.path, sec.items[0].alt || '') };
+      } else {
+        sec.items.push(makeItemFromTemplate(sec, parsed.path, ''));
+      }
+      markDirty(sec.id);
+      renderEditor();
+      renderLibrary();
+      return;
+    }
     if (sec.items.some(it => it.src === parsed.path)) {
       toast('Already in this section', 'err');
       return;
     }
-    sec.items.splice(targetIdx, 0, { src: parsed.path, alt: '' });
+    sec.items.splice(targetIdx, 0, makeItemFromTemplate(sec, parsed.path, ''));
     markDirty(sec.id);
     renderEditor();
     renderLibrary();
@@ -647,9 +704,20 @@ function renderLibrary() {
       e.dataTransfer.setData('text/plain', JSON.stringify({ kind: 'library', path: l.path }));
     };
     t.onclick = () => {
-      if (inSection.has(l.path)) { toast('Already in this section', 'err'); return; }
       if (!sec) return;
-      sec.items.push({ src: l.path, alt: '' });
+      if (sec.type === 'single') {
+        if (sec.items.length) {
+          sec.items[0] = { ...sec.items[0], src: l.path, html: applyItemEdit(sec.items[0].html, l.path, sec.items[0].alt || '') };
+        } else {
+          sec.items.push(makeItemFromTemplate(sec, l.path, ''));
+        }
+        markDirty(sec.id);
+        renderEditor();
+        renderLibrary();
+        return;
+      }
+      if (inSection.has(l.path)) { toast('Already in this section', 'err'); return; }
+      sec.items.push(makeItemFromTemplate(sec, l.path, ''));
       markDirty(sec.id);
       renderEditor();
       renderLibrary();
