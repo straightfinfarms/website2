@@ -60,14 +60,14 @@
 <title>Permaculture Course — Straight Fin Farms</title>
 <link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
 <link rel="apple-touch-icon" href="images/Logo/favicon-192.png">
-<meta property="og:title" content="Permaculture Course — Straight Fin Farms">
-<meta property="og:description" content="Immersive 3-day or 7-day permaculture course on a working 34-acre farm. Hands-on, farm-to-table meals included.">
+<meta property="og:title" content="Permaculture with Kenton Zerbin — Free Consultation | Straight Fin Farms">
+<meta property="og:description" content="Book a free 30-minute consultation with certified permaculture teacher Kenton Zerbin and the Straight Fin Farms team. Or enroll in our 3-day or 7-day course on a working 34-acre farm.">
 <meta property="og:image" content="https://straightfinfarms.com/images/Logo/Logo%202D%20White-bg.jpg">
 <meta property="og:url" content="https://straightfinfarms.com/permaculture-course.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://straightfinfarms.com/images/Logo/Logo%202D%20White-bg.jpg">
-<meta name="description" content="Immersive 3-day and 7-day permaculture courses at Straight Fin Farms. Learn soil, composting, food forests, beekeeping and regenerative design through hands-on farm experience. Meals included.">
+<meta name="description" content="Free 30-minute consultation with permaculture teacher Kenton Zerbin and the Straight Fin Farms team. Plus immersive 3-day and 7-day courses on a working 34-acre farm — soil, food forests, beekeeping, regenerative design.">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -266,12 +266,79 @@
   footer p { font-size: 14px; line-height: 1.7; }
   .footer-bottom { background: #101010; padding: 20px 48px; text-align: center; font-size: 13px; color: rgba(255,255,255,0.35); }
 
+  /* INSTRUCTOR */
+  .instructor { padding: 88px 48px; background: #fff; }
+  .instructor-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; gap: 56px; align-items: center; }
+  .instructor-photo-wrap { position: relative; }
+  .instructor-photo { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 12px; display: block; box-shadow: 0 12px 36px rgba(0,0,0,0.12); }
+  .instructor-badge { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); background: #3d8c40; color: #fff; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; padding: 8px 16px; border-radius: 999px; white-space: nowrap; box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .instructor-body .eyebrow { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #3d8c40; font-weight: 600; margin-bottom: 10px; }
+  .instructor-body h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(28px, 3.5vw, 42px); line-height: 1.12; margin-bottom: 8px; color: #1a1a1a; }
+  .instructor-body .role { font-size: 16px; color: #666; font-style: italic; margin-bottom: 22px; }
+  .instructor-body p { font-size: 16px; line-height: 1.8; color: #444; margin-bottom: 16px; max-width: 580px; }
+  .instructor-body .quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 17px; color: #2b4a1f; border-left: 3px solid #3d8c40; padding: 4px 0 4px 18px; margin: 22px 0 26px; max-width: 580px; }
+  .instructor-creds { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+  .instructor-creds span { background: #f0ede6; color: #2b4a1f; font-size: 12px; padding: 6px 12px; border-radius: 999px; font-weight: 500; }
+  .instructor-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .instructor-cta a { display: inline-block; padding: 13px 26px; border-radius: 50px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; }
+  .instructor-cta a.primary { background: #3d8c40; color: #fff; }
+  .instructor-cta a.primary:hover { background: #2e6e31; }
+  .instructor-cta a.outline { background: #fff; color: #1a1a1a; border: 1.5px solid #1a1a1a; }
+  .instructor-cta a.outline:hover { background: #1a1a1a; color: #fff; }
+
+  /* CONSULTATION */
+  .consult { padding: 88px 48px; background: #f0ede6; }
+  .consult-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .consult-left .eyebrow { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #3d8c40; font-weight: 600; margin-bottom: 12px; }
+  .consult-left h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(28px, 3.5vw, 42px); line-height: 1.15; margin-bottom: 16px; color: #1a1a1a; }
+  .consult-left p { font-size: 16px; line-height: 1.8; color: #444; margin-bottom: 18px; max-width: 460px; }
+  .consult-perks { list-style: none; margin: 22px 0 30px; padding: 0; }
+  .consult-perks li { font-size: 15px; color: #2b4a1f; padding: 6px 0 6px 28px; position: relative; line-height: 1.6; }
+  .consult-perks li::before { content: '✓'; position: absolute; left: 0; top: 6px; width: 20px; height: 20px; background: #3d8c40; color: #fff; border-radius: 50%; text-align: center; font-size: 12px; font-weight: 700; line-height: 20px; }
+  .call-card { background: #fff; border-radius: 12px; padding: 22px 24px; border: 1px solid #e0ddd6; }
+  .call-card .call-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px; margin-bottom: 6px; }
+  .call-card .call-now { font-size: 13px; color: #666; margin-bottom: 14px; }
+  .call-card .call-now strong { color: #3d8c40; }
+  .call-btn { display: inline-flex; align-items: center; gap: 10px; background: #1a1a1a; color: #fff; padding: 14px 22px; border-radius: 50px; font-size: 14px; font-weight: 600; text-decoration: none; letter-spacing: 0.04em; }
+  .call-btn:hover { background: #3d8c40; }
+  .call-btn .phone-num { font-family: 'Inter', sans-serif; letter-spacing: 0.02em; }
+  .call-hours { list-style: none; padding: 0; margin: 14px 0 0; font-size: 13px; color: #555; }
+  .call-hours li { padding: 4px 0; display: flex; justify-content: space-between; gap: 16px; border-top: 1px dashed #e8e4dc; }
+  .call-hours li:first-child { border-top: none; }
+  .call-hours li.active { color: #2b4a1f; font-weight: 600; }
+  .call-hours .label { color: #888; font-weight: 400; }
+  .call-hours li.active .label { color: #3d8c40; font-weight: 600; }
+
+  .consult-form-card { background: #fff; border-radius: 12px; padding: 32px; border: 1px solid #e0ddd6; box-shadow: 0 8px 28px rgba(0,0,0,0.05); }
+  .consult-form-card h3 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px; margin-bottom: 6px; color: #1a1a1a; }
+  .consult-form-card .form-sub { font-size: 13px; color: #666; margin-bottom: 20px; }
+  .consult-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .consult-form label { display: block; font-size: 12px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.04em; text-transform: uppercase; margin: 14px 0 6px; }
+  .consult-form input, .consult-form textarea {
+    width: 100%; padding: 12px 14px; border: 1px solid #d8d4cb; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; background: #fafaf7; color: #1a1a1a;
+  }
+  .consult-form input:focus, .consult-form textarea:focus { outline: none; border-color: #3d8c40; background: #fff; box-shadow: 0 0 0 3px rgba(61,140,64,0.12); }
+  .consult-form textarea { resize: vertical; min-height: 90px; line-height: 1.55; }
+  .consult-form .optional-hint { font-size: 11px; color: #999; font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+  .consult-form .submit { margin-top: 22px; width: 100%; padding: 16px; background: #3d8c40; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: inherit; }
+  .consult-form .submit:hover:not(:disabled) { background: #2e6e31; }
+  .consult-form .submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .consult-msg { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 14px; display: none; }
+  .consult-msg.ok { background: #e8f5e9; color: #2e6e31; display: block; }
+  .consult-msg.err { background: #fdecea; color: #b71c1c; display: block; }
+  .consult-success { display: none; text-align: center; padding: 16px 8px; }
+  .consult-success .check { width: 56px; height: 56px; border-radius: 50%; background: #3d8c40; color: #fff; font-size: 28px; line-height: 56px; margin: 0 auto 14px; }
+  .consult-success h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; }
+  .consult-success p { color: #555; font-size: 14px; line-height: 1.7; }
+
   /* RESPONSIVE */
   @media (max-width: 1024px) {
     .course-options { grid-template-columns: 1fr; max-width: 560px; margin-left: auto; margin-right: auto; }
     .included-grid { grid-template-columns: 1fr 1fr; }
     .stay-grid { grid-template-columns: 1fr 1fr; }
     .retreat-features { grid-template-columns: 1fr; }
+    .instructor-inner { grid-template-columns: 280px 1fr; gap: 36px; }
+    .consult-inner { grid-template-columns: 1fr; gap: 36px; }
   }
   @media (max-width: 768px) {
     nav { padding: 16px 20px; }
@@ -284,6 +351,14 @@
     .retreat { padding: 56px 24px; }
     .cta-banner { padding: 56px 24px; }
     footer { grid-template-columns: 1fr; padding: 40px 24px; }
+    .instructor { padding: 56px 24px; }
+    .instructor-inner { grid-template-columns: 1fr; gap: 28px; text-align: center; }
+    .instructor-body p, .instructor-body .quote { margin-left: auto; margin-right: auto; }
+    .instructor-creds, .instructor-cta { justify-content: center; }
+    .instructor-photo { max-width: 320px; margin: 0 auto; }
+    .consult { padding: 56px 24px; }
+    .consult-form-card { padding: 24px 22px; }
+    .consult-form .row { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -301,7 +376,7 @@
     <a href="straight-fin-farms.html#stay">Stay With Us</a>
     <a href="straight-fin-farms.html#about">About</a>
     <a href="straight-fin-farms.html#contact">Contact</a>
-    <a class="btn-book" href="book-course.html">Enroll Now</a>
+    <a class="btn-book" href="#consultation">Free Consultation</a>
   </div>
 </nav>
 
@@ -309,12 +384,110 @@
 <section class="page-hero">
   <div class="page-hero-bg"></div>
   <div class="page-hero-content">
-    <div class="breadcrumb"><a href="straight-fin-farms.html">Home</a> &nbsp;/&nbsp; Permaculture Course</div>
-    <h1>Learn Permaculture, Live the System</h1>
-    <p class="lede">A 3-day intensive or 7-day immersive course on a working 34-acre farm. Hands-on design, soil, food systems, beekeeping and more — with farm-to-table meals and overnight accommodation included.</p>
+    <div class="breadcrumb"><a href="straight-fin-farms.html">Home</a> &nbsp;/&nbsp; Permaculture</div>
+    <h1>Permaculture, Personalized for Your Land</h1>
+    <p class="lede">Book a free 30-minute consultation with <strong>Kenton Zerbin</strong> or a member of the Straight&nbsp;Fin Farms × Kenton team. We'll talk through your land, your goals, and the right next step — whether that's our 3-day or 7-day course on the farm, or a custom design path.</p>
     <div class="hero-cta-row">
-      <a class="btn-hero btn-hero-primary" href="book-course.html">Enroll Now</a>
-      <a class="btn-hero btn-hero-outline" href="#curriculum">See the curriculum</a>
+      <a class="btn-hero btn-hero-primary" href="#consultation">Book a Free Consultation</a>
+      <a class="btn-hero btn-hero-outline" href="#courses">See the Course Options</a>
+    </div>
+  </div>
+</section>
+
+<!-- INSTRUCTOR -->
+<section class="instructor" id="instructor">
+  <div class="instructor-inner">
+    <div class="instructor-photo-wrap">
+      <!--
+        Photo: Replace with a licensed local file at images/Instructor/kenton-zerbin.webp once received from Kenton.
+        Current source: kentonzerbin.com (used with attribution / placeholder pending license).
+      -->
+      <img class="instructor-photo"
+           src="https://kentonzerbin.com/wp-content/uploads/2025/07/Edmonton.Brand_.Photographer-Kantency522025-Edit-Edit-scaled.webp"
+           onerror="this.onerror=null;this.src='images/Instructor/kenton-zerbin.webp';"
+           alt="Kenton Zerbin — Certified International Permaculture Teacher">
+      <span class="instructor-badge">Your Instructor</span>
+    </div>
+    <div class="instructor-body">
+      <div class="eyebrow">Meet Your Instructor</div>
+      <h2>Kenton Zerbin</h2>
+      <div class="role">Certified International Permaculture Teacher · Regenerative Land Consultant</div>
+      <div class="instructor-creds">
+        <span>14+ years teaching</span>
+        <span>Trained by Mollison &amp; Lawton</span>
+        <span>4 countries · 30+ workshops</span>
+        <span>Founder, Attainable Sustainable Academy</span>
+      </div>
+      <p>Kenton is an international educator, speaker, and regenerative land consultant. A former high school teacher with a B.Ed. from the University of Alberta, he left the classroom in 2012 to pursue permaculture full-time — training under the field's founders, Bill Mollison and Geoff Lawton, in Australia.</p>
+      <p>Over the past 14 years he's taught across four countries (Canada, Australia, the U.S., and Barbados), led 30+ tiny-home workshops, and founded the Attainable Sustainable Academy. He brings real-world design experience from Canadian homesteads to tropical food forests, and a teacher's gift for making complex systems feel doable.</p>
+      <p class="quote">"Changing the world, one person, one property, one community at a time."</p>
+      <div class="instructor-cta">
+        <a class="primary" href="#consultation">Book a Free Consultation</a>
+        <a class="outline" href="https://kentonzerbin.com/" target="_blank" rel="noopener">Kenton's Site →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONSULTATION -->
+<section class="consult" id="consultation">
+  <div class="consult-inner">
+    <div class="consult-left">
+      <div class="eyebrow">Free 30-Minute Call</div>
+      <h2>Start with a free consultation</h2>
+      <p>Not sure where to begin? Book a free 30-minute call with Kenton or a member of the <strong>Straight&nbsp;Fin Farms × Kenton team</strong>. No pressure, no sales pitch — just a real conversation about your land, your goals, and whether the upcoming course (or something custom) is the right fit.</p>
+      <ul class="consult-perks">
+        <li>30 minutes, one-on-one</li>
+        <li>Talk through your property, your priorities, and your timeline</li>
+        <li>Get an honest recommendation on next steps</li>
+        <li>Decide if the 3-day, 7-day, or a custom path fits</li>
+      </ul>
+
+      <div class="call-card">
+        <div class="call-title">Prefer to talk now?</div>
+        <div class="call-now"><strong id="callNowLabel">Available now</strong> · <span id="callNowWindow">Business hours</span></div>
+        <a class="call-btn" id="callBtn" href="tel:+14162547104">
+          <span aria-hidden="true">📞</span>
+          <span class="phone-num" id="callBtnNumber">(416) 254-7104</span>
+        </a>
+        <ul class="call-hours" id="callHoursList">
+          <li data-window="business"><span>9 am – 5 pm EST</span> <span class="label" id="phoneBusiness">(416) 254-7104</span></li>
+          <li data-window="afterHours"><span>After 5 pm EST</span> <span class="label" id="phoneAfterHours">(416) 254-7104</span></li>
+          <li data-window="weekend"><span>Weekends</span> <span class="label" id="phoneWeekend">(416) 254-7104</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="consult-form-card">
+      <div id="consultFormWrap">
+        <h3>Book your free consultation</h3>
+        <p class="form-sub">We'll email you within one business day to schedule your 30-minute call.</p>
+        <form class="consult-form" id="consultForm" novalidate>
+          <div class="row">
+            <div>
+              <label for="cf-first">First Name</label>
+              <input type="text" id="cf-first" name="firstName" autocomplete="given-name" required>
+            </div>
+            <div>
+              <label for="cf-last">Last Name</label>
+              <input type="text" id="cf-last" name="lastName" autocomplete="family-name" required>
+            </div>
+          </div>
+          <label for="cf-email">Email</label>
+          <input type="email" id="cf-email" name="email" autocomplete="email" required>
+          <label for="cf-phone">Phone</label>
+          <input type="tel" id="cf-phone" name="phone" autocomplete="tel" required>
+          <label for="cf-reason">Why are you interested? <span class="optional-hint">(optional)</span></label>
+          <textarea id="cf-reason" name="reason" placeholder="A few words about your land, your goals, or what drew you here…"></textarea>
+          <button type="submit" class="submit" id="cf-submit">Request My Free Consultation</button>
+          <div class="consult-msg" id="cf-msg" role="status"></div>
+        </form>
+      </div>
+      <div class="consult-success" id="consultSuccess">
+        <div class="check">✓</div>
+        <h3>Request received</h3>
+        <p>Thanks — we'll be in touch within one business day to schedule your free 30-minute call. Check your inbox (and spam folder, just in case) for our reply.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -829,9 +1002,12 @@
 
 <!-- CTA -->
 <section class="cta-banner">
-  <h2>Reserve your spot</h2>
-  <p>Small cohorts — we keep it intimate. When we're full, we're full. Enroll now to guarantee your seat for August or September 2026.</p>
-  <a class="btn-primary" style="background:#3d8c40; color:#fff; border-radius:50px; padding:18px 52px; font-size:13px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; display:inline-block;" href="book-course.html">Enroll Now</a>
+  <h2>Two ways to start</h2>
+  <p>Talk it through first, or jump straight to enrolling for August or September 2026. Either way, we'll meet you where you are.</p>
+  <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+    <a style="background:#3d8c40; color:#fff; border-radius:50px; padding:18px 40px; font-size:13px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; display:inline-block;" href="#consultation">Book a Free Consultation</a>
+    <a style="background:#fff; color:#1a1a1a; border:1.5px solid #1a1a1a; border-radius:50px; padding:16px 40px; font-size:13px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; display:inline-block;" href="book-course.html">Enroll in the Course</a>
+  </div>
 </section>
 
 <!-- FOOTER -->
@@ -874,6 +1050,163 @@
       q.parentElement.classList.toggle('open');
     });
   });
+
+  // ────────────────────────────────────────────────────────────────────
+  // PERMACULTURE PHONE NUMBERS (admin-editable via Apps Script settings)
+  // ────────────────────────────────────────────────────────────────────
+  // Defaults if settings haven't been saved yet
+  var DEFAULT_PHONES = {
+    business:   '416-254-7104',   // 9 am – 5 pm EST
+    afterHours: '416-254-7104',   // After 5 pm EST
+    weekend:    '416-254-7104'    // Weekends
+  };
+
+  // Display helpers
+  function formatPhoneDisplay(raw) {
+    if (!raw) return '';
+    var digits = String(raw).replace(/\D/g, '');
+    if (digits.length === 11 && digits.charAt(0) === '1') digits = digits.slice(1);
+    if (digits.length !== 10) return raw;
+    return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+  }
+  function phoneTelHref(raw) {
+    if (!raw) return 'tel:';
+    var digits = String(raw).replace(/\D/g, '');
+    if (digits.length === 10) digits = '1' + digits;
+    return 'tel:+' + digits;
+  }
+
+  // Which window applies right now, in EST (UTC-5; we ignore DST nuance — close enough for routing)
+  function currentWindow() {
+    var now = new Date();
+    // Compute Eastern Time hour and weekday using Intl
+    var fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Toronto',
+      hour: 'numeric', hour12: false, weekday: 'short'
+    });
+    var parts = fmt.formatToParts(now);
+    var hour = 0, wkday = '';
+    parts.forEach(function (p) {
+      if (p.type === 'hour') hour = parseInt(p.value, 10);
+      if (p.type === 'weekday') wkday = p.value;
+    });
+    var isWeekend = (wkday === 'Sat' || wkday === 'Sun');
+    if (isWeekend) return { key: 'weekend', label: 'Weekend hours', window: 'Saturday & Sunday' };
+    if (hour >= 9 && hour < 17) return { key: 'business', label: 'Available now', window: '9 am – 5 pm EST' };
+    return { key: 'afterHours', label: 'After-hours line', window: 'After 5 pm EST' };
+  }
+
+  function applyPhones(phones) {
+    phones = Object.assign({}, DEFAULT_PHONES, phones || {});
+    var spans = {
+      business:   document.getElementById('phoneBusiness'),
+      afterHours: document.getElementById('phoneAfterHours'),
+      weekend:    document.getElementById('phoneWeekend')
+    };
+    Object.keys(spans).forEach(function (k) {
+      if (spans[k]) spans[k].textContent = formatPhoneDisplay(phones[k]);
+    });
+
+    var win = currentWindow();
+    var active = phones[win.key] || phones.business;
+    var btn = document.getElementById('callBtn');
+    var num = document.getElementById('callBtnNumber');
+    var label = document.getElementById('callNowLabel');
+    var window_ = document.getElementById('callNowWindow');
+    if (btn) btn.setAttribute('href', phoneTelHref(active));
+    if (num) num.textContent = formatPhoneDisplay(active);
+    if (label) label.textContent = win.label;
+    if (window_) window_.textContent = win.window;
+
+    // Highlight the active row in the hours list
+    document.querySelectorAll('#callHoursList li').forEach(function (li) {
+      li.classList.toggle('active', li.dataset.window === win.key);
+    });
+  }
+
+  // Fetch admin-configured phones from the Apps Script settings endpoint.
+  (function fetchPermaculturePhones() {
+    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+    // Apply defaults first so the section renders even if the fetch fails.
+    applyPhones(DEFAULT_PHONES);
+    try {
+      fetch(APPS_SCRIPT_URL + '?action=get_settings', { method: 'GET', cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (s) {
+          if (s && s.permaculturePhones) applyPhones(s.permaculturePhones);
+        })
+        .catch(function (err) { /* keep defaults */ });
+    } catch (err) { /* keep defaults */ }
+  })();
+
+  // ────────────────────────────────────────────────────────────────────
+  // FREE CONSULTATION FORM
+  // ────────────────────────────────────────────────────────────────────
+  (function wireConsultForm() {
+    var form = document.getElementById('consultForm');
+    if (!form) return;
+    var msg = document.getElementById('cf-msg');
+    var btn = document.getElementById('cf-submit');
+    var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pOYvYJBPvaTFD4ldcUnxtB5XGE81TrP70cBH2ap3QAGeOVWC0CefochRrxM97INo/exec';
+
+    function showMsg(text, kind) {
+      msg.textContent = text;
+      msg.className = 'consult-msg ' + (kind === 'ok' ? 'ok' : 'err');
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var firstName = document.getElementById('cf-first').value.trim();
+      var lastName  = document.getElementById('cf-last').value.trim();
+      var email     = document.getElementById('cf-email').value.trim();
+      var phone     = document.getElementById('cf-phone').value.trim();
+      var reason    = document.getElementById('cf-reason').value.trim();
+
+      if (!firstName || !lastName) return showMsg('Please enter your first and last name.', 'err');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showMsg('Please enter a valid email address.', 'err');
+      if (phone.replace(/\D/g, '').length < 7) return showMsg('Please enter a valid phone number.', 'err');
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      msg.className = 'consult-msg';
+      msg.textContent = '';
+
+      var payload = {
+        type: 'consultation',
+        source: 'permaculture-page',
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        reason: reason,
+        submittedAt: new Date().toISOString(),
+        pageUrl: location.href
+      };
+
+      // Use no-cors so Apps Script doesn't get a CORS preflight. The downside is we
+      // can't read the response — so we treat a successful network call as success,
+      // matching the existing bookings.html pattern.
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function () {
+        document.getElementById('consultFormWrap').style.display = 'none';
+        document.getElementById('consultSuccess').style.display = 'block';
+        if (window.gtag) {
+          gtag('event', 'consultation_request', {
+            page_path: location.pathname,
+            source: 'permaculture-page'
+          });
+        }
+      }).catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Request My Free Consultation';
+        showMsg('Network error — please try again, or email hello@straightfinfarms.com.', 'err');
+      });
+    });
+  })();
 </script>
 </body>
 </html>
