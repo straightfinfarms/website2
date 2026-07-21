@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTP0NKLDK7"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZTP0NKLDK7');</script>
+<title>Deal Finder — Balance Nature Property Fund</title>
+<meta name="description" content="Screen multi-residential properties daily. Auto-underwrite cap rate, DSCR, cash-on-cash and GRM to surface the deals that make sense.">
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="invest-platform.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<header class="hero-invest" style="padding:60px 0 52px;">
+  <div class="wrap">
+    <div class="eyebrow">Acquisition engine</div>
+    <h1 style="max-width:20ch;">Screen every multi-residence. Surface the ones that make sense.</h1>
+    <p class="lead" style="margin-top:18px;">The Deal Finder underwrites each candidate the moment its numbers are in — cap rate, debt coverage, cash-on-cash and expense ratio — and scores it so you spend time only on the properties worth a prospectus.</p>
+  </div>
+</header>
+
+<section class="section-sm" style="background:#fff;border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="grid grid-4" id="pipelineStats"></div>
+  </div>
+</section>
+
+<div class="wrap section" style="display:grid;grid-template-columns:1fr 380px;gap:44px;align-items:start;">
+
+  <!-- LEFT: pipeline -->
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div><div class="eyebrow" style="margin-bottom:4px;">Screening pipeline</div><h2>Candidate properties</h2></div>
+      <div class="tag-row">
+        <button class="btn ghost sm" id="sortScore">Sort by score</button>
+        <button class="btn ghost sm" id="filterPass">Show all</button>
+      </div>
+    </div>
+    <p class="muted" style="margin:12px 0 24px;">Each row is auto-underwritten. <span class="pill green">Makes sense</span> ≥ 70 · <span class="pill gold">Watch</span> 55–69 · <span class="pill red">Pass</span> &lt; 55. Promote a strong candidate straight into a fundable deal room.</p>
+
+    <div class="tbl-wrap card" style="padding:0;">
+      <table class="tbl" id="candTable"></table>
+    </div>
+
+    <div style="margin-top:22px;" data-disclaimer></div>
+  </div>
+
+  <!-- RIGHT: add candidate + underwrite -->
+  <aside style="position:sticky;top:96px;">
+    <div class="card">
+      <h3 class="serif" style="font-size:20px;margin-bottom:6px;">Underwrite a property</h3>
+      <p class="muted" style="font-size:14px;margin-bottom:18px;">Enter the numbers — the score updates live.</p>
+      <form id="candForm">
+        <div class="field"><label class="fld">Property name</label><input class="input" name="name" placeholder="e.g. Lakefield 5-Plex" required></div>
+        <div class="field"><label class="fld">Address</label><input class="input" name="address" placeholder="Street, City, ON"></div>
+        <div class="row">
+          <div class="field"><label class="fld">Units</label><input class="input" name="units" type="number" min="1" value="6"></div>
+          <div class="field"><label class="fld">Purchase price</label><input class="input" name="purchasePrice" inputmode="numeric" value="1200000"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label class="fld">Renovation</label><input class="input" name="renovation" inputmode="numeric" value="80000"></div>
+          <div class="field"><label class="fld">Closing / reserves</label><input class="input" name="closingCosts" inputmode="numeric" value="42000"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label class="fld">Gross annual rent</label><input class="input" name="grossRent" inputmode="numeric" value="132000"></div>
+          <div class="field"><label class="fld">Other income</label><input class="input" name="otherIncome" inputmode="numeric" value="5000"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label class="fld">Vacancy %</label><input class="input" name="vacancyPct" inputmode="decimal" value="5"></div>
+          <div class="field"><label class="fld">Operating expenses</label><input class="input" name="operatingExpenses" inputmode="numeric" value="49000"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label class="fld">Loan amount</label><input class="input" name="loanAmount" inputmode="numeric" value="840000"></div>
+          <div class="field"><label class="fld">Interest %</label><input class="input" name="interestRate" inputmode="decimal" value="5.75"></div>
+        </div>
+        <div class="field"><label class="fld">Amortization (years)</label><input class="input" name="amortYears" type="number" value="30"></div>
+
+        <div id="liveScore" class="card" style="background:#f2efe8;padding:16px;margin:8px 0 16px;"></div>
+
+        <button class="btn" type="submit" style="width:100%;">Add to pipeline</button>
+      </form>
+    </div>
+    <button class="btn ghost sm" id="resetData" style="width:100%;margin-top:14px;">Reset demo data</button>
+  </aside>
+</div>
+
+<div id="footer"></div>
+
+<script src="invest-platform.js"></script>
+<script>
+  SFF.ui.mount('finder');
+  var F = SFF.fmt, fin = SFF.fin;
+  var sortByScore = false, showPassing = false;
+
+  function parseNum(v) { return parseFloat(String(v == null ? '' : v).replace(/[^0-9.\-]/g, '')) || 0; }
+
+  function renderStats() {
+    var cands = SFF.store.candidates();
+    var scored = cands.map(function (c) { return fin.score(c); });
+    var makes = scored.filter(function (s) { return s.verdict === 'Makes sense'; }).length;
+    var avgCap = scored.length ? scored.reduce(function (s, x) { return s + x.u.capRate; }, 0) / scored.length : 0;
+    var totalValue = cands.reduce(function (s, c) { return s + c.purchasePrice; }, 0);
+    var stats = [
+      [cands.length, 'Properties screened'],
+      [makes, 'Make sense'],
+      [F.pct(avgCap), 'Avg cap rate'],
+      [F.money0(totalValue), 'Pipeline value']
+    ];
+    document.getElementById('pipelineStats').innerHTML = stats.map(function (s) {
+      return '<div class="stat"><div class="k">' + s[0] + '</div><div class="l">' + s[1] + '</div></div>';
+    }).join('');
+  }
+
+  function renderTable() {
+    var cands = SFF.store.candidates().map(function (c) { return { c: c, s: fin.score(c) }; });
+    if (showPassing) cands = cands.filter(function (x) { return x.s.verdict !== 'Pass'; });
+    if (sortByScore) cands.sort(function (a, b) { return b.s.score - a.s.score; });
+
+    var head = '<thead><tr><th>Property</th><th class="num">Cap</th><th class="num">DSCR</th><th class="num">CoC</th><th class="num">GRM</th><th class="num">Score</th><th>Verdict</th><th></th></tr></thead>';
+    var body = cands.map(function (x) {
+      var c = x.c, s = x.s;
+      var pill = s.verdict === 'Makes sense' ? 'green' : s.verdict === 'Watch' ? 'gold' : 'red';
+      var flags = s.flags.length ? '<div class="muted" style="font-size:11px;margin-top:3px;">' + s.flags.join(' · ') + '</div>' : '';
+      return '<tr>' +
+        '<td><strong>' + esc(c.name) + '</strong><div class="muted" style="font-size:12px;">' + esc(c.address || '') + ' · ' + (c.units || '?') + ' units</div>' + flags + '</td>' +
+        '<td class="num">' + F.pct(s.u.capRate) + '</td>' +
+        '<td class="num">' + F.x(s.u.dscr) + '</td>' +
+        '<td class="num">' + F.pct(s.u.cashOnCash) + '</td>' +
+        '<td class="num">' + s.u.grm.toFixed(1) + '</td>' +
+        '<td class="num"><strong>' + s.score + '</strong></td>' +
+        '<td><span class="pill ' + pill + '">' + s.verdict + '</span></td>' +
+        '<td class="num" style="white-space:nowrap;">' +
+          '<button class="btn sm" data-promote="' + esc(c.id) + '" ' + (s.verdict === 'Pass' ? 'style="opacity:.5;"' : '') + '>Prospectus</button> ' +
+          '<button class="btn ghost sm" data-remove="' + esc(c.id) + '">✕</button>' +
+        '</td></tr>';
+    }).join('');
+    document.getElementById('candTable').innerHTML = head + '<tbody>' + (body || '<tr><td colspan="8" class="muted center" style="padding:30px;">No candidates yet — underwrite one on the right.</td></tr>') + '</tbody>';
+
+    document.querySelectorAll('[data-promote]').forEach(function (b) { b.addEventListener('click', function () { promote(b.getAttribute('data-promote')); }); });
+    document.querySelectorAll('[data-remove]').forEach(function (b) { b.addEventListener('click', function () { SFF.store.removeCandidate(b.getAttribute('data-remove')); refresh(); }); });
+  }
+
+  // promote a candidate into a fundable deal (build the capital stack automatically)
+  function promote(id) {
+    var c = SFF.store.candidates().filter(function (x) { return x.id === id; })[0];
+    if (!c) return;
+    if (SFF.store.getDeal(c.id)) { location.href = 'deal-room.html?deal=' + encodeURIComponent(c.id); return; }
+    var raise = fin.totalCost(c) - (c.loanAmount || 0);
+    // default split of the raise: 45% investor notes, 45% Common B, 10% Common A
+    var deal = Object.assign({}, c, {
+      status: 'open',
+      type: 'Multi-residential — ' + (c.units || '?') + ' units',
+      image: 'images/Community/community Large.jpeg',
+      summary: 'Auto-generated prospectus from the Deal Finder. ' + (c.units || '') + '-unit multi-residential acquisition with a light-renovation, rent-to-market plan. Review and refine the raise structure before opening to investors.',
+      appreciationPct: 0.03, rentGrowthPct: 0.03,
+      classes: {
+        note:     { label: 'Investor Note (Lender)',    target: Math.round(raise * 0.45 / 1000) * 1000, rate: 0.09, termYears: 5 },
+        common_b: { label: 'Common B (Passive Equity)', target: Math.round(raise * 0.45 / 1000) * 1000, prefReturn: 0.07 },
+        common_a: { label: 'Common A (Control Equity)', target: Math.max(0, raise - Math.round(raise * 0.45 / 1000) * 1000 - Math.round(raise * 0.45 / 1000) * 1000) }
+      },
+      openedOn: '2026-07-21'
+    });
+    SFF.store.addDeal(deal);
+    SFF.store.removeCandidate(id);
+    try { gtag('event', 'deal_promoted', { deal_id: c.id }); } catch (e) {}
+    location.href = 'deal-room.html?deal=' + encodeURIComponent(c.id);
+  }
+
+  // live scoring in the form
+  var candForm = document.getElementById('candForm');
+  function formToCandidate() {
+    var fd = new FormData(candForm);
+    return {
+      id: 'c-' + Date.now(),
+      name: fd.get('name') || 'Untitled',
+      address: fd.get('address') || '',
+      units: parseNum(fd.get('units')),
+      purchasePrice: parseNum(fd.get('purchasePrice')),
+      renovation: parseNum(fd.get('renovation')),
+      closingCosts: parseNum(fd.get('closingCosts')),
+      grossRent: parseNum(fd.get('grossRent')),
+      otherIncome: parseNum(fd.get('otherIncome')),
+      vacancyPct: parseNum(fd.get('vacancyPct')) / 100,
+      operatingExpenses: parseNum(fd.get('operatingExpenses')),
+      loanAmount: parseNum(fd.get('loanAmount')),
+      interestRate: parseNum(fd.get('interestRate')) / 100,
+      amortYears: parseNum(fd.get('amortYears')) || 30
+    };
+  }
+  function liveScore() {
+    var cand = formToCandidate();
+    if (!cand.purchasePrice || !cand.grossRent) { document.getElementById('liveScore').innerHTML = '<span class="muted" style="font-size:13px;">Enter price and rent to score.</span>'; return; }
+    var s = fin.score(cand);
+    var pill = s.verdict === 'Makes sense' ? 'green' : s.verdict === 'Watch' ? 'gold' : 'red';
+    document.getElementById('liveScore').innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<div><div class="serif" style="font-size:30px;font-weight:900;">' + s.score + '<span style="font-size:15px;color:var(--muted);">/100</span></div>' +
+        '<span class="pill ' + pill + '">' + s.verdict + '</span></div>' +
+        '<div style="text-align:right;font-size:12px;" class="muted">Cap ' + F.pct(s.u.capRate) + '<br>DSCR ' + F.x(s.u.dscr) + '<br>CoC ' + F.pct(s.u.cashOnCash) + '</div>' +
+      '</div>' + (s.flags.length ? '<div class="muted" style="font-size:12px;margin-top:8px;">⚠ ' + s.flags.join(' · ') + '</div>' : '');
+  }
+  candForm.addEventListener('input', liveScore);
+  candForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var cand = formToCandidate();
+    if (!cand.purchasePrice || !cand.grossRent) return;
+    SFF.store.addCandidate(cand);
+    try { gtag('event', 'candidate_added', {}); } catch (err) {}
+    candForm.reset();
+    liveScore();
+    refresh();
+  });
+
+  document.getElementById('sortScore').addEventListener('click', function () { sortByScore = !sortByScore; this.textContent = sortByScore ? 'Sorted by score ✓' : 'Sort by score'; renderTable(); });
+  document.getElementById('filterPass').addEventListener('click', function () { showPassing = !showPassing; this.textContent = showPassing ? 'Hide passes ✓' : 'Show all'; renderTable(); });
+  document.getElementById('resetData').addEventListener('click', function () { if (confirm('Reset all demo deals, candidates and commitments?')) { SFF.store.reset(); refresh(); } });
+
+  function refresh() { renderStats(); renderTable(); }
+  refresh();
+  liveScore();
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+</script>
+</body>
+</html>
