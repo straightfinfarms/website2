@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRRRR Deal Lab — Multi-Family Investment Analyzer</title>
+<meta name="description" content="Assess multi-family properties, compute BRRRR purchase pricepoints, find cash-flowing deals on a map, and monitor your rental portfolio.">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">B</div>
+    <div>BRRRR Deal Lab <small>Multi-family underwriting · cash-flow first</small></div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-view="analyze">Analyzer</button>
+    <button class="tab" data-view="finder">Deal Finder</button>
+    <button class="tab" data-view="portfolio">Portfolio</button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ ANALYZER ============ -->
+  <section class="view active" id="view-analyze">
+    <div class="grid2">
+      <!-- Inputs -->
+      <div class="card" id="analyze-form">
+        <h2>Deal inputs</h2>
+        <p class="hint">Enter the property. Everything recalculates live. Leave itemized expenses at 0 to use the expense-ratio estimate.</p>
+
+        <h3>Property &amp; income</h3>
+        <div class="field"><label>Property name</label><input id="f-name" value="New Prospect"></div>
+        <div class="field"><label>Address</label><input id="f-address" placeholder="123 Main St, City, ST"></div>
+        <div class="row">
+          <div class="field"><label>Units</label><input id="f-units" type="number" min="1" value="4"></div>
+          <div class="field"><label>Rent / unit / mo</label><input id="f-rentPerUnit" type="number" value="1250"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Other income / mo</label><input id="f-otherIncome" type="number" value="0"></div>
+          <div class="field"><label>Vacancy %</label><input id="f-vacancyPct" type="number" value="6"></div>
+        </div>
+
+        <h3>Operating expenses (annual)</h3>
+        <div class="row">
+          <div class="field"><label>Property taxes</label><input id="f-taxesAnnual" type="number" value="0"></div>
+          <div class="field"><label>Insurance</label><input id="f-insuranceAnnual" type="number" value="0"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Utilities</label><input id="f-utilitiesAnnual" type="number" value="0"></div>
+          <div class="field"><label>Reserves / unit / yr</label><input id="f-reservesPerUnit" type="number" value="300"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>Maint %</label><input id="f-maintenancePct" type="number" value="8"></div>
+          <div class="field"><label>Mgmt %</label><input id="f-managementPct" type="number" value="8"></div>
+          <div class="field"><label>Exp ratio %</label><input id="f-expenseRatioPct" type="number" value="45"></div>
+        </div>
+
+        <h3>Acquisition</h3>
+        <div class="row">
+          <div class="field"><label>Purchase price</label><input id="f-price" type="number" value="250000"></div>
+          <div class="field"><label>Rehab budget</label><input id="f-rehab" type="number" value="50000"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>Down %</label><input id="f-downPct" type="number" value="25"></div>
+          <div class="field"><label>Rate %</label><input id="f-purchaseRate" type="number" value="8.5"></div>
+          <div class="field"><label>Term yrs</label><input id="f-purchaseTermYears" type="number" value="30"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>Closing %</label><input id="f-closingPct" type="number" value="3"></div>
+          <div class="field"><label>Hold mos</label><input id="f-holdingMonths" type="number" value="6"></div>
+          <div class="field"><label></label></div>
+        </div>
+
+        <h3>ARV &amp; refinance</h3>
+        <div class="row">
+          <div class="field"><label>ARV method</label>
+            <select id="f-arvMode">
+              <option value="income">Income (NOI ÷ market cap)</option>
+              <option value="manual">Manual ARV</option>
+            </select></div>
+          <div class="field"><label>Market cap % / Manual ARV</label>
+            <input id="f-marketCapPct" type="number" value="7.25"></div>
+        </div>
+        <div class="field" id="arvManual-wrap" style="display:none">
+          <label>Manual ARV ($)</label><input id="f-arvManual" type="number" value="420000">
+        </div>
+        <div class="row3">
+          <div class="field"><label>Refi LTV %</label><input id="f-refiLtvPct" type="number" value="75"></div>
+          <div class="field"><label>Refi rate %</label><input id="f-refiRate" type="number" value="7.25"></div>
+          <div class="field"><label>Refi term</label><input id="f-refiTermYears" type="number" value="30"></div>
+        </div>
+        <div class="field"><label>Refi closing %</label><input id="f-refiClosingPct" type="number" value="2"></div>
+
+        <h3>Your targets (key = cash flow)</h3>
+        <div class="row">
+          <div class="field"><label>Target CF / unit / mo</label><input id="f-targetCashflowPerUnit" type="number" value="150"></div>
+          <div class="field"><label>Target CoC %</label><input id="f-targetCoCPct" type="number" value="12"></div>
+        </div>
+
+        <div class="btnrow">
+          <button class="btn" id="btn-save-prospect">Save to Deal Finder</button>
+          <button class="btn ghost" id="btn-send-portfolio">Add to Portfolio</button>
+          <button class="btn ghost sm" id="btn-reset-inputs">Reset</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div>
+        <div class="card">
+          <div class="scorewrap">
+            <div class="dial" id="dial"></div>
+            <div class="reco" id="reco"></div>
+          </div>
+          <div class="crit" id="crit"></div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2>Purchasing pricepoints</h2>
+          <p class="hint">What you should pay to hit each goal, given this property's ARV and rents.</p>
+          <div class="pp" id="pricepoints"></div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2>Underwriting detail</h2>
+          <div class="tiles" id="tiles"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEAL FINDER ============ -->
+  <section class="view" id="view-finder">
+    <div class="card">
+      <h2>Find cash-flowing multi-family near an address</h2>
+      <p class="hint">Enter an address to center the map, then see saved prospects ranked by BRRRR rating within your radius. Click the map to drop a new prospect.</p>
+      <div class="finderbar">
+        <div class="field" style="flex:1;min-width:220px"><label>Address or place</label>
+          <input id="find-address" placeholder="e.g. Short North, Columbus OH"></div>
+        <div class="field"><label>Radius (mi)</label><input id="find-radius" type="number" value="5" style="width:90px"></div>
+        <div class="field"><label>Min rating</label>
+          <select id="find-minrating">
+            <option value="0">Any</option><option value="40">C or better</option>
+            <option value="55">C+ / B</option><option value="65">B- or better</option>
+            <option value="75">B+ / A only</option>
+          </select></div>
+        <button class="btn" id="btn-find">Search</button>
+        <button class="btn ghost sm" id="btn-reset-prospects">Reset samples</button>
+      </div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="grid2">
+      <div>
+        <div id="map"></div>
+      </div>
+      <div class="card">
+        <h2>Ranked deals <span class="tag" id="find-count">—</span></h2>
+        <p class="hint">Sorted by cash flow per unit — the metric that matters.</p>
+        <div style="overflow:auto">
+          <table id="find-table">
+            <thead><tr>
+              <th>Rating</th><th>Property</th><th class="num">Dist</th>
+              <th class="num">Price</th><th class="num">CF/unit</th><th class="num">CoC</th><th></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PORTFOLIO ============ -->
+  <section class="view" id="view-portfolio">
+    <div class="kpis" id="kpis"></div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px">
+        <h2 style="margin:0">Properties under management</h2>
+        <div style="margin-left:auto" class="btnrow">
+          <button class="btn sm" id="btn-add-holding">+ Add property</button>
+          <button class="btn ghost sm" id="btn-export">Export</button>
+          <button class="btn ghost sm" id="btn-import">Import</button>
+        </div>
+      </div>
+      <p class="hint">Live monitoring of equity, cash flow, DSCR and cash-on-cash. Data is stored in your browser.</p>
+      <div style="overflow:auto">
+        <table id="port-table">
+          <thead><tr>
+            <th>Property</th><th class="num">Units</th><th class="num">Value</th>
+            <th class="num">Loan</th><th class="num">Equity</th><th class="num">CF/mo</th>
+            <th class="num">DSCR</th><th class="num">CoC</th><th>Status</th><th></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="js/finance.js"></script>
+<script src="js/store.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/analyze.js"></script>
+<script src="js/finder.js"></script>
+<script src="js/portfolio.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
