@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTP0NKLDK7"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZTP0NKLDK7');</script>
+<title>Investor Portal — Balance Nature Property Fund</title>
+<meta name="description" content="Shareholder and lender portal: cap table, distributions, and financial statements for each Straight Fin Farms property.">
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="invest-platform.css">
+<style>
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:24px 0; }
+  .tab { padding:10px 20px; border-radius:50px; border:1.5px solid var(--line); background:#fff; cursor:pointer; font-size:14px; font-weight:600; color:var(--muted); }
+  .tab.active { background:var(--green); color:#fff; border-color:var(--green); }
+  .statement { max-width:720px; }
+  @media print {
+    #nav, #footer, .tabs, .noprint { display:none !important; }
+    body { background:#fff; }
+  }
+</style>
+</head>
+<body>
+<div id="nav"></div>
+
+<header class="hero-invest" style="padding:52px 0 44px;">
+  <div class="wrap">
+    <div class="eyebrow">Investor Portal</div>
+    <h1 style="max-width:22ch;">Live statements for every shareholder and lender.</h1>
+    <p class="lead" style="margin-top:16px;">Cap table, distribution history, and full financial statements for each property — the reporting we share with the people who funded the deal.</p>
+    <div style="margin-top:24px;">
+      <label class="fld" style="color:rgba(255,255,255,.7);">Viewing property</label>
+      <select class="input" id="dealPick" style="max-width:420px;"></select>
+    </div>
+  </div>
+</header>
+
+<section class="section-sm" style="background:#fff;border-bottom:1px solid var(--line);">
+  <div class="wrap"><div class="grid grid-4" id="portalStats"></div></div>
+</section>
+
+<div class="wrap section">
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="capital">Cap Table &amp; Investors</div>
+    <div class="tab" data-tab="income">Income Statement</div>
+    <div class="tab" data-tab="balance">Balance Sheet</div>
+    <div class="tab" data-tab="cashflow">Cash Flow &amp; Distributions</div>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px;" class="noprint">
+    <button class="btn ghost sm" onclick="window.print()">⎙ Print / save PDF</button>
+  </div>
+
+  <div id="tabContent"></div>
+
+  <div style="margin-top:32px;max-width:720px;" data-disclaimer></div>
+</div>
+
+<div id="footer"></div>
+
+<script src="invest-platform.js"></script>
+<script>
+  SFF.ui.mount('portal');
+  var F = SFF.fmt, fin = SFF.fin;
+  var currentTab = 'capital';
+  var deal;
+
+  // deal picker
+  var deals = SFF.store.deals();
+  var pick = document.getElementById('dealPick');
+  pick.innerHTML = deals.map(function (d) { return '<option value="' + d.id + '">' + esc(d.name) + '</option>'; }).join('');
+  pick.addEventListener('change', function () { deal = SFF.store.getDeal(pick.value); renderAll(); });
+  deal = deals[0];
+
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.addEventListener('click', function () {
+      document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      currentTab = t.getAttribute('data-tab');
+      renderTab();
+    });
+  });
+
+  function renderAll() { renderStats(); renderTab(); }
+
+  function renderStats() {
+    var u = fin.underwrite(deal), fund = fin.funding(deal), cf = fin.cashFlow(deal);
+    var stats = [
+      [F.money0(fin.totalCost(deal)), 'Total capitalization'],
+      [F.money0(fund.raised), 'Investor capital committed'],
+      [F.money0(u.noi), 'Net operating income (Yr 1)'],
+      [F.money0(cf.distributions), 'Cash available to distribute']
+    ];
+    document.getElementById('portalStats').innerHTML = stats.map(function (s) {
+      return '<div class="stat"><div class="k">' + s[0] + '</div><div class="l">' + s[1] + '</div></div>';
+    }).join('');
+  }
+
+  function renderTab() {
+    var el = document.getElementById('tabContent');
+    if (currentTab === 'capital') el.innerHTML = capitalView();
+    else if (currentTab === 'income') el.innerHTML = incomeView();
+    else if (currentTab === 'balance') el.innerHTML = balanceView();
+    else el.innerHTML = cashflowView();
+  }
+
+  // ---------- Cap table & investors ----------
+  function capitalView() {
+    var ct = fin.capTable(deal);
+    var noteT = fin.classTarget(deal, 'note');
+    var commits = SFF.store.commitments(deal.id);
+
+    var equityRows = ct.rows.map(function (r) {
+      return '<tr><td><span class="dot ' + (r.klass === 'common_a' ? 'a' : 'b') + '"></span><strong>' + r.label + '</strong></td>' +
+        '<td>' + r.votes + '</td><td class="num">' + r.units.toLocaleString() + '</td>' +
+        '<td class="num">' + F.money0(r.capital) + '</td><td class="num">' + F.pct(r.pct) + '</td></tr>';
+    }).join('');
+
+    var invByClass = { common_a: [], common_b: [], note: [] };
+    commits.forEach(function (c) { if (invByClass[c.klass]) invByClass[c.klass].push(c); });
+
+    function invRows(list, dot) {
+      if (!list.length) return '<tr class="sub"><td colspan="4" class="muted">None yet</td></tr>';
+      return list.map(function (c) {
+        var st = c.status === 'funded' ? '<span class="pill green" style="font-size:10px;">funded</span>' : '<span class="pill gold" style="font-size:10px;">pledged</span>';
+        return '<tr><td><span class="dot ' + dot + '"></span>' + esc(c.name) + '</td><td class="num">' + F.money0(c.amount) + '</td><td>' + F.date(c.date) + '</td><td>' + st + '</td></tr>';
+      }).join('');
+    }
+
+    return '<div class="statement" style="max-width:860px;">' +
+      '<h2 class="serif">Capitalization table</h2><p class="muted" style="margin:6px 0 18px;">' + esc(deal.name) + ' · as of ' + F.date(new Date().toISOString()) + '</p>' +
+      '<div class="card tbl-wrap"><table class="tbl"><thead><tr><th>Equity class</th><th>Rights</th><th class="num">Units</th><th class="num">Capital</th><th class="num">Ownership</th></tr></thead><tbody>' +
+        equityRows +
+        '<tr class="total"><td>Total equity</td><td></td><td class="num"></td><td class="num">' + F.money0(ct.totalEquity) + '</td><td class="num">100%</td></tr>' +
+      '</tbody></table></div>' +
+
+      '<div class="card" style="margin-top:20px;background:#f9f7f2;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div><span class="dot n"></span><strong>Investor Notes (debt — not ownership)</strong><div class="muted" style="font-size:13px;">Lenders paid a fixed premium, senior to all equity. Excluded from the cap table.</div></div>' +
+          '<div class="serif" style="font-size:24px;font-weight:900;">' + F.money0(noteT) + '</div>' +
+        '</div></div>' +
+
+      '<h3 class="serif" style="margin:34px 0 14px;">Investors of record</h3>' +
+      '<div class="card tbl-wrap"><table class="tbl"><thead><tr><th>Investor</th><th class="num">Amount</th><th>Date</th><th>Status</th></tr></thead><tbody>' +
+        '<tr class="sub"><td colspan="4"><strong>Common A — Control equity</strong></td></tr>' + invRows(invByClass.common_a, 'a') +
+        '<tr class="sub"><td colspan="4"><strong>Common B — Passive equity</strong></td></tr>' + invRows(invByClass.common_b, 'b') +
+        '<tr class="sub"><td colspan="4"><strong>Investor Notes — Lenders</strong></td></tr>' + invRows(invByClass.note, 'n') +
+      '</tbody></table></div></div>';
+  }
+
+  // ---------- Income statement ----------
+  function incomeView() {
+    var is = fin.incomeStatement(deal);
+    return '<div class="statement">' +
+      stHeader('Statement of Operations', 'For the stabilized year ending Dec 31, 2026 (projected)') +
+      '<div class="card tbl-wrap"><table class="tbl">' +
+        row('Rental income', is.grossRent) +
+        row('Other income', is.otherIncome) +
+        row('Vacancy &amp; credit loss', -is.vacancy, 'sub') +
+        rowT('Effective gross income', is.egi) +
+        row('Operating expenses', -is.operatingExpenses, 'sub') +
+        rowT('Net operating income', is.noi) +
+        row('Depreciation', -is.depreciation, 'sub') +
+        row('Interest — senior mortgage', -is.interestSenior, 'sub') +
+        row('Interest — investor notes', -is.interestNotes, 'sub') +
+        rowT('Net income', is.netIncome) +
+      '</table></div>' +
+      '<p class="muted" style="font-size:13px;margin-top:12px;">Prepared on an accrual basis for illustration. Depreciation uses a 27.5-year straight-line building basis.</p></div>';
+  }
+
+  // ---------- Balance sheet ----------
+  function balanceView() {
+    var bs = fin.balanceSheet(deal);
+    return '<div class="statement">' +
+      stHeader('Balance Sheet', 'As at closing / Dec 31, 2026 (projected)') +
+      '<div class="card tbl-wrap"><table class="tbl">' +
+        '<tr class="sub"><td colspan="2"><strong>Assets</strong></td></tr>' +
+        row('Investment property, at cost', bs.propertyAtCost) +
+        row('Cash &amp; capital reserve', bs.cashReserve) +
+        rowT('Total assets', bs.totalAssets) +
+        '<tr class="sub"><td colspan="2"><strong>Liabilities</strong></td></tr>' +
+        row('Senior mortgage payable', bs.seniorLoan) +
+        row('Investor notes payable', bs.notesPayable) +
+        rowT('Total liabilities', bs.totalLiabilities) +
+        '<tr class="sub"><td colspan="2"><strong>Equity</strong></td></tr>' +
+        row('Common A contributed capital', bs.commonA) +
+        row('Common B contributed capital', bs.commonB) +
+        row('Retained earnings', bs.retainedEarnings) +
+        rowT('Total equity', bs.totalEquity) +
+        rowT('Total liabilities &amp; equity', bs.totalLiabEquity) +
+      '</table></div></div>';
+  }
+
+  // ---------- Cash flow + distributions ----------
+  function cashflowView() {
+    var cf = fin.cashFlow(deal);
+    var cr = fin.classReturns(deal);
+    return '<div class="statement">' +
+      stHeader('Statement of Cash Flows &amp; Distributions', 'For the stabilized year ending Dec 31, 2026 (projected)') +
+      '<div class="card tbl-wrap"><table class="tbl">' +
+        '<tr class="sub"><td colspan="2"><strong>Operating activities</strong></td></tr>' +
+        row('Net operating income', cf.noi) +
+        '<tr class="sub"><td colspan="2"><strong>Financing activities</strong></td></tr>' +
+        row('Senior mortgage — interest', -cf.interestSenior, 'sub') +
+        row('Senior mortgage — principal', -cf.principalRepaid, 'sub') +
+        row('Investor notes — interest', -cf.interestNotes, 'sub') +
+        rowT('Cash available for distribution', cf.distributions) +
+      '</table></div>' +
+
+      '<h3 class="serif" style="margin:30px 0 12px;">Distribution waterfall</h3>' +
+      '<div class="card tbl-wrap"><table class="tbl"><thead><tr><th>Priority</th><th>Recipient</th><th class="num">Annual</th><th class="num">On capital</th></tr></thead><tbody>' +
+        '<tr><td>1</td><td><span class="dot" style="background:var(--navy);"></span>Senior lender (bank)</td><td class="num">' + F.money0(cf.interestSenior + cf.principalRepaid) + '</td><td class="num muted">contractual</td></tr>' +
+        '<tr><td>2</td><td><span class="dot n"></span>Investor Notes — premium</td><td class="num">' + F.money0(cr.note.cash) + '</td><td class="num">' + F.pct(cr.note.yield) + '</td></tr>' +
+        '<tr><td>3</td><td><span class="dot b"></span>Common B — preferred + pro-rata</td><td class="num">' + F.money0(cr.common_b.cash) + '</td><td class="num">' + F.pct(cr.common_b.yield) + '</td></tr>' +
+        '<tr><td>4</td><td><span class="dot a"></span>Common A — residual</td><td class="num">' + F.money0(cr.common_a.cash) + '</td><td class="num">' + F.pct(cr.common_a.yield) + '</td></tr>' +
+      '</tbody></table></div>' +
+      '<p class="muted" style="font-size:13px;margin-top:12px;">Lenders are paid their fixed premium before any equity distribution. Equity classes receive cash only after all debt is serviced; appreciation and sale proceeds accrue to equity and are not shown here.</p></div>';
+  }
+
+  // helpers
+  function stHeader(title, sub) {
+    return '<div style="margin-bottom:18px;"><div class="muted" style="font-size:13px;">Balance Nature Property Fund · ' + esc(deal.name) + '</div>' +
+      '<h2 class="serif" style="margin:4px 0;">' + title + '</h2><div class="muted">' + sub + '</div></div>';
+  }
+  function row(label, val, cls) {
+    var neg = val < 0;
+    var disp = neg ? '(' + F.money0(Math.abs(val)) + ')' : F.money0(val);
+    return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + label + '</td><td class="num">' + disp + '</td></tr>';
+  }
+  function rowT(label, val) { return '<tr class="total"><td>' + label + '</td><td class="num">' + F.money0(val) + '</td></tr>'; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  renderAll();
+</script>
+</body>
+</html>

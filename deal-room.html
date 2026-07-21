@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTP0NKLDK7"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZTP0NKLDK7');</script>
+<title>Deal Room — Balance Nature Property Fund</title>
+<meta name="description" content="Digital prospectus: underwriting, capital stack, projected returns, and online commitment for a Straight Fin Farms property raise.">
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="invest-platform.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<div id="dealError" style="display:none;" class="wrap section center">
+  <h2>Deal not found</h2>
+  <p class="muted" style="margin:14px 0 24px;">We couldn't find that opportunity. It may have closed.</p>
+  <a class="btn" href="invest.html#deals">See open deals</a>
+</div>
+
+<main id="dealMain" style="display:none;">
+
+  <!-- HERO -->
+  <header style="position:relative;">
+    <div id="dealHeroImg" style="height:340px;background:#24303a center/cover;"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(15,22,18,.82),rgba(15,22,18,.25));"></div>
+    <div class="wrap" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:28px;color:#fff;">
+      <div id="dealStatus"></div>
+      <h1 id="dealName" style="color:#fff;margin:10px 0 6px;"></h1>
+      <p id="dealAddress" style="color:rgba(255,255,255,.85);font-size:17px;"></p>
+    </div>
+  </header>
+
+  <!-- KEY METRICS -->
+  <section class="section-sm" style="background:#fff;border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="grid grid-4" id="keyMetrics"></div>
+    </div>
+  </section>
+
+  <div class="wrap section" style="display:grid;grid-template-columns:1fr 380px;gap:44px;align-items:start;">
+
+    <!-- LEFT: prospectus -->
+    <div>
+      <div class="eyebrow">The opportunity</div>
+      <h2 id="dealHeadline"></h2>
+      <p class="lead" id="dealSummary" style="margin-top:14px;"></p>
+
+      <!-- The plan -->
+      <h3 style="margin:40px 0 14px;">The plan — creating the cash cow</h3>
+      <div class="grid grid-3">
+        <div class="card"><div class="serif" style="font-size:26px;color:var(--green);">Acquire</div><p class="muted" style="margin-top:8px;font-size:14px;">Purchase below replacement cost with in-place tenants and below-market rents.</p></div>
+        <div class="card"><div class="serif" style="font-size:26px;color:var(--green);">Improve</div><p class="muted" style="margin-top:8px;font-size:14px;">Light per-suite renovation on turnover; upgrade common systems to cut opex.</p></div>
+        <div class="card"><div class="serif" style="font-size:26px;color:var(--green);">Stabilize</div><p class="muted" style="margin-top:8px;font-size:14px;">Lift rents to market, hold for durable cash flow, refinance or sell on the upside.</p></div>
+      </div>
+
+      <!-- Acquisition & sources/uses -->
+      <h3 style="margin:44px 0 14px;">Acquisition &amp; capitalization</h3>
+      <div class="grid grid-2">
+        <div class="card">
+          <h4 class="serif" style="font-size:18px;margin-bottom:10px;">Uses of capital</h4>
+          <div id="usesTable"></div>
+        </div>
+        <div class="card">
+          <h4 class="serif" style="font-size:18px;margin-bottom:10px;">Sources of capital</h4>
+          <div id="sourcesTable"></div>
+        </div>
+      </div>
+
+      <!-- Capital stack -->
+      <h3 style="margin:44px 0 14px;">Capital stack</h3>
+      <div class="card">
+        <div class="stack" id="capStack"></div>
+        <div id="capLegend" class="tag-row" style="margin-top:16px;"></div>
+        <p class="muted" style="font-size:13px;margin-top:14px;">The stack pays top-down: the bank is repaid first, then <strong>Investor Note</strong> lenders receive their fixed premium, then <strong>Common B</strong> its preferred return, and <strong>Common A</strong> takes the residual. Lower in the stack means more risk and more upside.</p>
+      </div>
+
+      <!-- Projected financials -->
+      <h3 style="margin:44px 0 14px;">Projected stabilized operations (Year 1)</h3>
+      <div class="card tbl-wrap">
+        <table class="tbl" id="proforma"></table>
+      </div>
+
+      <!-- Returns by class -->
+      <h3 style="margin:44px 0 14px;">Projected returns by class</h3>
+      <div class="card tbl-wrap">
+        <table class="tbl" id="classReturns"></table>
+        <p class="muted" style="font-size:13px;margin-top:12px;">Note holders receive a fixed contractual premium regardless of equity performance. Equity yields are pre-tax cash-on-cash from stabilized operations and exclude appreciation, refinance, and sale proceeds.</p>
+      </div>
+
+      <div style="margin-top:28px;" data-disclaimer></div>
+    </div>
+
+    <!-- RIGHT: funding + commit -->
+    <aside style="position:sticky;top:96px;">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div class="serif" id="raisedAmt" style="font-size:30px;font-weight:900;"></div>
+          <div class="muted" id="targetAmt" style="font-size:14px;"></div>
+        </div>
+        <div class="progress" style="margin:12px 0;"><span id="fundBar" style="width:0%;"></span></div>
+        <div id="fundPct" class="muted" style="font-size:13px;"></div>
+
+        <hr class="divider">
+        <div id="classProgress"></div>
+
+        <hr class="divider">
+        <h4 class="serif" style="font-size:18px;margin-bottom:12px;">Commit to this deal</h4>
+        <form id="commitForm">
+          <div class="field">
+            <label class="fld">How do you want to participate?</label>
+            <select class="input" name="klass" id="klassSel"></select>
+          </div>
+          <div id="klassBlurb" class="notice warn" style="font-size:13px;"></div>
+          <div class="field">
+            <label class="fld">Amount (CAD)</label>
+            <input class="input" name="amount" id="amtInput" inputmode="numeric" placeholder="e.g. 25,000" required>
+          </div>
+          <div id="projReturn" class="kv" style="border:none;background:#f2efe8;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:none;">
+            <span class="k">Projected Year-1 return</span><span class="v" id="projReturnVal"></span>
+          </div>
+          <div class="row">
+            <div class="field"><label class="fld">Name</label><input class="input" name="name" required></div>
+            <div class="field"><label class="fld">Email</label><input class="input" type="email" name="email" required></div>
+          </div>
+          <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);margin-bottom:14px;">
+            <input type="checkbox" name="ack" required style="margin-top:3px;">
+            <span>Non-binding indication of interest. Final terms are set by the offering documents.</span>
+          </label>
+          <button class="btn" type="submit" style="width:100%;">Pledge commitment</button>
+          <div id="commitMsg"></div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <h4 class="serif" style="font-size:17px;margin-bottom:10px;">Committed investors</h4>
+        <div id="commitList"></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div id="footer"></div>
+
+<script src="invest-platform.js"></script>
+<script>
+  SFF.ui.mount();
+  var F = SFF.fmt, fin = SFF.fin;
+  var params = new URLSearchParams(location.search);
+  var deal = SFF.store.getDeal(params.get('deal') || 'kawartha-6plex');
+
+  if (!deal) {
+    document.getElementById('dealError').style.display = 'block';
+  } else {
+    render();
+  }
+
+  function render() {
+    document.getElementById('dealMain').style.display = 'block';
+    document.title = deal.name + ' — Deal Room';
+    var u = fin.underwrite(deal);
+
+    // hero
+    if (deal.image) document.getElementById('dealHeroImg').style.backgroundImage = "url('" + deal.image + "')";
+    var statusPill = deal.status === 'open' ? '<span class="pill green">Open for investment</span>'
+      : '<span class="pill blue">' + deal.status + '</span>';
+    document.getElementById('dealStatus').innerHTML = statusPill + ' <span class="pill grey" style="margin-left:6px;">' + deal.type + '</span>';
+    document.getElementById('dealName').textContent = deal.name;
+    document.getElementById('dealAddress').textContent = deal.address;
+    document.getElementById('dealHeadline').textContent = deal.units + '-unit multi-residential — buy, improve, and hold for durable cash flow.';
+    document.getElementById('dealSummary').textContent = deal.summary;
+
+    // key metrics
+    document.getElementById('keyMetrics').innerHTML = [
+      [F.pct(u.capRate), 'Going-in cap rate', F.money0(u.noi) + ' NOI'],
+      [F.x(u.dscr), 'Debt-service coverage', F.money0(u.debtService) + ' annual debt svc'],
+      [F.pct(u.cashOnCash), 'Equity cash-on-cash', 'Year 1, pre-tax'],
+      [F.money0(fin.totalCost(deal)), 'Total project cost', deal.units + ' units']
+    ].map(function (m) {
+      return '<div class="stat"><div class="k">' + m[0] + '</div><div class="l">' + m[1] + '</div><div class="sub">' + m[2] + '</div></div>';
+    }).join('');
+
+    // uses
+    document.getElementById('usesTable').innerHTML = kvRows([
+      ['Purchase price', F.money0(deal.purchasePrice)],
+      ['Renovation budget', F.money0(deal.renovation)],
+      ['Closing &amp; reserves', F.money0(deal.closingCosts)],
+      ['Total uses', F.money0(fin.totalCost(deal)), true]
+    ]);
+    // sources
+    var noteT = fin.classTarget(deal, 'note'), bT = fin.classTarget(deal, 'common_b'), aT = fin.classTarget(deal, 'common_a');
+    document.getElementById('sourcesTable').innerHTML = kvRows([
+      ['Senior mortgage', F.money0(deal.loanAmount)],
+      ['Investor Notes (debt)', F.money0(noteT)],
+      ['Common B equity', F.money0(bT)],
+      ['Common A equity', F.money0(aT)],
+      ['Total sources', F.money0(deal.loanAmount + noteT + bT + aT), true]
+    ]);
+
+    // capital stack
+    var total = deal.loanAmount + noteT + bT + aT || 1;
+    var segs = [
+      ['seg-loan', deal.loanAmount, 'Senior loan'],
+      ['seg-note', noteT, 'Notes'],
+      ['seg-b', bT, 'Common B'],
+      ['seg-a', aT, 'Common A']
+    ];
+    document.getElementById('capStack').innerHTML = segs.map(function (s) {
+      var pct = s[1] / total * 100;
+      return pct < 1 ? '' : '<div class="' + s[0] + '" style="width:' + pct + '%;" title="' + s[2] + '">' + (pct > 10 ? Math.round(pct) + '%' : '') + '</div>';
+    }).join('');
+    document.getElementById('capLegend').innerHTML = segs.map(function (s) {
+      var cls = s[0] === 'seg-loan' ? 'grey' : s[0] === 'seg-note' ? 'gold' : 'green';
+      return '<span class="pill ' + cls + '">' + s[2] + ' · ' + F.money0(s[1]) + '</span>';
+    }).join('');
+
+    // proforma
+    var vac = deal.grossRent * deal.vacancyPct;
+    document.getElementById('proforma').innerHTML =
+      trow('Gross scheduled rent', F.money0(deal.grossRent)) +
+      trow('Other income (laundry, parking)', F.money0(deal.otherIncome)) +
+      trow('Vacancy &amp; credit loss', '(' + F.money0(vac) + ')', 'sub') +
+      trow('Effective gross income', F.money0(u.egi), 'total') +
+      trow('Operating expenses', '(' + F.money0(deal.operatingExpenses) + ')', 'sub') +
+      trow('Net operating income (NOI)', F.money0(u.noi), 'total') +
+      trow('Less: senior debt service', '(' + F.money0(u.debtService) + ')', 'sub') +
+      trow('Less: investor note interest', '(' + F.money0(u.noteInterest) + ')', 'sub') +
+      trow('Cash flow to equity', F.money0(u.cashFlowToEquity), 'total');
+
+    // returns by class
+    var cr = fin.classReturns(deal);
+    document.getElementById('classReturns').innerHTML =
+      '<thead><tr><th>Class</th><th>Type</th><th class="num">Raise</th><th class="num">Yr-1 cash</th><th class="num">Cash yield</th><th>Notes</th></tr></thead><tbody>' +
+      crow('a', 'Common A', 'Equity · control', cr.common_a.amount, cr.common_a.cash, cr.common_a.yield, 'Residual + appreciation, voting') +
+      crow('b', 'Common B', 'Equity · passive', cr.common_b.amount, cr.common_b.cash, cr.common_b.yield, F.pct(cr.common_b.pref) + ' preferred, then pro-rata') +
+      crow('n', 'Investor Note', 'Debt · lender', cr.note.amount, cr.note.cash, cr.note.yield, F.pct(cr.note.rate) + ' fixed, ' + cr.note.termYears + '-yr term, not an owner') +
+      '</tbody>';
+
+    renderFunding();
+    buildCommitForm();
+  }
+
+  function renderFunding() {
+    var fund = fin.funding(deal);
+    document.getElementById('raisedAmt').textContent = F.money0(fund.raised);
+    document.getElementById('targetAmt').textContent = 'of ' + F.money0(fund.target) + ' target';
+    document.getElementById('fundBar').style.width = Math.min(100, fund.pct * 100) + '%';
+    document.getElementById('fundPct').textContent = F.pct(fund.pct, 0) + ' committed · ' + F.money0(fund.remaining) + ' remaining';
+
+    var labels = { note: ['n', 'Investor Note (lender)'], common_b: ['b', 'Common B (passive)'], common_a: ['a', 'Common A (control)'] };
+    document.getElementById('classProgress').innerHTML = ['note', 'common_b', 'common_a'].map(function (k) {
+      var c = fund.byClass[k]; if (!c.target) return '';
+      var pct = c.target ? Math.min(100, c.raised / c.target * 100) : 0;
+      return '<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">' +
+        '<span><span class="dot ' + labels[k][0] + '"></span>' + labels[k][1] + '</span>' +
+        '<span class="muted">' + F.money0(c.raised) + ' / ' + F.money0(c.target) + '</span></div>' +
+        '<div class="progress" style="height:8px;"><span style="width:' + pct + '%;"></span></div></div>';
+    }).join('');
+
+    var commits = SFF.store.commitments(deal.id);
+    document.getElementById('commitList').innerHTML = commits.length ? commits.slice().reverse().map(function (c) {
+      var dot = c.klass === 'note' ? 'n' : c.klass === 'common_b' ? 'b' : 'a';
+      var st = c.status === 'funded' ? '<span class="pill green" style="font-size:10px;">funded</span>' : '<span class="pill gold" style="font-size:10px;">pledged</span>';
+      return '<div class="kv"><span class="k"><span class="dot ' + dot + '"></span>' + esc(c.name) + '</span><span class="v">' + F.money0(c.amount) + ' ' + st + '</span></div>';
+    }).join('') : '<p class="muted" style="font-size:14px;">Be the first to commit.</p>';
+  }
+
+  function buildCommitForm() {
+    var sel = document.getElementById('klassSel');
+    var cr = fin.classReturns(deal);
+    var opts = [
+      ['note', 'Investor Note — Lender (' + F.pct(cr.note.rate) + ' fixed premium)'],
+      ['common_b', 'Common B — Passive equity'],
+      ['common_a', 'Common A — Control equity']
+    ];
+    sel.innerHTML = opts.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('');
+
+    var blurbs = {
+      note: 'You participate as a <strong>lender</strong>, not an owner. Your note pays a fixed ' + F.pct(cr.note.rate) + ' annual premium over a ' + cr.note.termYears + '-year term and is repaid ahead of equity. No voting, no ownership.',
+      common_b: 'Passive ownership. You receive a ' + F.pct(cr.common_b.pref) + ' preferred return, then share in cash flow and appreciation pro-rata. Non-voting.',
+      common_a: 'Control equity. Voting rights and full residual exposure to cash flow and appreciation after other classes are paid. Highest risk and highest upside.'
+    };
+    var yields = { note: cr.note.rate, common_b: cr.common_b.yield, common_a: cr.common_a.yield };
+
+    function update() {
+      var k = sel.value;
+      document.getElementById('klassBlurb').innerHTML = blurbs[k];
+      var amt = parseFloat((document.getElementById('amtInput').value || '').replace(/[^0-9.]/g, '')) || 0;
+      var box = document.getElementById('projReturn');
+      if (amt > 0) {
+        box.style.display = 'flex';
+        document.getElementById('projReturnVal').textContent = F.money0(amt * yields[k]) + '/yr (' + F.pct(yields[k]) + ')';
+      } else { box.style.display = 'none'; }
+    }
+    sel.addEventListener('change', update);
+    document.getElementById('amtInput').addEventListener('input', update);
+    update();
+  }
+
+  var form = document.getElementById('commitForm');
+  if (form) form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var fd = new FormData(e.target);
+    var amt = parseFloat((fd.get('amount') || '').replace(/[^0-9.]/g, '')) || 0;
+    if (amt <= 0) return;
+    SFF.store.addCommitment({
+      deal: deal.id, name: fd.get('name'), email: fd.get('email'),
+      klass: fd.get('klass'), amount: amt, status: 'pledged'
+    });
+    try { gtag('event', 'form_submit', { form_name: 'invest_commit', klass: fd.get('klass'), value: amt }); } catch (err) {}
+    renderFunding();
+    document.getElementById('commitMsg').innerHTML = '<div class="notice ok" style="margin-top:14px;">Commitment recorded — thank you, ' + esc(fd.get('name')) + '. We\'ll follow up at ' + esc(fd.get('email')) + ' with offering documents and next steps.</div>';
+    e.target.reset();
+    document.getElementById('projReturn').style.display = 'none';
+    document.getElementById('klassBlurb').innerHTML = '';
+    document.getElementById('klassSel').dispatchEvent(new Event('change'));
+  });
+
+  // helpers
+  function kvRows(rows) {
+    return rows.map(function (r) {
+      return '<div class="kv"' + (r[2] ? ' style="border-top:2px solid #c9c4b8;margin-top:4px;"' : '') + '><span class="k"' + (r[2] ? ' style="color:var(--ink);font-weight:700;"' : '') + '>' + r[0] + '</span><span class="v">' + r[1] + '</span></div>';
+    }).join('');
+  }
+  function trow(label, val, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + label + '</td><td class="num">' + val + '</td></tr>'; }
+  function crow(dot, name, type, raise, cash, y, notes) {
+    return '<tr><td><span class="dot ' + dot + '"></span><strong>' + name + '</strong></td><td>' + type + '</td><td class="num">' + F.money0(raise) + '</td><td class="num">' + F.money0(cash) + '</td><td class="num">' + F.pct(y) + '</td><td class="muted" style="font-size:13px;">' + notes + '</td></tr>';
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+</script>
+</body>
+</html>
