@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTP0NKLDK7"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZTP0NKLDK7');</script>
+<title>Property — Portfolio Dashboard</title>
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="invest-platform.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<div id="notfound" class="app center" style="display:none;padding:80px 20px;">
+  <h2>Property not found</h2>
+  <a class="btn" href="portfolio.html" style="margin-top:18px;">← Back to dashboard</a>
+</div>
+
+<main id="main" class="app" style="display:none;">
+  <a href="portfolio.html" class="muted" style="font-size:13px;text-decoration:none;">← Portfolio dashboard</a>
+
+  <!-- header -->
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:26px;align-items:center;margin:16px 0 26px;">
+    <div id="pImg" style="height:180px;border-radius:14px;background:#dcd8cf center/cover;"></div>
+    <div>
+      <div id="pBadges" class="tag-row" style="margin-bottom:10px;"></div>
+      <h1 id="pName" style="font-size:32px;"></h1>
+      <p class="muted" id="pAddr" style="margin-top:4px;"></p>
+      <p class="muted" id="pMeta" style="font-size:13px;margin-top:8px;"></p>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis" id="pKpis"></div>
+
+  <!-- BRRRR tracker (conditional) -->
+  <div id="brrrrWrap" style="display:none;margin-top:28px;">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3 style="font-size:18px;">BRRRR progress</h3>
+        <span class="muted" id="brrrrHint" style="font-size:13px;"></span>
+      </div>
+      <div class="brrrr-track" id="brrrrTrack"></div>
+    </div>
+  </div>
+
+  <!-- tabs -->
+  <div class="tabs-line" id="tabs" style="margin-top:30px;">
+    <div class="t active" data-tab="performance">Performance</div>
+    <div class="t" data-tab="ownership">Ownership &amp; Partners</div>
+    <div class="t" data-tab="feeds">Connected Feeds</div>
+    <div class="t" data-tab="services">Services &amp; Work Orders</div>
+    <div class="t" data-tab="insights">Opportunities</div>
+  </div>
+  <div id="tabBody"></div>
+</main>
+
+<div id="footer"></div>
+
+<script src="invest-platform.js"></script>
+<script src="portfolio-engine.js"></script>
+<script>
+  SFF.ui.mount('portfolio');
+  var F = SFF.fmt, perf = SFF.perf, pf = SFF.pf, insights = SFF.insights;
+  var id = new URLSearchParams(location.search).get('id');
+  var p = pf.getProperty(id) || pf.properties()[0];
+
+  if (!p) { document.getElementById('notfound').style.display = 'block'; }
+  else { render(); }
+
+  function render() {
+    document.getElementById('main').style.display = 'block';
+    document.title = p.name + ' — Portfolio';
+    var u = perf.of(p);
+
+    if (p.image) document.getElementById('pImg').style.backgroundImage = "url('" + p.image + "')";
+    var stratPill = p.strategy === 'STR' ? '<span class="pill gold">Short-term rental</span>'
+      : p.strategy === 'BRRRR' ? '<span class="pill blue">BRRRR</span>' : '<span class="pill green">Buy &amp; hold</span>';
+    document.getElementById('pBadges').innerHTML = stratPill +
+      (p.owners.length > 1 ? ' <span class="pill grey">' + p.owners.length + ' investors</span>' : ' <span class="pill grey">Sole owner</span>');
+    document.getElementById('pName').textContent = p.name;
+    document.getElementById('pAddr').textContent = p.address;
+    document.getElementById('pMeta').textContent = p.type + ' · ' + p.units + ' unit' + (p.units > 1 ? 's' : '') + ' · acquired ' + F.date(p.acquiredOn) + ' · ' + p.mortgage.lender;
+
+    document.getElementById('pKpis').innerHTML = [
+      [F.money0(p.currentValue), 'Current value', 'up', '+' + F.money0(u.appreciation) + ' since buy'],
+      [F.money0(u.equity), 'Your equity', 'up', F.pct(1 - u.ltv, 0) + ' of value'],
+      [F.money0(u.cashFlowMonthly) + '/mo', 'Cash flow', u.cashFlowMonthly >= 0 ? 'up' : 'down', F.money0(u.annualCashFlow) + '/yr'],
+      [u.dscr === Infinity ? '∞' : u.dscr.toFixed(2) + '×', 'DSCR', u.dscr >= 1.25 ? 'up' : 'down', u.dscr >= 1.25 ? 'Healthy' : 'Watch'],
+      [F.pct(u.capRate), 'Cap rate', 'up', 'on value'],
+      [F.pct(u.cashOnCash), 'Cash-on-cash', u.cashOnCash >= 0.06 ? 'up' : 'down', 'on ' + F.money0(u.cashInvested)]
+    ].map(function (k) { return '<div class="kpi"><div class="k">' + k[0] + '</div><div class="l">' + k[1] + '</div><div class="d ' + k[2] + '">' + k[3] + '</div></div>'; }).join('');
+
+    // BRRRR tracker
+    if (p.brrrr) {
+      document.getElementById('brrrrWrap').style.display = 'block';
+      var steps = [['buy', 'Buy'], ['rehab', 'Rehab'], ['rent', 'Rent'], ['refinance', 'Refinance'], ['repeat', 'Repeat']];
+      var st = p.brrrr.stages;
+      document.getElementById('brrrrTrack').innerHTML = steps.map(function (s) {
+        var done = st[s[0]];
+        var current = !done && p.brrrr.stage === s[0];
+        return '<div class="brrrr-step ' + (done ? 'done' : current ? 'current' : '') + '"><div class="bubble">' + (done ? '✓' : '') + '</div><div class="lbl">' + s[1] + '</div></div>';
+      }).join('');
+      document.getElementById('brrrrHint').textContent = 'Stage: ' + p.brrrr.stage + ' · est. ' + F.money0(u.refiExtractable) + ' to pull out at refi';
+    }
+
+    bindTabs();
+    showTab('performance');
+  }
+
+  function bindTabs() {
+    document.querySelectorAll('#tabs .t').forEach(function (t) {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('#tabs .t').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        showTab(t.getAttribute('data-tab'));
+      });
+    });
+  }
+
+  function showTab(tab) {
+    var el = document.getElementById('tabBody');
+    if (tab === 'performance') el.innerHTML = perfView();
+    else if (tab === 'ownership') el.innerHTML = ownersView();
+    else if (tab === 'feeds') el.innerHTML = feedsView();
+    else if (tab === 'services') el.innerHTML = servicesView();
+    else el.innerHTML = insightsView();
+  }
+
+  // ---- performance ----
+  function perfView() {
+    var u = perf.of(p);
+    var e = p.expenses;
+    var incomeLine = p.strategy === 'STR'
+      ? kv('STR revenue (' + F.money0(p.str.adr) + ' ADR × ' + F.pct(p.str.occupancy, 0) + ' occ.)', F.money0(p.str.adr * 30.4 * p.str.occupancy))
+      : kv('Rent (' + p.units + ' units)', F.money0(p.monthlyRent));
+    return '<div class="grid grid-2">' +
+      '<div class="card"><h3 style="font-size:17px;margin-bottom:12px;">Monthly operating statement</h3>' +
+        incomeLine +
+        kv('Other income', F.money0(p.otherMonthly || 0)) +
+        kvT('Gross income', F.money0(u.grossMonthly)) +
+        kv('Property tax', '(' + F.money0(e.taxMonthly) + ')') +
+        kv('Insurance', '(' + F.money0(e.insuranceMonthly) + ')') +
+        kv('Utilities', '(' + F.money0(e.utilitiesMonthly) + ')') +
+        kv('Maintenance', '(' + F.money0(e.maintenanceMonthly) + ')') +
+        kv('Management (' + F.pct(e.mgmtPct, 0) + ')', '(' + F.money0(e.mgmtPct * u.grossMonthly) + ')') +
+        kvT('Net operating income', F.money0(u.noiMonthly)) +
+        kv('Mortgage (' + p.mortgage.lender + ')', '(' + F.money0(u.mortgageMonthly) + ')') +
+        kvT('Net cash flow', F.money0(u.cashFlowMonthly)) +
+      '</div>' +
+      '<div class="card"><h3 style="font-size:17px;margin-bottom:12px;">Financing &amp; position</h3>' +
+        kv('Purchase price', F.money0(p.purchasePrice)) +
+        kv('Rehab invested', F.money0(p.rehab)) +
+        kv('Cash invested', F.money0(u.cashInvested)) +
+        kv('Current value', F.money0(p.currentValue)) +
+        kv('Mortgage balance', F.money0(p.mortgage.balance)) +
+        kv('Interest rate', F.pct(p.mortgage.rate)) +
+        kvT('Equity', F.money0(u.equity)) +
+        kv('Loan-to-value', F.pct(u.ltv)) +
+        kv('Refi headroom (75% LTV)', F.money0(u.refiExtractable)) +
+        kv('Annual appreciation', F.money0(u.appreciation)) +
+      '</div></div>';
+  }
+
+  // ---- ownership & partners (transparency) ----
+  function ownersView() {
+    var u = perf.of(p);
+    var colors = { common_a: 'var(--classA)', common_b: 'var(--classB)', note: 'var(--note)' };
+    var bar = p.owners.map(function (o) {
+      return '<div style="width:' + (o.equityPct * 100) + '%;background:' + colors[o.klass] + ';">' + (o.equityPct >= 0.12 ? F.pct(o.equityPct, 0) : '') + '</div>';
+    }).join('');
+
+    var rows = p.owners.map(function (o) {
+      var sh = perf.ownerShare(p, o.name);
+      var dot = o.klass === 'note' ? 'n' : o.klass === 'common_b' ? 'b' : 'a';
+      var typ = o.klass === 'note' ? 'Lender (note)' : o.klass === 'common_b' ? 'Common B — passive' : 'Common A — control';
+      var val = sh.isLender ? F.money0(sh.capital) + ' principal' : F.money0(sh.equityValue);
+      var cash = sh.isLender ? F.money0(sh.annualCash) + '/yr premium' : F.money0(sh.annualCash) + '/yr';
+      return '<tr><td><span class="dot ' + dot + '"></span><strong>' + esc(o.name) + '</strong><div class="muted" style="font-size:12px;">' + o.role + '</div></td>' +
+        '<td>' + typ + '</td><td class="num">' + F.money0(o.capital) + '</td>' +
+        '<td class="num">' + (sh.isLender ? '—' : F.pct(o.equityPct)) + '</td>' +
+        '<td class="num">' + val + '</td><td class="num">' + cash + '</td></tr>';
+    }).join('');
+
+    return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
+        '<h3 style="font-size:17px;">Ownership &amp; partner transparency</h3>' +
+        '<span class="pill green">🔒 Shared securely with all investors</span></div>' +
+      '<p class="muted" style="font-size:13.5px;margin:10px 0 18px;">Every investor in this property sees the same live position — their capital, their share, their value, and their distributions. Lenders (notes) are shown separately: they are paid a premium and hold no equity.</p>' +
+      '<div class="own-bar" style="margin-bottom:20px;">' + bar + '</div>' +
+      '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Investor</th><th>Class</th><th class="num">Capital in</th><th class="num">Equity share</th><th class="num">Value of stake</th><th class="num">Annual cash</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">' +
+        '<a class="btn sm" href="investor-portal.html">View financial statements →</a>' +
+        '<button class="btn ghost sm" onclick="alert(\'In production this generates a secure, per-investor invite link with view-only access to this property\\u2019s live dashboard and statements.\')">Invite a co-investor</button>' +
+      '</div></div>';
+  }
+
+  // ---- connected feeds ----
+  function feedsView() {
+    var conns = (p.connections || []).map(function (cid) { return pf.getConnection(cid); }).filter(Boolean);
+    var icons = { bank: '🏦', str: '🏠', utility: '💡', government: '🏛', accounting: '📊' };
+    var cards = conns.map(function (c) {
+      var st = c.status === 'connected' ? '<span class="status-dot status-connected"></span>Connected' : '<span class="status-dot status-available"></span>Available';
+      return '<div class="conn-card"><div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">' +
+        '<div class="conn-logo">' + (icons[c.category] || '🔗') + '</div>' +
+        '<div><strong style="font-size:15px;">' + c.provider + '</strong><div class="muted" style="font-size:12px;">' + c.category + '</div></div></div>' +
+        '<div style="font-size:13px;">' + st + (c.lastSync ? ' · synced ' + F.date(c.lastSync) : '') + '</div>' +
+        (c.accounts && c.accounts.length ? '<div class="muted" style="font-size:12.5px;margin-top:8px;">' + c.accounts.join('<br>') + '</div>' : '') +
+        '</div>';
+    }).join('');
+    // sample synced transactions (illustrative of the live feed)
+    var feed = p.strategy === 'STR'
+      ? [['Airbnb payout', '+' + F.money0(2380), 'Airbnb'], ['Hydro One', '-' + F.money0(214), 'Hydro One'], ['Cleaning — turnover', '-' + F.money0(95), 'RBC ••4021']]
+      : [['Rent — Unit A', '+' + F.money0(2200), p.mortgage.lender], ['Rent — Unit B', '+' + F.money0(2100), p.mortgage.lender], ['Mortgage payment', '-' + F.money0(p.mortgage.monthlyPayment), p.mortgage.lender]];
+    return '<div class="grid grid-2" style="align-items:start;">' +
+      '<div><h3 style="font-size:17px;margin-bottom:12px;">Connected accounts</h3><div class="conn-grid" style="grid-template-columns:1fr;">' + (cards || '<p class="muted">No connections yet.</p>') + '</div>' +
+        '<a class="btn ghost sm" href="connections.html" style="margin-top:14px;">Manage connections →</a></div>' +
+      '<div class="card"><h3 style="font-size:17px;margin-bottom:6px;">Recent synced activity</h3><p class="muted" style="font-size:12.5px;margin-bottom:12px;">Auto-imported from connected accounts (sandbox data).</p>' +
+        feed.map(function (t) { return '<div class="kv"><span class="k">' + t[0] + '<div style="font-size:11px;">' + t[2] + '</div></span><span class="v" style="color:' + (t[1][0] === '+' ? '#2e6e31' : '#a3402f') + ';">' + t[1] + '</span></div>'; }).join('') +
+      '</div></div>';
+  }
+
+  // ---- services & work orders ----
+  function servicesView() {
+    var vendors = (p.vendors || []).map(function (vid) { return pf.getVendor(vid); }).filter(Boolean);
+    var icons = { cleaning: '🧹', maintenance: '🔧', hospitality: '🛎', facilities: '🌿' };
+    var vlist = vendors.map(function (v) {
+      return '<div class="svc-card"><div class="svc-ic">' + (icons[v.category] || '🔧') + '</div>' +
+        '<div style="flex:1;"><strong>' + v.name + '</strong><div class="muted" style="font-size:12.5px;">' + v.category + ' · ' + v.rate + ' · ★ ' + v.rating + '</div></div></div>';
+    }).join('');
+    var wos = pf.workOrders(p.id);
+    var woRows = wos.length ? wos.map(function (w) {
+      var v = pf.getVendor(w.vendorId);
+      var pill = w.status === 'done' ? 'green' : w.status === 'scheduled' ? 'blue' : 'gold';
+      return '<tr><td>' + w.title + '</td><td>' + (v ? v.name : '—') + '</td><td class="num">' + F.money0(w.cost) + '</td><td>' + F.date(w.date) + '</td><td><span class="pill ' + pill + '">' + w.status + '</span></td></tr>';
+    }).join('') : '<tr><td colspan="5" class="muted center" style="padding:20px;">No work orders.</td></tr>';
+    return '<div class="grid grid-2" style="align-items:start;">' +
+      '<div><h3 style="font-size:17px;margin-bottom:12px;">Assigned service partners</h3>' + (vlist || '<p class="muted">None assigned.</p>') +
+        '<button class="btn ghost sm" onclick="alert(\'Opens the vendor marketplace to add cleaning, maintenance, hospitality or facilities partners to this property.\')" style="margin-top:8px;">+ Add service partner</button></div>' +
+      '<div class="card"><h3 style="font-size:17px;margin-bottom:12px;">Work orders</h3><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Task</th><th>Vendor</th><th class="num">Cost</th><th>Date</th><th>Status</th></tr></thead><tbody>' + woRows + '</tbody></table></div></div>' +
+      '</div>';
+  }
+
+  // ---- opportunities ----
+  function insightsView() {
+    var cards = insights.forProperty(p);
+    return '<div style="max-width:760px;">' + cards.map(function (c) {
+      return '<div class="insight ' + c.level + '"><div class="ic">' + c.icon + '</div><div><h4>' + c.title + '</h4><p>' + c.body + '</p></div></div>';
+    }).join('') +
+    '<div class="card" style="margin-top:12px;background:#f2efe8;"><strong>Grow or diversify?</strong><p class="muted" style="font-size:13.5px;margin-top:6px;">Use the extractable equity here to fund the next acquisition, or screen a different market to diversify. The Deal Finder underwrites new candidates in seconds.</p><div style="margin-top:12px;"><a class="btn sm" href="deal-finder.html">Open Deal Finder →</a></div></div></div>';
+  }
+
+  function kv(k, v) { return '<div class="kv"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>'; }
+  function kvT(k, v) { return '<div class="kv" style="border-top:2px solid #c9c4b8;margin-top:4px;"><span class="k" style="color:var(--ink);font-weight:700;">' + k + '</span><span class="v">' + v + '</span></div>'; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTP0NKLDK7"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZTP0NKLDK7');</script>
+<title>Portfolio Dashboard — Balance Nature Property Fund</title>
+<meta name="description" content="Live dashboard for your real estate portfolio: value, equity, cash flow, DSCR, occupancy, and grow-vs-diversify insights.">
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="invest-platform.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<div class="app">
+  <div class="page-head">
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px;">Portfolio dashboard</div>
+      <h1 style="font-size:34px;">Your real estate portfolio</h1>
+      <p class="muted" id="subline" style="margin-top:6px;"></p>
+    </div>
+    <div class="tag-row">
+      <a class="btn ghost sm" href="connections.html">⚡ Connections</a>
+      <a class="btn sm" href="onboard.html">+ Add property</a>
+    </div>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpis" id="kpis"></div>
+
+  <!-- MAIN GRID -->
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start;margin-top:32px;">
+    <!-- properties -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-size:22px;">Properties</h2>
+        <span class="muted" id="propCount" style="font-size:13px;"></span>
+      </div>
+      <div class="grid grid-2" id="propGrid"></div>
+
+      <h2 style="font-size:22px;margin:36px 0 16px;">Cash flow &amp; equity by property</h2>
+      <div class="card tbl-wrap">
+        <table class="tbl" id="perfTable"></table>
+      </div>
+    </div>
+
+    <!-- insights sidebar -->
+    <aside style="position:sticky;top:96px;">
+      <div class="card" style="padding:22px;">
+        <h3 style="font-size:18px;margin-bottom:4px;">Insights</h3>
+        <p class="muted" style="font-size:13px;margin-bottom:16px;">Where to grow, and when to diversify.</p>
+        <div id="insightFeed"></div>
+      </div>
+
+      <div class="card" style="padding:22px;margin-top:20px;">
+        <h3 style="font-size:18px;margin-bottom:12px;">Market concentration</h3>
+        <div id="concentration"></div>
+      </div>
+
+      <div class="card" style="padding:22px;margin-top:20px;background:#24303a;color:#fff;">
+        <h3 style="font-size:18px;margin-bottom:8px;color:#fff;">Extractable equity</h3>
+        <div class="serif" id="extractable" style="font-size:34px;font-weight:900;"></div>
+        <p style="font-size:13px;color:rgba(255,255,255,.75);margin:8px 0 16px;">Refinanceable at 75% LTV across the portfolio — enough to recycle into the next BRRRR without new cash.</p>
+        <a class="btn sm" href="onboard.html" style="width:100%;text-align:center;">Fund the next deal →</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="invest-platform.js"></script>
+<script src="portfolio-engine.js"></script>
+<script>
+  SFF.ui.mount('portfolio');
+  var F = SFF.fmt, perf = SFF.perf, pf = SFF.pf, insights = SFF.insights;
+  var props = pf.properties();
+  var report = insights.forPortfolio();
+  var agg = report.agg;
+
+  document.getElementById('subline').textContent =
+    props.length + ' properties · ' + agg.units + ' units · acquired since 2023';
+
+  // KPI strip
+  document.getElementById('kpis').innerHTML = [
+    [F.money0(agg.value), 'Portfolio value', 'up', '+' + F.money0(props.reduce(function(s,p){return s+perf.of(p).appreciation;},0)) + ' apprec.'],
+    [F.money0(agg.equity), 'Total equity', 'up', F.pct(1 - agg.blendedLTV, 0) + ' equity position'],
+    [F.money0(agg.cashFlowMonthly) + '/mo', 'Net cash flow', agg.cashFlowMonthly >= 0 ? 'up' : 'down', F.money0(agg.cashFlowMonthly * 12) + '/yr'],
+    [agg.blendedDSCR.toFixed(2) + '×', 'Blended DSCR', agg.blendedDSCR >= 1.25 ? 'up' : 'down', agg.blendedDSCR >= 1.25 ? 'Healthy' : 'Watch'],
+    [F.pct(agg.blendedCapRate), 'Blended cap rate', 'up', 'on current value'],
+    [F.pct(agg.cashOnCash), 'Cash-on-cash', agg.cashOnCash >= 0.06 ? 'up' : 'down', 'on ' + F.money0(agg.invested) + ' in']
+  ].map(function (k) {
+    return '<div class="kpi"><div class="k">' + k[0] + '</div><div class="l">' + k[1] + '</div><div class="d ' + k[2] + '">' + k[3] + '</div></div>';
+  }).join('');
+
+  // property cards
+  document.getElementById('propCount').textContent = props.length + ' owned';
+  document.getElementById('propGrid').innerHTML = props.map(function (p) {
+    var u = perf.of(p);
+    var stratPill = p.strategy === 'STR' ? '<span class="pill gold">Short-term</span>'
+      : p.strategy === 'BRRRR' ? '<span class="pill blue">BRRRR</span>' : '<span class="pill green">Buy &amp; hold</span>';
+    var partners = (p.owners && p.owners.length > 1) ? '<span class="pill grey" style="margin-left:4px;">' + p.owners.length + ' partners</span>' : '';
+    return '<a class="prop-card" href="property.html?id=' + encodeURIComponent(p.id) + '">' +
+      '<div class="prop-thumb" style="background-image:url(\'' + (p.image || '') + '\');"><div class="badge">' + stratPill + partners + '</div></div>' +
+      '<div class="prop-body">' +
+        '<h3 style="font-size:17px;">' + p.name + '</h3>' +
+        '<p class="muted" style="font-size:13px;">' + p.address + '</p>' +
+        '<div class="mini-grid">' +
+          mini(F.money0(u.cashFlowMonthly) + '/mo', 'Cash flow') +
+          mini(u.dscr === Infinity ? '∞' : u.dscr.toFixed(2) + '×', 'DSCR') +
+          mini(F.money0(u.equity), 'Equity') +
+        '</div>' +
+        '<div class="progress" style="height:7px;"><span style="width:' + Math.min(100, (1 - u.ltv) * 100).toFixed(0) + '%;"></span></div>' +
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px;" class="muted"><span>' + F.pct(u.ltv, 0) + ' LTV</span><span>' + F.money0(p.currentValue) + ' value</span></div>' +
+      '</div></a>';
+  }).join('');
+  function mini(v, l) { return '<div class="mini"><div class="v">' + v + '</div><div class="l">' + l + '</div></div>'; }
+
+  // performance table
+  var head = '<thead><tr><th>Property</th><th class="num">Income/mo</th><th class="num">Opex/mo</th><th class="num">Debt/mo</th><th class="num">Cash flow/mo</th><th class="num">DSCR</th><th class="num">Equity</th></tr></thead>';
+  var body = props.map(function (p) {
+    var u = perf.of(p);
+    return '<tr><td><strong>' + p.name + '</strong></td>' +
+      '<td class="num">' + F.money0(u.grossMonthly) + '</td>' +
+      '<td class="num">' + F.money0(u.opexMonthly) + '</td>' +
+      '<td class="num">' + F.money0(u.mortgageMonthly) + '</td>' +
+      '<td class="num" style="color:' + (u.cashFlowMonthly >= 0 ? '#2e6e31' : '#a3402f') + ';font-weight:600;">' + F.money0(u.cashFlowMonthly) + '</td>' +
+      '<td class="num">' + (u.dscr === Infinity ? '∞' : u.dscr.toFixed(2) + '×') + '</td>' +
+      '<td class="num">' + F.money0(u.equity) + '</td></tr>';
+  }).join('');
+  var tot = '<tr class="total"><td>Portfolio</td><td class="num">' + F.money0(props.reduce(function(s,p){return s+perf.of(p).grossMonthly;},0)) + '</td>' +
+    '<td class="num">' + F.money0(props.reduce(function(s,p){return s+perf.of(p).opexMonthly;},0)) + '</td>' +
+    '<td class="num">' + F.money0(props.reduce(function(s,p){return s+perf.of(p).mortgageMonthly;},0)) + '</td>' +
+    '<td class="num">' + F.money0(agg.cashFlowMonthly) + '</td><td class="num">' + agg.blendedDSCR.toFixed(2) + '×</td><td class="num">' + F.money0(agg.equity) + '</td></tr>';
+  document.getElementById('perfTable').innerHTML = head + '<tbody>' + body + tot + '</tbody>';
+
+  // insights feed
+  document.getElementById('insightFeed').innerHTML = report.cards.map(function (c) {
+    var cta = c.cta ? '<a href="' + c.cta[1] + '" style="font-size:13px;font-weight:600;">' + c.cta[0] + ' →</a>' : '';
+    return '<div class="insight ' + c.level + '"><div class="ic">' + c.icon + '</div><div><h4>' + c.title + '</h4><p>' + c.body + '</p>' + (cta ? '<div style="margin-top:6px;">' + cta + '</div>' : '') + '</div></div>';
+  }).join('');
+
+  // concentration
+  var cities = Object.keys(report.byCity).sort(function (a, b) { return report.byCity[b] - report.byCity[a]; });
+  document.getElementById('concentration').innerHTML = cities.map(function (c) {
+    var pctv = agg.value ? report.byCity[c] / agg.value : 0;
+    return '<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>' + c + '</span><span class="muted">' + F.pct(pctv, 0) + '</span></div>' +
+      '<div class="progress" style="height:8px;"><span style="width:' + (pctv * 100).toFixed(0) + '%;background:' + (pctv > 0.45 ? '#b8892b' : '#3d8c40') + ';"></span></div></div>';
+  }).join('');
+
+  document.getElementById('extractable').textContent = F.money0(agg.totalRefiExtractable);
+</script>
+</body>
+</html>

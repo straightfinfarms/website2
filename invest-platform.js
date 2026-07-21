@@ -349,26 +349,27 @@
   var ui = {
     nav: function (active) {
       var links = [
-        ['invest.html', 'Invest', 'invest'],
+        ['portfolio.html', 'Dashboard', 'portfolio'],
         ['deal-finder.html', 'Deal Finder', 'finder'],
-        ['investor-portal.html', 'Investor Portal', 'portal'],
-        ['straight-fin-farms.html', 'Main Site', 'main']
+        ['connections.html', 'Connections', 'connections'],
+        ['invest.html', 'Invest', 'invest'],
+        ['investor-portal.html', 'Portal', 'portal']
       ];
       var html = '<nav class="sff-nav">' +
-        '<a class="nav-logo" href="straight-fin-farms.html">Balance Nature Property Fund</a>' +
+        '<a class="nav-logo" href="portfolio.html">Balance Nature Property Fund</a>' +
         '<button class="hamburger" onclick="this.parentNode.querySelector(\'.nav-links\').classList.toggle(\'open\')" aria-label="Menu"><span></span><span></span><span></span></button>' +
         '<div class="nav-links">' +
         links.map(function (l) {
           return '<a href="' + l[0] + '"' + (l[2] === active ? ' style="text-decoration:underline;font-weight:600;"' : '') + '>' + l[1] + '</a>';
         }).join('') +
-        '<a class="btn-book" href="invest.html#deals">VIEW DEALS</a>' +
+        '<a class="btn-book" href="onboard.html">+ ADD PROPERTY</a>' +
         '</div></nav>';
       return html;
     },
     footer: function () {
       return '<footer class="sff-footer"><div class="cols">' +
         '<div><h4>Balance Nature Property Fund</h4><p>A community-funded approach to regenerative multi-residential real estate in the Kawarthas — built by Straight Fin Farms.</p><br><p>1091 County Road 24, Dunsford, ON, K0M 1L0</p><br><p>invest@straightfinfarms.com</p></div>' +
-        '<div><h4>Platform</h4><a href="invest.html">Investment Opportunities</a><a href="deal-finder.html">Deal Finder</a><a href="investor-portal.html">Investor Portal</a><a href="straight-fin-farms.html">Straight Fin Farms</a></div>' +
+        '<div><h4>Platform</h4><a href="portfolio.html">Portfolio Dashboard</a><a href="deal-finder.html">Deal Finder</a><a href="connections.html">Connections</a><a href="onboard.html">Onboard a Property</a><a href="invest.html">Investment Opportunities</a><a href="investor-portal.html">Investor Portal</a><a href="straight-fin-farms.html">Straight Fin Farms</a></div>' +
         '<div><h4>Participate As</h4><a href="invest.html#classes"><span class="dot a"></span>Common A — Control</a><a href="invest.html#classes"><span class="dot b"></span>Common B — Passive</a><a href="invest.html#classes"><span class="dot n"></span>Investor Note — Lender</a></div>' +
         '</div><div class="footer-bottom">&copy; 2026 Straight Fin Farms. All rights reserved. &middot; Figures shown are illustrative underwriting, not an offer to sell securities.</div></footer>';
     },
