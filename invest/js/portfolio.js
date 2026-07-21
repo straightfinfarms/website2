@@ -22,14 +22,23 @@
     var cfMo = noiMo - debtMo;
     var equity = n(h.currentValue) - n(h.loanBalance);
     var dscr = debtMo > 0 ? noiMo / debtMo : Infinity;
-    var coc = n(h.cashInvested) > 0 ? cfMo * 12 / n(h.cashInvested) * 100 : Infinity;
+    // BRRRR basis: all-in cost = purchase + rehab. Cash still tied up after the
+    // refinance ≈ basis − current loan (the loan already handed back the rest).
+    var basis = n(h.purchasePrice) + n(h.rehabInvested);
+    var estCashLeft = Math.max(0, basis - n(h.loanBalance));
+    var valueAdded = basis > 0 ? n(h.currentValue) - basis : 0;
+    // Use the entered figure if given, else the estimate from the basis.
+    var cashInvested = (h.cashInvested != null && h.cashInvested !== "") ?
+      n(h.cashInvested) : (basis > 0 ? estCashLeft : 0);
+    var coc = cashInvested > 0 ? cfMo * 12 / cashInvested * 100 : Infinity;
     var capRate = n(h.currentValue) > 0 ? noiMo * 12 / n(h.currentValue) * 100 : 0;
     var alerts = [];
     if (cfMo < 0) alerts.push("Negative cash flow");
     if (isFinite(dscr) && dscr < 1.2) alerts.push("DSCR below 1.2");
     if (n(h.occupancyPct, 100) < 90) alerts.push("Occupancy " + n(h.occupancyPct, 100) + "%");
     return { units: units, grossMo: grossMo, noiMo: noiMo, debtMo: debtMo, cfMo: cfMo,
-      equity: equity, dscr: dscr, coc: coc, capRate: capRate, alerts: alerts };
+      equity: equity, dscr: dscr, coc: coc, capRate: capRate, alerts: alerts,
+      basis: basis, estCashLeft: estCashLeft, valueAdded: valueAdded, cashInvested: cashInvested };
   }
 
   function renderKPIs(list) {
@@ -39,7 +48,7 @@
       var m = metrics(h);
       totVal += n(h.currentValue); totLoan += n(h.loanBalance);
       totCF += m.cfMo; totUnits += m.units; totNOI += m.noiMo; totDebt += m.debtMo;
-      totInvested += n(h.cashInvested);
+      totInvested += m.cashInvested;
       occNum += n(h.occupancyPct, 100) * m.units; occDen += m.units;
     });
     var equity = totVal - totLoan;
@@ -96,9 +105,15 @@
 
   function fieldRow(h) {
     h = h || {};
-    function f(id, lbl, val, type) {
-      return '<div class="field"><label>' + lbl + '</label><input id="h-' + id + '" type="' +
-        (type || "number") + '" value="' + (val != null ? String(val).replace(/"/g, "&quot;") : "") + '"></div>';
+    function tip(text) {
+      return ' <span class="tip" title="' + text.replace(/"/g, "&quot;") + '">&#9432;</span>';
+    }
+    function f(id, lbl, val, opts) {
+      opts = opts || {};
+      return '<div class="field"><label>' + lbl + (opts.tip ? tip(opts.tip) : "") + '</label>' +
+        '<input id="h-' + id + '" type="' + (opts.type || "number") + '"' +
+        (opts.placeholder ? ' placeholder="' + opts.placeholder + '"' : "") +
+        ' value="' + (val != null && val !== "" ? String(val).replace(/"/g, "&quot;") : "") + '"></div>';
     }
     return '<div class="field"><label>Property name</label><input id="h-name" value="' +
         (h.name || "").replace(/"/g, "&quot;") + '"></div>' +
@@ -110,17 +125,28 @@
           f("monthlyRent", "Gross rent / mo", h.monthlyRent != null ? h.monthlyRent : 4800) +
           f("otherIncomeMo", "Other income / mo", h.otherIncomeMo || 0) +
           f("occupancyPct", "Occupancy %", h.occupancyPct != null ? h.occupancyPct : 95) +
-          f("monthlyExpenses", "OpEx / mo (blank = ratio)", h.monthlyExpenses) +
-          f("expenseRatioPct", "Expense ratio %", h.expenseRatioPct != null ? h.expenseRatioPct : 45) +
+          f("monthlyExpenses", "OpEx / mo", h.monthlyExpenses,
+            { placeholder: "blank = use ratio", tip: "Actual monthly operating expenses (taxes, insurance, repairs, mgmt, reserves — NOT the mortgage). Leave blank to estimate from the expense ratio." }) +
+          f("expenseRatioPct", "Expense ratio %", h.expenseRatioPct != null ? h.expenseRatioPct : 45,
+            { tip: "Fallback: operating expenses as a % of collected rent, used only when OpEx/mo is blank. ~45–50% is typical for small multifamily." }) +
         '</div>' +
         '<div>' +
-          f("currentValue", "Current value", h.currentValue != null ? h.currentValue : 640000) +
-          f("loanBalance", "Loan balance", h.loanBalance != null ? h.loanBalance : 480000) +
+          f("currentValue", "Current value", h.currentValue != null ? h.currentValue : 640000,
+            { tip: "Today's market value (your estimate or a broker/appraiser figure)." }) +
+          f("loanBalance", "Loan balance", h.loanBalance != null ? h.loanBalance : 480000,
+            { tip: "Current outstanding mortgage principal." }) +
           f("loanRate", "Loan rate %", h.loanRate != null ? h.loanRate : 7.25) +
           f("loanTermYears", "Loan term yrs", h.loanTermYears != null ? h.loanTermYears : 30) +
-          f("debtServiceMo", "Debt svc / mo (blank = calc)", h.debtServiceMo) +
-          f("cashInvested", "Cash left invested", h.cashInvested != null ? h.cashInvested : 40000) +
-          f("acquiredAt", "Acquired (YYYY-MM-DD)", h.acquiredAt || new Date().toISOString().slice(0, 10), "text") +
+          f("debtServiceMo", "Debt svc / mo", h.debtServiceMo,
+            { placeholder: "blank = calc", tip: "Monthly principal + interest. Leave blank to compute from loan balance, rate and term." }) +
+          f("purchasePrice", "Purchase price", h.purchasePrice,
+            { tip: "What you paid to acquire it. Part of your all-in basis and needed to estimate cash left in the deal." }) +
+          f("rehabInvested", "Rehab invested", h.rehabInvested,
+            { tip: "Total rehab / capital you put in to force value. The 'BRRRR cost' — added to purchase price to get your all-in basis." }) +
+          f("cashInvested", "Cash left in deal", h.cashInvested,
+            { placeholder: "blank = auto-estimate", tip: "Your own cash still tied up after refinancing = (purchase price + rehab) − current loan balance. This is the base for cash-on-cash return. $0 or negative means you pulled all your capital back out (the BRRRR win). Different from equity, which is value − loan. Leave blank to auto-estimate." }) +
+          '<div class="hint" id="h-est-note" style="margin:-4px 0 10px"></div>' +
+          f("acquiredAt", "Acquired (YYYY-MM-DD)", h.acquiredAt || new Date().toISOString().slice(0, 10), { type: "text" }) +
         '</div>' +
       '</div>';
   }
@@ -128,7 +154,7 @@
   function readHolding(root, base) {
     var ids = ["name", "address", "units", "monthlyRent", "otherIncomeMo", "occupancyPct",
       "monthlyExpenses", "expenseRatioPct", "currentValue", "loanBalance", "loanRate",
-      "loanTermYears", "debtServiceMo", "cashInvested", "acquiredAt"];
+      "loanTermYears", "debtServiceMo", "purchasePrice", "rehabInvested", "cashInvested", "acquiredAt"];
     var o = Object.assign({}, base || {});
     ids.forEach(function (id) {
       var node = root.querySelector("#h-" + id);
@@ -142,11 +168,35 @@
     var isEdit = !!existing;
     BRRRR.ui.modal(
       '<h2>' + (isEdit ? "Edit property" : "Add property") + '</h2>' +
-      '<p class="hint">Blank OpEx or debt-service fields are auto-estimated. Metrics update on save.</p>' +
+      '<p class="hint">Hover any &#9432; for help. Blank OpEx, debt-service and cash-left fields are auto-estimated. Metrics update on save.</p>' +
       fieldRow(existing) +
       '<div class="btnrow"><button class="btn" id="h-save">' + (isEdit ? "Save changes" : "Add property") + '</button>' +
       '<button class="btn ghost" id="h-cancel">Cancel</button></div>',
       function (root) {
+        // Live "cash left in deal" estimate from the BRRRR basis.
+        function q(id) { return root.querySelector("#h-" + id); }
+        function updateEstimate() {
+          var basis = n(q("purchasePrice").value) + n(q("rehabInvested").value);
+          var loan = n(q("loanBalance").value), val = n(q("currentValue").value);
+          var note = root.querySelector("#h-est-note");
+          var est = Math.max(0, basis - loan);
+          if (basis > 0) {
+            q("cashInvested").placeholder = "auto: " + fmt(est);
+            var valueAdded = val - basis, equity = val - loan;
+            note.innerHTML = "All-in basis " + fmt(basis) + " &middot; est. cash left " +
+              "<b style='color:" + (est <= 0 ? "var(--buy)" : "var(--ink)") + "'>" + fmt(est) + "</b>" +
+              (est <= 0 ? " (all capital recovered)" : "") +
+              " &middot; value added " + fmt(valueAdded) + " &middot; equity " + fmt(equity);
+          } else {
+            q("cashInvested").placeholder = "enter, or add purchase + rehab to estimate";
+            note.textContent = "Add purchase price and rehab to auto-estimate cash left in the deal.";
+          }
+        }
+        ["purchasePrice", "rehabInvested", "loanBalance", "currentValue"].forEach(function (id) {
+          q(id).addEventListener("input", updateEstimate);
+        });
+        updateEstimate();
+
         root.querySelector("#h-cancel").onclick = BRRRR.ui.closeModal;
         root.querySelector("#h-save").onclick = function () {
           var o = readHolding(root, existing);
@@ -171,6 +221,7 @@
       currentValue: Math.round(r.arv), loanBalance: Math.round(r.refiLoan),
       loanRate: i.refiRate, loanTermYears: i.refiTermYears,
       debtServiceMo: Math.round(r.refiPmt),
+      purchasePrice: Math.round(i.price), rehabInvested: Math.round(i.rehab),
       cashInvested: Math.max(0, Math.round(r.cashLeftInDeal))
     };
     openEditor(null);

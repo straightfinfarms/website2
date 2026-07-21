@@ -61,6 +61,9 @@ a:hover { text-decoration: underline; }
   border-radius: 8px; padding: 8px 10px; font-size: 14px;
 }
 .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.field input::placeholder { color: var(--faint); }
+.tip { display: inline-block; color: var(--faint); cursor: help; font-size: 12px; }
+.tip:hover { color: var(--accent); }
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .btn {
