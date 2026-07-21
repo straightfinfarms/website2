@@ -18,6 +18,8 @@
       setTimeout(function () { BRRRR.finder.refresh(); }, 30);
     }
     if (name === "portfolio") BRRRR.portfolio.refresh();
+    if (name === "dashboard") BRRRR.dashboard.render();
+    if (name === "syndicate") BRRRR.syndicate.render();
     location.hash = name;
   }
 
@@ -53,9 +55,12 @@
     BRRRR.analyze.init();
     BRRRR.finder.init();
     BRRRR.portfolio.init();
+    BRRRR.dashboard.init();
+    BRRRR.syndicate.init();
 
     var start = (location.hash || "").replace("#", "");
-    if (["analyze", "finder", "portfolio"].indexOf(start) >= 0) switchView(start);
+    if (["dashboard", "analyze", "finder", "portfolio", "syndicate"].indexOf(start) >= 0) switchView(start);
+    else BRRRR.dashboard.render();
   }
 
   window.BRRRR = window.BRRRR || {};

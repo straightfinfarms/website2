@@ -93,6 +93,22 @@
     setPortfolio(getPortfolio().filter(function (h) { return h.id !== id; }));
   }
 
+  /* Syndication deals / SPVs. */
+  function getDeals() { return load("brrrr.deals.v1", []); }
+  function setDeals(list) { save("brrrr.deals.v1", list); }
+  function addDeal(obj) {
+    var list = getDeals();
+    obj.id = obj.id || uid();
+    obj.createdAt = obj.createdAt || new Date().toISOString();
+    obj.investors = obj.investors || [];
+    list.push(obj); setDeals(list); return obj;
+  }
+  function updateDeal(id, patch) {
+    var list = getDeals(), idx = list.findIndex(function (d) { return d.id === id; });
+    if (idx >= 0) { list[idx] = Object.assign({}, list[idx], patch); setDeals(list); return list[idx]; }
+  }
+  function removeDeal(id) { setDeals(getDeals().filter(function (d) { return d.id !== id; })); }
+
   function getSettings() {
     return load(K_SETTINGS, {
       targetCashflowPerUnit: 150, targetCoCPct: 12, marketCapPct: 6.5,
@@ -102,12 +118,13 @@
   function setSettings(s) { save(K_SETTINGS, s); }
 
   function exportAll() {
-    return { prospects: getProspects(), portfolio: getPortfolio(),
+    return { prospects: getProspects(), portfolio: getPortfolio(), deals: getDeals(),
       settings: getSettings(), exportedAt: new Date().toISOString() };
   }
   function importAll(data) {
     if (data.prospects) setProspects(data.prospects);
     if (data.portfolio) setPortfolio(data.portfolio);
+    if (data.deals) setDeals(data.deals);
     if (data.settings) setSettings(data.settings);
   }
 
@@ -118,6 +135,8 @@
     removeProspect: removeProspect, resetProspects: resetProspects,
     getPortfolio: getPortfolio, setPortfolio: setPortfolio, addHolding: addHolding,
     updateHolding: updateHolding, removeHolding: removeHolding,
+    getDeals: getDeals, setDeals: setDeals, addDeal: addDeal,
+    updateDeal: updateDeal, removeDeal: removeDeal,
     getSettings: getSettings, setSettings: setSettings,
     exportAll: exportAll, importAll: importAll
   };

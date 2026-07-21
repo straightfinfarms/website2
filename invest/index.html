@@ -16,16 +16,45 @@
     <div>BRRRR Deal Lab <small>Multi-family underwriting · cash-flow first</small></div>
   </div>
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-view="analyze">Analyzer</button>
+    <button class="tab active" data-view="dashboard">Dashboard</button>
+    <button class="tab" data-view="analyze">Analyzer</button>
     <button class="tab" data-view="finder">Deal Finder</button>
     <button class="tab" data-view="portfolio">Portfolio</button>
+    <button class="tab" data-view="syndicate">Syndication</button>
   </nav>
 </header>
 
 <main class="wrap">
 
+  <!-- ============ DASHBOARD ============ -->
+  <section class="view active" id="view-dashboard">
+    <div class="kpis" id="dash-kpis"></div>
+    <div class="grid2">
+      <div>
+        <div class="card" id="dash-reco-card"><div id="dash-reco"></div></div>
+        <div class="card" style="margin-top:16px">
+          <h2>Per-property opportunities</h2>
+          <p class="hint">Where to push rents, cut expenses, refinance, or harvest equity.</p>
+          <div id="dash-property-insights"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h2>Portfolio signals</h2>
+          <p class="hint">Concentration, leverage and diversification across the whole book.</p>
+          <div class="tiles" id="dash-portfolio-insights" style="grid-template-columns:1fr"></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h2>Connect your data <span class="tag">Phase 2</span></h2>
+          <p class="hint">Live integrations use OAuth and RealMo's secure backend — not available in this browser-only build, but here's the roadmap.</p>
+          <div class="tiles" id="dash-integrations"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ ANALYZER ============ -->
-  <section class="view active" id="view-analyze">
+  <section class="view" id="view-analyze">
     <div class="grid2">
       <!-- Inputs -->
       <div class="card" id="analyze-form">
@@ -198,6 +227,33 @@
     </div>
   </section>
 
+  <!-- ============ SYNDICATION ============ -->
+  <section class="view" id="view-syndicate">
+    <div class="grid2">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h2 style="margin:0">Syndications</h2>
+          <button class="btn sm" id="synd-new" style="margin-left:auto">+ New deal</button>
+        </div>
+        <p class="hint">Model a property funded by multiple investors — as equity shareholders or as lenders paid a premium.</p>
+        <div class="tiles" id="synd-list" style="grid-template-columns:1fr"></div>
+        <div class="card" style="margin-top:14px;box-shadow:none;background:var(--panel2)">
+          <b>⚖️ Compliance note</b>
+          <p class="note" style="color:var(--muted);font-size:12.5px;margin:6px 0 0">
+            Raising money from investors — as equity or as debt — is a securities activity.
+            In the US this typically means an exemption (Reg CF, Reg D 506(b)/(c), or Reg A+),
+            KYC/AML, accredited-investor verification, escrow, and often a registered funding
+            portal or broker-dealer. This tool models and documents deals; the actual raise
+            must be run through a compliant path with securities counsel.
+          </p>
+        </div>
+      </div>
+      <div class="card" id="synd-detail-card">
+        <div id="synd-detail"><div class="empty">Select or create a syndication to see its capital stack, cap table, per-investor returns, and prospectus.</div></div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
@@ -207,9 +263,13 @@
 <script src="js/finance.js"></script>
 <script src="js/store.js"></script>
 <script src="js/geo.js"></script>
+<script src="js/insights.js"></script>
+<script src="js/syndication.js"></script>
 <script src="js/analyze.js"></script>
 <script src="js/finder.js"></script>
 <script src="js/portfolio.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/syndicate.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

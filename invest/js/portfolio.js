@@ -279,5 +279,5 @@
   }
 
   window.BRRRR = window.BRRRR || {};
-  window.BRRRR.portfolio = { init: init, refresh: refresh, addFromAnalysis: addFromAnalysis };
+  window.BRRRR.portfolio = { init: init, refresh: refresh, addFromAnalysis: addFromAnalysis, metrics: metrics };
 })();

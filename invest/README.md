@@ -10,7 +10,32 @@ Live path (GitHub Pages): `https://straightfinfarms.com/invest/`
 No build step, no backend. Pure static HTML/CSS/JS. All of your data
 (prospects, portfolio) is stored locally in your browser via `localStorage`.
 
-## The three tools
+## The tools
+
+### Dashboard (`Dashboard` tab)
+The home view. Portfolio KPIs (value, equity, cash flow, blended CoC, LTV,
+extractable equity) plus a **rule-based insight engine**:
+- **Per-property opportunities** — cash-out refi capacity, thin DSCR, negative
+  cash flow, high expense ratio, lease-up, realized value-add, top performers.
+- **Portfolio signals** — geographic concentration, leverage (over/under).
+- **Grow vs. diversify** — compares your blended return and extractable equity
+  against the best sourced deal to recommend ACQUIRE / DIVERSIFY / OPTIMIZE.
+- **Connect your data** — roadmap of Phase-2 integrations (bank/Plaid, Airbnb,
+  utilities, accounting, public records, vendors). These need the secure
+  backend; they're stubs here.
+
+### Syndication (`Syndicate` tab)
+Model a property funded by multiple investors, with full transparency:
+- Two structures — **Equity** (investors are shareholders: pro-rata ownership,
+  preferred return, sponsor promote, share of cash flow + sale profit) or
+  **Debt** (investors are **lenders paid a premium**: fixed rate, interest-only,
+  principal back at term; sponsor keeps all equity upside).
+- **Capital stack** and a **cap table** with each investor's contribution,
+  position, cash/yr, projected total profit, equity multiple and annual return.
+- **Per-investor view** — each partner's live, transparent position (the basis
+  for their future secure portal).
+- **Prospectus generator** — a shareable "perspective" you can print / save to
+  PDF to bring investors together. Includes a securities-compliance disclaimer.
 
 ### 1. Analyzer (`Analyzer` tab)
 Enter a property's numbers and everything recalculates live:
@@ -75,17 +100,47 @@ requires positive cash flow to earn a buy.
 **This is an underwriting aid, not financial advice.** Verify rents, comps,
 taxes, insurance, and lender terms before making offers.
 
+## Roadmap — from prototype to platform
+
+This build is **Phase 1**: a complete, client-side underwriting + portfolio +
+syndication-modeling app with no backend. The larger vision (live integrations,
+real capital raising, multi-user secure access, enterprise) requires more:
+
+- **Phase 2 — Backend & auth.** A server (API + database), user accounts, and
+  OAuth so RealMo can connect banks (Plaid/MX), Airbnb/STR, utilities, QuickBooks
+  and public records. API secrets and tokens live server-side — they cannot be
+  handled safely in a browser-only app, which is why those buttons are stubs here.
+- **Phase 3 — Investor portals & documents.** Per-investor secure logins,
+  live deal dashboards, generated financial statements, distribution tracking,
+  and e-signed subscription docs.
+- **Phase 4 — Compliant capital raising / crowdfunding.** KYC/AML, accredited
+  verification, escrow, and a regulated offering path (Reg CF / Reg D / Reg A+),
+  typically via a registered funding portal or broker-dealer, with counsel.
+- **Phase 5 — Vendor marketplace & enterprise.** Cleaning, maintenance and
+  hospitality dispatch/work-orders; roles, teams and reporting for institutional
+  portfolios.
+
+**Compliance:** Raising money from investors — whether as equity or as
+lender/premium debt — is a securities activity. This software models and
+documents deals; it does not itself make an offering. Any real raise must be run
+through a compliant path with securities counsel. Nothing here is legal,
+financial, or investment advice.
+
 ## Files
 ```
 invest/
   index.html          app shell + tabs
   css/app.css         styles
   js/finance.js       underwriting + BRRRR scoring + pricepoint solver (pure)
+  js/insights.js      portfolio insight & grow-vs-diversify engine (pure)
+  js/syndication.js   capital-stack + investor-return model, equity & debt (pure)
   js/store.js         localStorage persistence + seed market data
   js/geo.js           geocoding (OSM Nominatim) + distance
   js/analyze.js       Analyzer tab UI
   js/finder.js        Deal Finder map/tab UI
   js/portfolio.js     Portfolio tab UI
+  js/dashboard.js     Dashboard tab UI (KPIs, insights, integrations)
+  js/syndicate.js     Syndication tab UI (cap table, investors, prospectus)
   js/app.js           bootstrap, tab nav, toast/modal helpers
   vendor/leaflet/     Leaflet 1.9.4 (vendored — no CDN dependency)
 ```
