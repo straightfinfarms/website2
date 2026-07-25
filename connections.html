@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTP0NKLDK7"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-ZTP0NKLDK7');</script>
+<title>Connections — Portfolio Dashboard</title>
+<meta name="description" content="Connect and authenticate your financial institutions, Airbnb, utilities, government and accounting so your portfolio updates itself.">
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="invest-platform.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<div class="app">
+  <div class="page-head">
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px;">Integrations</div>
+      <h1 style="font-size:34px;">Connect your accounts</h1>
+      <p class="muted" style="margin-top:6px;max-width:60ch;">Securely link your banks, short-term-rental channels, utilities, government portals and accounting. Once connected, your portfolio dashboard updates itself — income, expenses, balances and occupancy flow in automatically.</p>
+    </div>
+    <div class="kpi" style="min-width:150px;"><div class="k" id="connCount">0</div><div class="l">Active connections</div></div>
+  </div>
+
+  <div class="notice warn" style="max-width:none;">
+    <strong>Sandbox mode.</strong> Connections here run against demo data so you can see the full experience. Going live to real banks (via open-banking / Plaid), Airbnb, utilities and municipal portals requires a backend that holds OAuth credentials securely — this screen is built to plug into that.
+  </div>
+
+  <div id="catBlocks" style="margin-top:26px;"></div>
+</div>
+
+<!-- connect modal -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(20,26,22,.55);z-index:200;align-items:center;justify-content:center;padding:20px;">
+  <div class="card" style="max-width:440px;width:100%;">
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div id="footer"></div>
+
+<script src="invest-platform.js"></script>
+<script src="portfolio-engine.js"></script>
+<script>
+  SFF.ui.mount('connections');
+  var F = SFF.fmt, pf = SFF.pf;
+  var icons = { bank: '🏦', str: '🏠', utility: '💡', government: '🏛', accounting: '📊' };
+  var catNames = {
+    bank: ['Financial institutions', 'Chequing, savings and mortgage accounts — balances and transactions sync automatically.'],
+    str: ['Short-term rental channels', 'Airbnb, Vrbo and more — payouts, bookings and occupancy flow into each STR property.'],
+    utility: ['Utilities', 'Hydro, gas and water — usage and bills tracked as operating expenses.'],
+    government: ['Government &amp; municipal', 'Property tax, assessment (MPAC) and permits.'],
+    accounting: ['Accounting', 'QuickBooks / Xero — keep the books reconciled with property performance.']
+  };
+
+  function render() {
+    var conns = pf.connections();
+    document.getElementById('connCount').textContent = conns.filter(function (c) { return c.status === 'connected'; }).length;
+    var cats = ['bank', 'str', 'utility', 'government', 'accounting'];
+    document.getElementById('catBlocks').innerHTML = cats.map(function (cat) {
+      var list = conns.filter(function (c) { return c.category === cat; });
+      if (!list.length) return '';
+      return '<div style="margin-bottom:34px;">' +
+        '<h2 style="font-size:20px;">' + icons[cat] + ' ' + catNames[cat][0] + '</h2>' +
+        '<p class="muted" style="font-size:13.5px;margin:4px 0 16px;">' + catNames[cat][1] + '</p>' +
+        '<div class="conn-grid">' + list.map(card).join('') + '</div></div>';
+    }).join('');
+    bind();
+  }
+
+  function card(c) {
+    var connected = c.status === 'connected';
+    var st = connected ? '<span class="status-dot status-connected"></span>Connected'
+      : c.status === 'error' ? '<span class="status-dot status-error"></span>Needs attention'
+      : '<span class="status-dot status-available"></span>Not connected';
+    return '<div class="conn-card">' +
+      '<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">' +
+        '<div class="conn-logo">' + (icons[c.category] || '🔗') + '</div>' +
+        '<div><strong style="font-size:15px;">' + c.provider + '</strong><div class="muted" style="font-size:12px;">' + (c.via || c.category) + '</div></div></div>' +
+      '<div style="font-size:13px;margin-bottom:10px;">' + st + (c.lastSync ? ' · ' + F.date(c.lastSync) : '') + '</div>' +
+      (connected && c.accounts.length ? '<div class="muted" style="font-size:12.5px;margin-bottom:12px;">' + c.accounts.join('<br>') + '</div>' : '') +
+      (connected
+        ? '<button class="btn ghost sm" data-disconnect="' + c.id + '" style="width:100%;">Disconnect</button>'
+        : '<button class="btn sm" data-connect="' + c.id + '" style="width:100%;">Connect</button>') +
+      '</div>';
+  }
+
+  function bind() {
+    document.querySelectorAll('[data-connect]').forEach(function (b) {
+      b.addEventListener('click', function () { openConnect(b.getAttribute('data-connect')); });
+    });
+    document.querySelectorAll('[data-disconnect]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        pf.updateConnection(b.getAttribute('data-disconnect'), { status: 'available', lastSync: null, accounts: [] });
+        render();
+      });
+    });
+  }
+
+  // simulated OAuth-style connect flow
+  function openConnect(id) {
+    var c = pf.getConnection(id);
+    var modal = document.getElementById('modal');
+    modal.style.display = 'flex';
+    document.getElementById('modalBody').innerHTML =
+      '<div style="text-align:center;">' +
+      '<div class="conn-logo" style="margin:0 auto 14px;width:54px;height:54px;font-size:24px;">' + (icons[c.category] || '🔗') + '</div>' +
+      '<h3 style="font-size:20px;">Connect ' + c.provider + '</h3>' +
+      '<p class="muted" style="font-size:13.5px;margin:10px 0 18px;">You\'ll be securely redirected to ' + c.provider + ' to authorize read-only access via ' + (c.via || 'their API') + '. We never see or store your password.</p>' +
+      '<div class="disclaimer" style="text-align:left;margin-bottom:18px;font-size:12px;">Sandbox: this simulates the authorization handshake and links demo accounts. No real credentials are used.</div>' +
+      '<button class="btn" id="doConnect" style="width:100%;">🔒 Authorize with ' + c.provider + '</button>' +
+      '<button class="btn ghost sm" id="cancelConnect" style="width:100%;margin-top:10px;">Cancel</button>' +
+      '</div>';
+    document.getElementById('cancelConnect').addEventListener('click', function () { modal.style.display = 'none'; });
+    document.getElementById('doConnect').addEventListener('click', function () {
+      this.textContent = 'Authorizing…'; this.disabled = true;
+      var demoAccounts = {
+        bank: ['Chequing ••' + (1000 + Math.floor(id.length * 137) % 8999)],
+        str: [c.provider + ' listing'], utility: ['Account ••' + (2000 + id.length * 51 % 7999)],
+        government: ['Tax roll ••' + (3000 + id.length * 29 % 6999)], accounting: ['Company file']
+      };
+      setTimeout(function () {
+        pf.updateConnection(id, { status: 'connected', lastSync: '2026-07-21', accounts: demoAccounts[c.category] || ['Linked'] });
+        modal.style.display = 'none';
+        try { gtag('event', 'connection_added', { provider: c.provider, category: c.category }); } catch (e) {}
+        render();
+      }, 700);
+    });
+  }
+
+  document.getElementById('modal').addEventListener('click', function (e) { if (e.target === this) this.style.display = 'none'; });
+  render();
+</script>
+</body>
+</html>
