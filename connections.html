@@ -40,10 +40,12 @@
 
 <div id="footer"></div>
 
+<script src="sff-config.js"></script>
 <script src="invest-platform.js"></script>
 <script src="portfolio-engine.js"></script>
+<script src="sff-backend.js"></script>
 <script>
-  SFF.ui.mount('connections');
+  SFF.boot('connections', { auth: true }, function () {
   var F = SFF.fmt, pf = SFF.pf;
   var icons = { bank: '🏦', str: '🏠', utility: '💡', government: '🏛', accounting: '📊' };
   var catNames = {
@@ -131,6 +133,7 @@
 
   document.getElementById('modal').addEventListener('click', function (e) { if (e.target === this) this.style.display = 'none'; });
   render();
+  });
 </script>
 </body>
 </html>

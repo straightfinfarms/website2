@@ -165,9 +165,11 @@
 
 <div id="footer"></div>
 
+<script src="sff-config.js"></script>
 <script src="invest-platform.js"></script>
+<script src="sff-backend.js"></script>
 <script>
-  SFF.ui.mount('invest');
+  SFF.boot('invest', { auth: false }, function () {
   var F = SFF.fmt, fin = SFF.fin;
 
   // ---- hero stats (aggregate across open deals) ----
@@ -230,6 +232,7 @@
     try { gtag('event', 'form_submit', { form_name: 'invest_access' }); } catch (err) {}
     document.getElementById('accessMsg').innerHTML = '<div class="notice ok" style="margin-top:16px;">Thank you, ' + (fd.get('name') || '') + '. Your request has been received — we\'ll be in touch at ' + (fd.get('email') || '') + ' with the next opportunity.</div>';
     e.target.reset();
+  });
   });
 </script>
 </body>

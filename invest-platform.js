@@ -346,6 +346,17 @@
   /* ----------------------------------------------------------------------
      Shared UI chrome
      ---------------------------------------------------------------------- */
+  // account slot: shows sign-in or the current account + sign out (backend mode only)
+  function accountSlot() {
+    var b = global.SFF && global.SFF.backend;
+    if (!b || !b.enabled) return '';
+    var label = b.accountLabel && b.accountLabel();
+    if (label) {
+      return '<a href="#" onclick="SFF.backend.signOut();return false;" title="' + label + '" style="font-size:13px;">Sign out</a>';
+    }
+    return '<a href="login.html" style="font-weight:600;">Sign in</a>';
+  }
+
   var ui = {
     nav: function (active) {
       var links = [
@@ -362,6 +373,7 @@
         links.map(function (l) {
           return '<a href="' + l[0] + '"' + (l[2] === active ? ' style="text-decoration:underline;font-weight:600;"' : '') + '>' + l[1] + '</a>';
         }).join('') +
+        accountSlot() +
         '<a class="btn-book" href="onboard.html">+ ADD PROPERTY</a>' +
         '</div></nav>';
       return html;

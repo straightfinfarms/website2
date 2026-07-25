@@ -59,10 +59,12 @@
 
 <div id="footer"></div>
 
+<script src="sff-config.js"></script>
 <script src="invest-platform.js"></script>
 <script src="portfolio-engine.js"></script>
+<script src="sff-backend.js"></script>
 <script>
-  SFF.ui.mount('portfolio');
+  SFF.boot('portfolio', { auth: true }, function () {
   var F = SFF.fmt, perf = SFF.perf, pf = SFF.pf, insights = SFF.insights;
   var id = new URLSearchParams(location.search).get('id');
   var p = pf.getProperty(id) || pf.properties()[0];
@@ -254,6 +256,7 @@
   function kv(k, v) { return '<div class="kv"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>'; }
   function kvT(k, v) { return '<div class="kv" style="border-top:2px solid #c9c4b8;margin-top:4px;"><span class="k" style="color:var(--ink);font-weight:700;">' + k + '</span><span class="v">' + v + '</span></div>'; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  });
 </script>
 </body>
 </html>

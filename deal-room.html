@@ -144,9 +144,11 @@
 
 <div id="footer"></div>
 
+<script src="sff-config.js"></script>
 <script src="invest-platform.js"></script>
+<script src="sff-backend.js"></script>
 <script>
-  SFF.ui.mount();
+  SFF.boot(null, { auth: false }, function () {
   var F = SFF.fmt, fin = SFF.fin;
   var params = new URLSearchParams(location.search);
   var deal = SFF.store.getDeal(params.get('deal') || 'kawartha-6plex');
@@ -329,6 +331,7 @@
     return '<tr><td><span class="dot ' + dot + '"></span><strong>' + name + '</strong></td><td>' + type + '</td><td class="num">' + F.money0(raise) + '</td><td class="num">' + F.money0(cash) + '</td><td class="num">' + F.pct(y) + '</td><td class="muted" style="font-size:13px;">' + notes + '</td></tr>';
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  });
 </script>
 </body>
 </html>

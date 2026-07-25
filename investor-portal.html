@@ -59,9 +59,11 @@
 
 <div id="footer"></div>
 
+<script src="sff-config.js"></script>
 <script src="invest-platform.js"></script>
+<script src="sff-backend.js"></script>
 <script>
-  SFF.ui.mount('portal');
+  SFF.boot('portal', { auth: true }, function () {
   var F = SFF.fmt, fin = SFF.fin;
   var currentTab = 'capital';
   var deal;
@@ -232,6 +234,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 
   renderAll();
+  });
 </script>
 </body>
 </html>

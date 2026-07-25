@@ -89,9 +89,11 @@
 
 <div id="footer"></div>
 
+<script src="sff-config.js"></script>
 <script src="invest-platform.js"></script>
+<script src="sff-backend.js"></script>
 <script>
-  SFF.ui.mount('finder');
+  SFF.boot('finder', { auth: false }, function () {
   var F = SFF.fmt, fin = SFF.fin;
   var sortByScore = false, showPassing = false;
 
@@ -223,6 +225,7 @@
   liveScore();
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  });
 </script>
 </body>
 </html>

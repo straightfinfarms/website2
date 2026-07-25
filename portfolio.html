@@ -71,10 +71,12 @@
 
 <div id="footer"></div>
 
+<script src="sff-config.js"></script>
 <script src="invest-platform.js"></script>
 <script src="portfolio-engine.js"></script>
+<script src="sff-backend.js"></script>
 <script>
-  SFF.ui.mount('portfolio');
+  SFF.boot('portfolio', { auth: true }, function () {
   var F = SFF.fmt, perf = SFF.perf, pf = SFF.pf, insights = SFF.insights;
   var props = pf.properties();
   var report = insights.forPortfolio();
@@ -151,6 +153,7 @@
   }).join('');
 
   document.getElementById('extractable').textContent = F.money0(agg.totalRefiExtractable);
+  });
 </script>
 </body>
 </html>

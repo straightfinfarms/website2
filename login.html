@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Balance Nature Property Fund</title>
+<link rel="icon" type="image/png" href="images/Logo/favicon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="invest-platform.css">
+<style>
+  .auth-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    background:linear-gradient(135deg,#24303a 0%,#2e4636 100%); }
+  .auth-card { background:#fff; border-radius:18px; padding:36px; max-width:420px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.28); }
+  .auth-logo { font-family:'Playfair Display',serif; font-weight:900; font-size:18px; text-align:center; margin-bottom:6px; }
+  .switch { text-align:center; font-size:14px; margin-top:18px; }
+  .switch a { font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">Balance Nature Property Fund</div>
+    <p class="muted center" style="font-size:13.5px;margin-bottom:24px;">Investor &amp; partner portal</p>
+
+    <div id="demoNote" style="display:none;" class="notice warn">
+      Backend not configured yet — the platform is running in <strong>demo mode</strong>. Add your Supabase keys in <code>sff-config.js</code> to enable real logins. <a href="portfolio.html">Continue to the demo →</a>
+    </div>
+
+    <form id="authForm">
+      <div class="field" id="nameField" style="display:none;">
+        <label class="fld">Full name</label>
+        <input class="input" name="fullName" autocomplete="name">
+      </div>
+      <div class="field">
+        <label class="fld">Email</label>
+        <input class="input" name="email" type="email" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label class="fld">Password</label>
+        <input class="input" name="password" type="password" autocomplete="current-password" minlength="6" required>
+      </div>
+      <button class="btn" type="submit" id="submitBtn" style="width:100%;">Sign in</button>
+      <div id="authMsg"></div>
+    </form>
+
+    <div class="switch" id="switchLine">
+      New here? <a id="toSignup">Create an account</a>
+    </div>
+    <div class="switch"><a id="forgot" class="muted">Forgot password?</a></div>
+  </div>
+</div>
+
+<script src="sff-config.js"></script>
+<script src="invest-platform.js"></script>
+<script src="sff-backend.js"></script>
+<script>
+  var mode = 'signin';
+  var params = new URLSearchParams(location.search);
+  var next = params.get('next') || 'portfolio.html';
+
+  if (!SFF.backend.enabled) { document.getElementById('demoNote').style.display = 'block'; }
+
+  // if already signed in, skip to the app
+  if (SFF.backend.enabled) {
+    SFF.backend.getSession().then(function (s) { if (s) location.href = next; }).catch(function(){});
+  }
+
+  var form = document.getElementById('authForm');
+  var msg = document.getElementById('authMsg');
+  function setMode(m) {
+    mode = m;
+    document.getElementById('nameField').style.display = m === 'signup' ? 'block' : 'none';
+    document.getElementById('submitBtn').textContent = m === 'signup' ? 'Create account' : 'Sign in';
+    document.getElementById('switchLine').innerHTML = m === 'signup'
+      ? 'Already have an account? <a id="toSignin">Sign in</a>'
+      : 'New here? <a id="toSignup">Create an account</a>';
+    wireSwitch();
+    msg.innerHTML = '';
+  }
+  function wireSwitch() {
+    var a = document.getElementById('toSignup'); if (a) a.onclick = function () { setMode('signup'); };
+    var b = document.getElementById('toSignin'); if (b) b.onclick = function () { setMode('signin'); };
+  }
+  wireSwitch();
+
+  document.getElementById('forgot').onclick = function () {
+    var email = form.email.value;
+    if (!SFF.backend.enabled) { location.href = 'portfolio.html'; return; }
+    if (!email) { note('Enter your email above first, then click Forgot password.', 'warn'); return; }
+    SFF.backend.resetPassword(email).then(function () { note('Password reset link sent to ' + email + '.', 'ok'); });
+  };
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!SFF.backend.enabled) { location.href = next; return; }
+    var email = form.email.value, password = form.password.value, fullName = form.fullName ? form.fullName.value : '';
+    document.getElementById('submitBtn').disabled = true;
+    var op = mode === 'signup'
+      ? SFF.backend.signUp(email, password, fullName)
+      : SFF.backend.signIn(email, password);
+    op.then(function (r) {
+      document.getElementById('submitBtn').disabled = false;
+      if (r.error) { note(r.error.message, 'warn'); return; }
+      if (mode === 'signup' && r.data && r.data.user && !r.data.session) {
+        note('Account created. Check your email to confirm, then sign in. (You can disable email confirmation in Supabase for instant access.)', 'ok');
+        setMode('signin');
+        return;
+      }
+      location.href = next;
+    }).catch(function (err) {
+      document.getElementById('submitBtn').disabled = false;
+      note(err.message || 'Something went wrong.', 'warn');
+    });
+  });
+
+  function note(text, kind) { msg.innerHTML = '<div class="notice ' + (kind === 'ok' ? 'ok' : 'warn') + '" style="margin-top:14px;">' + text + '</div>'; }
+</script>
+</body>
+</html>
